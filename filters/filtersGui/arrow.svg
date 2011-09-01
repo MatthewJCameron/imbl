@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   width="99.999992"
+   height="99.999992"
+   id="svg2">
+  <defs
+     id="defs4">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="Arrow1Lstart"
+       style="overflow:visible">
+      <path
+         d="M 0,0 L 5,-5 L -12.5,0 L 5,5 L 0,0 z"
+         transform="matrix(0.8,0,0,0.8,10,0)"
+         id="path3158"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInL"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.8,-0.8)"
+         id="path3292"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+  </defs>
+  <g
+     transform="translate(-100.03589,-852.33912)"
+     id="layer1">
+    <path
+       d="M 150.45401,852.42469 C 133.67185,869.06224 116.90363,885.71721 100.12146,902.35476 C 116.90363,918.9923 133.67185,935.61599 150.45401,952.25354 C 150.45401,943.92173 150.45401,935.58903 150.45401,927.25723 C 166.95431,927.25723 183.45002,927.25723 199.95031,927.25723 C 199.95031,910.65249 199.95031,894.02575 199.95031,877.421 C 183.45002,877.421 166.95431,877.421 150.45401,877.421 C 150.45401,869.08919 150.45401,860.7565 150.45401,852.42469 z"
+       id="rect5017"
+       style="opacity:1;fill:#ff0000;fill-opacity:0.39215686;fill-rule:evenodd;stroke:#ff0000;stroke-width:0.17114332;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:10;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+  </g>
+</svg>

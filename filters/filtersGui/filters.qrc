@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>arrow.svg</file>
+        <file>flux.dat</file>
+        <file>mu-Ag.dat</file>
+        <file>mu-Al.dat</file>
+        <file>mu-Au.dat</file>
+        <file>mu-Be.dat</file>
+        <file>mu-C.dat</file>
+        <file>mu-Cu.dat</file>
+        <file>mu-Mo.dat</file>
+    </qresource>
+</RCC>
