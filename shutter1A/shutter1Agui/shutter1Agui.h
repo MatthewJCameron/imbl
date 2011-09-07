@@ -4,7 +4,6 @@
 #include <QTimer>
 #include "componentGui.h"
 #include "shutter1A.h"
-#include "ui_shutter1Agui.h"
 
 namespace Ui {
     class Shutter1Agui;

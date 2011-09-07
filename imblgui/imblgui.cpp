@@ -9,6 +9,7 @@
 #include "shutter1Agui.h"
 #include "mrtShutterGui.h"
 #include "DEImonoGui.h"
+#include <timescan.h>
 
 #include <QDebug>
 
@@ -36,7 +37,28 @@ ImblGui::ImblGui(QWidget *parent) :
     ui->stackedWidget->addWidget(hhlS);
     blView->add(":/images/slit.png", hhlS, 0, 388, 1564);
 
-    blView->add(":/images/slit-IP.png", 276, 666, 362);
+    QChartMX * vacMon = new QChartMX(this);
+    vacMon->setInterval(0.5);
+    vacMon->setPeriod(1800);
+    vacMon->setContinious(true);
+    vacMon->setAutoMin(false);
+    vacMon->setMin(1.0e-09);
+    vacMon->setAutoMax(false);
+    vacMon->setMax(1.0e-05);
+    vacMon->setLogarithmic(true);
+    vacMon->setGridVisible(true);
+    vacMon->setAutoName(false);
+    vacMon->setSaveName("BL_VacMonitor_" +
+                        QDateTime::currentDateTime().toString("yyyy-MM-dd_hh-mm-ss"));
+    vacMon->addSignal("SR08ID01CCG01:PRESSURE_MONITOR");
+    vacMon->addSignal("SR08ID01CCG02:PRESSURE_MONITOR");
+    vacMon->setControlCollapsed(true);
+    vacMon->lock(true);
+    vacMon->start();
+    ComponentWidget * vacCmp = new ComponentWidget(vacMon,this);
+    ui->stackedWidget->addWidget(vacCmp);
+
+    blView->add(":/images/slit-IP.png", vacCmp, 276, 666, 362);
 
     blView->add(":/images/slit-filter.png", 955, 996, 110);
 
@@ -64,13 +86,13 @@ ImblGui::ImblGui(QWidget *parent) :
     ui->stackedWidget->addWidget(mrtW);
     blView->add(":/images/mrt.png", mrtW, 1, 3744, 1454);
 
-    blView->add(":/images/mrt-IP.png", 391, 3815, 379);
+    blView->add(":/images/mrt-IP.png", vacCmp, 391, 3815, 379);
 
     blView->add(":/images/mrt-ss.png", 944, 4032, 146);
 
     blView->add(":/images/ss.png", sh1a, 1, 4097, 1670);
 
-    blView->add(":/images/ss-IP.png", 436, 4163, 364);
+    blView->add(":/images/ss-IP.png", vacCmp, 436, 4163, 364);
 
     blView->add(":/images/junction.png", 1, 4417, 1100);
 

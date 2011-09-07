@@ -41,6 +41,7 @@ INCLUDEPATH += ../ \
 
 LIBS += \
         -lmotorstack \
+        -lTimeScanMX \
         -L../shutterFE/shutterFEbase -lshutterFE \
         -L../shutterFE/shutterFEgui -lshutterFEgui \
         -L../filters/filtersBase -lfilters \

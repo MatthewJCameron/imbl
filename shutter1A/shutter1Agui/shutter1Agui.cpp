@@ -1,4 +1,5 @@
 #include "shutter1Agui.h"
+#include "ui_shutter1Agui.h"
 #include <QDebug>
 
 
