@@ -18,6 +18,7 @@ public:
 
 private:
   Ui::ImblGui * ui;
+  const static QString configPath;
 
 private slots:
   void changeComponent(ComponentGui * component);
