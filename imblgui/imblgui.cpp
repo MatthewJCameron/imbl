@@ -150,6 +150,7 @@ ImblGui::ImblGui(QWidget *parent) :
   ui->stackedWidget->addWidget(cmp);
   blView->add(":/images/table2.png", cmp, 40, 7727, 670);
 
+
   blView->add(":/images/ledstop1B.png", 3, 8603, 1221);
 
   ui->scroll_bl->setWidget(blView);
