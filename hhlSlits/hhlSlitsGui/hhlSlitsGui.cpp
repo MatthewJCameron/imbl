@@ -231,10 +231,11 @@ void HhlSlitsGui::updateLimits(HhlSlits::Limits lms) {
 
 void HhlSlitsGui::updateConnection(bool con) {
   foreach(QWidget* widg, findChildren<QWidget *>() )
-    if (widg != ui->advanced_pb)
+    if (widg != ui->advanced_pb && widg != ui->advanced)
       widg->setEnabled(con);
   if (con) {
     QTimer::singleShot(0, this, SLOT(onResetPressed()));
+    updateMotion(component()->isMoving());
   } else {
     ui->gostop_pb->setText("Disconnected");
     ui->reset_pb->setText("Disconnected");
