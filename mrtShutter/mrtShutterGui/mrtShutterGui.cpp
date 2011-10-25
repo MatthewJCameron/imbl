@@ -61,7 +61,7 @@ void MrtShutterGui::updateConnection(bool con) {
 void MrtShutterGui::updateProgress(int prog) {
   ui->progressBar->setVisible(prog);
   ui->progressBar->setValue(prog-1);
-  ui->start->setText( prog ? "Stop" : "Start" );
+  ui->start->setText( prog ? "Stop" : "Expose" );
   updateCanStart(component()->canStart());
 }
 
