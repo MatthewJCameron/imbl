@@ -170,7 +170,7 @@ void MrtShutter::setExposure(int val) {
 }
 
 void MrtShutter::setCycle(int val) {
-  pvs["CYCLEPERIOD_MONITOR"]->set(val);
+  pvs["CYCLEPERIOD_CMD"]->set(val);
 }
 
 void MrtShutter::setRepeats(int val) {
