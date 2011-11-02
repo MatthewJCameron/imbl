@@ -55,6 +55,9 @@ void MrtShutterGui::updateConnection(bool con) {
     ui->exposure->setValue(component()->exposure());
     ui->cycle->setValue(component()->cycle());
     ui->repititions->setValue(component()->repeats());
+  } else {
+    ui->start->setText("Disconnected");
+    ui->open->setText("Disconnected");
   }
 }
 

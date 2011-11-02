@@ -15,10 +15,13 @@ SOURCES += \
 HEADERS += \
     mrtShutter.h
 
-INCLUDEPATH += . ../.. ../../component/componentBase
+INCLUDEPATH += . ../.. \
+               ../../component/componentBase \
+               ../../shutter1A/shutter1Abase
 
 LIBS +=  -lqtpv \
-        -L../../component/componentBase -lcomponent
+        -L../../component/componentBase -lcomponent \
+        -L../../shutter1A/shutter1Abase -lshutter1A
 
 
 headers.files = $$HEADERS

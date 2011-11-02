@@ -1,7 +1,9 @@
 #include "mrtShutter.h"
+#include "shutter1A.h"
 #include <QDebug>
 
 const QString MrtShutter::pvBaseName = "SR08ID01MRT01:";
+Shutter1A * MrtShutter::shut1A = new Shutter1A();
 const QHash<QString,QEpicsPv*> MrtShutter::pvs = MrtShutter::init_static();
 
 MrtShutter::MrtShutter(QObject * parent) :
@@ -113,8 +115,10 @@ void MrtShutter::updateProgress() {
     return;
   int newProgress = pvs["EXPOSUREINPROGRESS_MONITOR"]->get().toBool()  ?
         pvs["REPETITIONSCOMPLETE_MONITOR"]->get().toInt() + 1  :  0;
-  if (newProgress != _progress)
-    emit progressChanged(_progress=newProgress);
+  // if (newProgress != _progress) // commented out to avoid the situation when change in
+  // EXPOSUREINPROGRESS_MONITOR  _and_ REPETITIONSCOMPLETE_MONITOR does not influence the progress.
+  // It happens when EXPOSUREINPROGRESS_MONITOR turns to false.
+  emit progressChanged(_progress=newProgress);
 }
 
 void MrtShutter::updateState() {
@@ -156,12 +160,36 @@ void MrtShutter::setOpened(bool opn) {
   pvs["SHUTTEROPEN_CMD"]->set(opn ? 1 : 0);
 }
 
-void MrtShutter::start() {
-  if (_canStart && _valuesOK)
-    pvs["EXPOSURESTART_CMD"]->set(1);
+void MrtShutter::start(bool beAwareOf1A) {
+  // WARNING: BUG
+  // Now there is no way I can determine if the safety shutter is opened - the status of the 1A shutter does not
+  // reflect the behevioral differences in the fast and normal mode. the next if-block and beAware condition in the singleShot
+  // are here to address the bug:
+  // the command to open the safety shutter is sent and then relaxing for 1 sec to make sure it has opened. This waiting time
+  // is redundant if the safety shutter was opened in prior.
+  if (beAwareOf1A)
+    shut1A->open(false);
+  // WARNING: BUG
+  // Perhaps not a bug, but a complex behaviour which may lead to a buggy situation.
+  // If I call pvs["EXPOSURESTART_CMD"]->set(1) from within this function
+  // there is a chance that the progressChanged signals will all be emited before this function returns what
+  // makes it difficult to catch them to monitor the progress to detect the finish of the exposure.
+  QTimer::singleShot(beAwareOf1A ? 1000 : 0, this, SLOT(actual_start()));
+}
+
+void MrtShutter::actual_start() {
+  if (! _canStart ) {
+    emit progressChanged(_progress);
+    return;
+  }
+  emit progressChanged(_progress=1);
+  pvs["EXPOSURESTART_CMD"]->set(1);
+  QTimer::singleShot(1000, this, SLOT(updateProgress()));
 }
 
 void MrtShutter::stop() {
+  updateProgress();
+  emit progressChanged(_progress);
   pvs["EXPOSURESTART_CMD"]->set(0);
 }
 

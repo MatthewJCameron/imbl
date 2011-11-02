@@ -17,6 +17,7 @@ PaddleGui::PaddleGui(Paddle *_pad, QWidget *parent) :
 
   ui->setupUi(this);
 
+  connect(component()->motor(), SIGNAL(changedUserPosition(double)), SLOT(updateLabel()));
   connect(component(), SIGNAL(motionStateChanged(bool)), SLOT(updateMotionState(bool)));
   connect(component(), SIGNAL(windowChanged(int)), SLOT(updateWindow(int)));
   connect(component(), SIGNAL(limitStateChanged(bool)), SLOT(updateLabel()));
@@ -347,11 +348,14 @@ void FiltersGui::updateTrain() {
 
 void FiltersGui::updateSelection() {
   QList<Absorber::Foil> new_train;
-  foreach(PaddleGui* paddleUI, paddles)
+  selectedWindows.clear();
+  foreach(PaddleGui* paddleUI, paddles) {
+    selectedWindows << paddleUI->selectedWindow();
     foreach( Absorber::Foil foil, paddleUI->selectedAbsorber().sandwich() ) {
       foil.second /= sin(paddleUI->component()->inclination());
       new_train << foil;
     }
+  }
   QVector<double> ns;
   absorb(ns, new_train);
   new_curve->setSamples(energies, ns);

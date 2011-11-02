@@ -5,6 +5,8 @@
 #include <qtpv.h>
 #include <QHash>
 
+class Shutter1A;
+
 class MrtShutter : public Component {
   Q_OBJECT;
 
@@ -21,6 +23,7 @@ private:
   static const QString pvBaseName;
   static const QHash<QString,QEpicsPv*> pvs;
   static const QHash<QString,QEpicsPv*> init_static();
+  static Shutter1A * shut1A; // needed to address the bug (see implimentation of start() member).
 
   int _exposure;
   int _cycle;
@@ -49,11 +52,14 @@ public slots:
   void setOpened(bool opn);
   inline void open() {setOpened(true);}
   inline void close() {setOpened(false);}
-  void start();
+  void start(bool beAwareOf1A=false);
   void stop();
   void setExposure(int val);
   void setCycle(int val);
   void setRepeats(int val);
+
+private slots:
+  void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
 
 protected slots:
 
