@@ -4,6 +4,8 @@
 #include "component.h"
 #include <qtpv.h>
 #include <QHash>
+#include <QTimer>
+#include <QTime>
 
 class Shutter1A;
 
@@ -20,10 +22,14 @@ public:
 
 private:
 
+
   static const QString pvBaseName;
   static const QHash<QString,QEpicsPv*> pvs;
   static const QHash<QString,QEpicsPv*> init_static();
   static Shutter1A * shut1A; // needed to address the bug (see implimentation of start() member).
+
+  QTimer dwellTimer;
+  QTime startTime;
 
   int _exposure;
   int _cycle;

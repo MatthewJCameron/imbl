@@ -105,5 +105,5 @@ void MrtShutterGui::onStartStop() {
   if (component()->progress())
     component()->stop();
   else
-    component()->start();
+    component()->start(true);
 }
