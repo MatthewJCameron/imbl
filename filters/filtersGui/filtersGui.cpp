@@ -411,7 +411,7 @@ void FiltersGui::onAutoCalibration() {
   foreach(QCaMotor * mot, mlist) {
     positions[mot] = mot->get(); // get current positions
     mot->setUserLoLimit( -qAbs(mot->get()) - 500 ); // set software limits to something what is guaranteed to be beyond the real limit
-    mot->goLimit(-1,false); // go to find the hardware limits
+    mot->goLimit(-1,QCaMotor::STARTED); // go to find the hardware limits
   }
 
   component()->wait_stop();
@@ -428,7 +428,7 @@ void FiltersGui::onAutoCalibration() {
   foreach(QCaMotor * mot, mlist) {
     mot->setUserPosition(0); // calibrate
     mot->setUserLoLimit(0); // restore software limits
-    mot->goUserPosition(positions[mot], false); // return to the initial positions
+    mot->goUserPosition(positions[mot]); // return to the initial positions
   }
 
   ShutterFE::setOpenedS(inst == ShutterFE::OPENED);

@@ -76,7 +76,11 @@ signals:
 
 public slots:
 
-  inline void stop(bool wait=false) { if (!isConnected()) return; else _motor->stop(wait); }
+  inline void stop(bool wait=false) {
+    if (!isConnected()) return;
+    else _motor->stop(wait ? QCaMotor::STOPPED : QCaMotor::IMMIDIATELY);
+  }
+
   void setWindow(int win);
 
 private slots:

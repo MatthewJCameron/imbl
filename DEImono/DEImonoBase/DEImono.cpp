@@ -128,10 +128,10 @@ void DEImono::updateZdisplacement() {
 
 
 void DEImono::setEnergy(double val, bool keepDSdisplacement, bool keepZdisplacement) {
-  usMotor->goUserPosition(usPosition(val), false);
+  usMotor->goUserPosition(usPosition(val));
   if (dsIsUsed())
-    dsMotor->goUserPosition (dsPosition(val, keepDSdisplacement ? _dsDisplacement : 0.0), false);
-  zMotor->goUserPosition (zPosition(val, keepZdisplacement ? _zDisplacement : 0.0), false);
+    dsMotor->goUserPosition (dsPosition(val, keepDSdisplacement ? _dsDisplacement : 0.0));
+  zMotor->goUserPosition (zPosition(val, keepZdisplacement ? _zDisplacement : 0.0));
 }
 
 void DEImono::useDS(bool use) {

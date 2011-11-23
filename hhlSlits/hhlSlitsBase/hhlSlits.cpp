@@ -68,10 +68,10 @@ void HhlSlits::wait_stop(){
 void HhlSlits::stop(bool wait) {
   if ( ! isConnected() || ! isMoving() )
     return;
-  hLeft->stop(false);
-  hRight->stop(false);
-  vOpen->stop(false);
-  vPos->stop(false);
+  hLeft->stop();
+  hRight->stop();
+  vOpen->stop();
+  vPos->stop();
   if (wait)
     wait_stop();
 }
