@@ -6,8 +6,10 @@ const QString MrtShutter::pvBaseName = "SR08ID01MRT01:";
 Shutter1A * MrtShutter::shut1A = new Shutter1A();
 const QHash<QString,QEpicsPv*> MrtShutter::pvs = MrtShutter::init_static();
 
+
 MrtShutter::MrtShutter(QObject * parent) :
   Component("MRT shutter", parent),
+  dwellTimer(),
   _exposure(0),
   _cycle(0),
   _repeats(0),
@@ -17,6 +19,8 @@ MrtShutter::MrtShutter(QObject * parent) :
   _canStart(false),
   _valuesOK(false)
 {
+
+  dwellTimer.setSingleShot(true);
 
   foreach(QEpicsPv* pv, pvs)
     connect(pv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
@@ -31,6 +35,8 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(pvs["REPETITIONSCOMPLETE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateProgress()));
   connect(pvs["VALUESTATUS_MONITOR"],         SIGNAL(valueChanged(QVariant)) , SLOT(updateValuesOK()));
   connect(pvs["PSSENABLE_MONITOR"],           SIGNAL(valueChanged(QVariant)) , SLOT(updateCanStart()));
+
+  connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
   updateConnection();
 
@@ -111,14 +117,24 @@ void MrtShutter::updateMinCycle() {
 }
 
 void MrtShutter::updateProgress() {
+
   if (!isConnected())
     return;
-  int newProgress = pvs["EXPOSUREINPROGRESS_MONITOR"]->get().toBool()  ?
-        pvs["REPETITIONSCOMPLETE_MONITOR"]->get().toInt() + 1  :  0;
+
+  int newProgress  =  pvs["EXPOSUREINPROGRESS_MONITOR"]->get().toBool()  ?
+                      pvs["REPETITIONSCOMPLETE_MONITOR"]->get().toInt() + 1   :   0;
+
+  if ( newProgress && ! _progress )
+    startTime.start();
+  else if ( ! newProgress && _progress )
+    dwellTimer.start(startTime.elapsed()+500);
+  updateCanStart();
+
   // if (newProgress != _progress) // commented out to avoid the situation when change in
   // EXPOSUREINPROGRESS_MONITOR  _and_ REPETITIONSCOMPLETE_MONITOR does not influence the progress.
   // It happens when EXPOSUREINPROGRESS_MONITOR turns to false.
   emit progressChanged(_progress=newProgress);
+
 }
 
 void MrtShutter::updateState() {
@@ -142,6 +158,7 @@ void MrtShutter::updateCanStart() {
       && valuesOK()
       && state() == CLOSED
       //&& pvs["PSSENABLE_MONITOR"]->get().toBool(); // What happens??? BUG!!
+      && ! dwellTimer.isActive()
       && ! pvs["EXPOSUREINPROGRESS_MONITOR"]->get().toBool();
   if (newCan != _canStart)
     emit canStartChanged(_canStart=newCan);
@@ -178,11 +195,11 @@ void MrtShutter::start(bool beAwareOf1A) {
 }
 
 void MrtShutter::actual_start() {
-  if (! _canStart ) {
-    emit progressChanged(_progress);
+  if (! canStart() ) {
+    //emit progressChanged(_progress);
     return;
   }
-  emit progressChanged(_progress=1);
+  //emit progressChanged(_progress=1);
   pvs["EXPOSURESTART_CMD"]->set(1);
   QTimer::singleShot(1000, this, SLOT(updateProgress()));
 }
