@@ -27,6 +27,7 @@ public:
 private:
 
   Ui::MrtShutterGui *ui;
+  bool wasProg;
 
 protected slots:
 
@@ -35,9 +36,12 @@ protected slots:
   void updateValuesOK(bool ok);
   void updateProgress(int prog);
   void updateCanStart(bool can);
+  void updateExposureMode(MrtShutter::ExposureMode mode);
 
   void onStartStop();
   void onOpenClose();
+  void onExposureMode();
+  void onTrig();
 
 
 

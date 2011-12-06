@@ -20,6 +20,14 @@ public:
     BETWEEN = 2
   };
 
+  enum ExposureMode {
+    TIME=0,
+    SOFT=1,
+    HARD=2
+  };
+
+
+
 private:
 
 
@@ -28,10 +36,13 @@ private:
   static const QHash<QString,QEpicsPv*> init_static();
   static Shutter1A * shut1A; // needed to address the bug (see implimentation of start() member).
 
+  /*
   QTimer dwellTimer;
   QTime startTime;
+  */
 
   int _exposure;
+  ExposureMode _expMode;
   int _cycle;
   int _repeats;
   int _minCycle;
@@ -45,6 +56,7 @@ public:
   explicit MrtShutter(QObject * parent=0);
 
   inline int exposure() const {return _exposure;}
+  inline ExposureMode exposureMode() const {return _expMode;}
   inline int cycle() const {return _cycle;}
   inline int repeats() const {return _repeats;}
   inline int minCycle() const {return _minCycle;}
@@ -59,8 +71,10 @@ public slots:
   inline void open() {setOpened(true);}
   inline void close() {setOpened(false);}
   void start(bool beAwareOf1A=false);
+  void trig(bool wait=false);
   void stop();
   void setExposure(int val);
+  void setExposureMode(ExposureMode val);
   void setCycle(int val);
   void setRepeats(int val);
 
@@ -71,6 +85,7 @@ protected slots:
 
   void updateConnection();
   void updateExposure();
+  void updateExposureMode();
   void updateCycle();
   void updateRepeats();
   void updateMinCycle();
@@ -83,6 +98,7 @@ protected slots:
 signals:
 
   void exposureChanged(int);
+  void exposureModeChanged(MrtShutter::ExposureMode);
   void cycleChanged(int);
   void repeatsChanged(int);
   void minCycleChanged(int);
