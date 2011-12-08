@@ -24,8 +24,8 @@ void MrtShutterGui::init() {
 
   ui->setupUi(this);
 
-  connect(ui->cycle, SIGNAL(valueEdited(int)), component(), SLOT(setCycle(int)));
-  connect(ui->exposure, SIGNAL(valueEdited(int)), component(), SLOT(setExposure(int)));
+  connect(ui->cycle, SIGNAL(valueEdited(double)), component(), SLOT(setCycle(double)));
+  connect(ui->exposure, SIGNAL(valueEdited(double)), component(), SLOT(setExposure(double)));
   connect(ui->repititions, SIGNAL(valueChanged(int)), component(), SLOT(setRepeats(int)));
 
   connect(ui->start, SIGNAL(clicked()), SLOT(onStartStop()));
@@ -33,9 +33,9 @@ void MrtShutterGui::init() {
   connect(ui->exposureMode, SIGNAL(activated(int)), SLOT(onExposureMode()));
   connect(ui->trig, SIGNAL(clicked()), SLOT(onTrig()));
 
-  connect(component(), SIGNAL(exposureChanged(int)), ui->exposure, SLOT(setValue(int)));
-  connect(component(), SIGNAL(cycleChanged(int)), ui->cycle, SLOT(setValue(int)));
-  connect(component(), SIGNAL(minCycleChanged(int)), ui->cycle, SLOT(setMin(int)));
+  connect(component(), SIGNAL(exposureChanged(double)), ui->exposure, SLOT(setValue(double)));
+  connect(component(), SIGNAL(cycleChanged(double)), ui->cycle, SLOT(setValue(double)));
+  connect(component(), SIGNAL(minCycleChanged(double)), ui->cycle, SLOT(setMin(double)));
   connect(component(), SIGNAL(repeatsChanged(int)), ui->repititions, SLOT(setValue(int)));
   connect(component(), SIGNAL(repeatsChanged(int)), ui->progressBar, SLOT(setMaximum(int)));
   connect(component(), SIGNAL(progressChanged(int)), SLOT(updateProgress(int)));

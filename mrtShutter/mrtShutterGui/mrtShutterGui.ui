@@ -23,19 +23,6 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QMSpinBox" name="exposure">
-       <property name="suffix">
-        <string>ms</string>
-       </property>
-       <property name="minimum">
-        <number>5</number>
-       </property>
-       <property name="maximum">
-        <number>10000</number>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
@@ -55,11 +42,22 @@
          <string>Software</string>
         </property>
        </item>
-       <item>
-        <property name="text">
-         <string>Hardware</string>
-        </property>
-       </item>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QMDoubleSpinBox" name="exposure">
+       <property name="suffix">
+        <string>ms</string>
+       </property>
+       <property name="decimals">
+        <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>5.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>20000.000000000000000</double>
+       </property>
       </widget>
      </item>
     </layout>
@@ -81,19 +79,6 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
-       <widget class="QMSpinBox" name="cycle">
-        <property name="suffix">
-         <string>ms</string>
-        </property>
-        <property name="minimum">
-         <number>5</number>
-        </property>
-        <property name="maximum">
-         <number>10000</number>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="2">
        <widget class="QLabel" name="label_3">
         <property name="text">
@@ -108,6 +93,22 @@
        <widget class="QMSpinBox" name="repititions">
         <property name="maximum">
          <number>10000</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QMDoubleSpinBox" name="cycle">
+        <property name="suffix">
+         <string>ms</string>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>5.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>20000.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -171,6 +172,11 @@
   <customwidget>
    <class>QMComboBox</class>
    <extends>QComboBox</extends>
+   <header location="global">qtpvwidgets.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QMDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
    <header location="global">qtpvwidgets.h</header>
   </customwidget>
  </customwidgets>

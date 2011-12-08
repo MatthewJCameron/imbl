@@ -22,8 +22,8 @@ public:
 
   enum ExposureMode {
     TIME=0,
-    SOFT=1,
-    HARD=2
+    SOFT=1
+//    HARD=2
   };
 
 
@@ -41,11 +41,11 @@ private:
   QTime startTime;
   */
 
-  int _exposure;
+  double _exposure;
   ExposureMode _expMode;
-  int _cycle;
+  double _cycle;
   int _repeats;
-  int _minCycle;
+  double _minCycle;
   int _progress; // 0 - not running, >0 - current repetiotion
   State _state;
   bool _canStart;
@@ -55,11 +55,11 @@ public:
 
   explicit MrtShutter(QObject * parent=0);
 
-  inline int exposure() const {return _exposure;}
+  inline double exposure() const {return _exposure;}
   inline ExposureMode exposureMode() const {return _expMode;}
-  inline int cycle() const {return _cycle;}
+  inline double cycle() const {return _cycle;}
   inline int repeats() const {return _repeats;}
-  inline int minCycle() const {return _minCycle;}
+  inline double minCycle() const {return _minCycle;}
   inline int progress() const {return _progress;}
   inline State state() const {return _state;}
   inline bool canStart() const {return _canStart;}
@@ -73,9 +73,9 @@ public slots:
   void start(bool beAwareOf1A=false);
   void trig(bool wait=false);
   void stop();
-  void setExposure(int val);
+  void setExposure(double msec);
   void setExposureMode(ExposureMode val);
-  void setCycle(int val);
+  void setCycle(double msec);
   void setRepeats(int val);
 
 private slots:
@@ -97,11 +97,11 @@ protected slots:
 
 signals:
 
-  void exposureChanged(int);
+  void exposureChanged(double);
   void exposureModeChanged(MrtShutter::ExposureMode);
-  void cycleChanged(int);
+  void cycleChanged(double);
   void repeatsChanged(int);
-  void minCycleChanged(int);
+  void minCycleChanged(double);
   void progressChanged(int);
   void stateChanged(MrtShutter::State);
   void canStartChanged(bool);

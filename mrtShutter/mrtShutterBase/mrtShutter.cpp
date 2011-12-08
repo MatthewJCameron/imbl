@@ -35,8 +35,7 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(pvs["REPETITIONSCOMPLETE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateProgress()));
   connect(pvs["VALUESTATUS_MONITOR"],         SIGNAL(valueChanged(QVariant)) , SLOT(updateValuesOK()));
   connect(pvs["PSSENABLE_MONITOR"],           SIGNAL(valueChanged(QVariant)) , SLOT(updateCanStart()));
-
-  connect(pvs["EXPOSURE_TRIG_MODE"],          SIGNAL(valueChanged(QVariant)) , SLOT(updateExposureMode()));
+  connect(pvs["EXPOSURETRIGGERMODE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateExposureMode()));
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
@@ -63,9 +62,10 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["REPETITIONSCOMPLETE_MONITOR"] = new QEpicsPv(pvBaseName+"REPETITIONSCOMPLETE_MONITOR");
   _pvs["VALUESTATUS_MONITOR"]         = new QEpicsPv(pvBaseName+"VALUESTATUS_MONITOR");
   _pvs["PSSENABLE_MONITOR"]           = new QEpicsPv(pvBaseName+"PSSENABLE_MONITOR");
-
-  _pvs["EXPOSURE_TRIG_MODE"]          = new QEpicsPv(pvBaseName+"EXPOSURE_TRIG_MODE");
-  _pvs["EXPOSURE_TRIGGER_EVENT"]      = new QEpicsPv(pvBaseName+"EXPOSURE_TRIGGER_EVENT");
+  _pvs["EXPOSURETRIGGERMODE_MONITOR"] = new QEpicsPv(pvBaseName+"EXPOSURETRIGGERMODE_MONITOR");
+  _pvs["EXPOSURETRIGGERMODE_CMD"]     = new QEpicsPv(pvBaseName+"EXPOSURETRIGGERMODE_CMD");
+  _pvs["SOFTWARETRIGGEREVENT_CMD"]    = new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_CMD");
+  _pvs["SOFTWARETRIGGEREVENT_MONITOR"]= new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_MONITOR");
 
   return _pvs;
 
@@ -93,7 +93,7 @@ void MrtShutter::updateConnection() {
 void MrtShutter::updateCycle() {
   if (!isConnected())
     return;
-  int newCycle = pvs["CYCLEPERIOD_MONITOR"]->get().toInt();
+  double newCycle = 0.1 * pvs["CYCLEPERIOD_MONITOR"]->get().toInt();
   if (newCycle != _cycle)
     emit cycleChanged(_cycle=newCycle);
 }
@@ -101,7 +101,7 @@ void MrtShutter::updateCycle() {
 void MrtShutter::updateExposure() {
   if (!isConnected())
     return;
-  int newExposure = pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
+  double newExposure = 0.1 * pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
   if (newExposure != _exposure)
     emit exposureChanged(_exposure=newExposure);
 }
@@ -110,7 +110,7 @@ void MrtShutter::updateExposureMode() {
   if (!isConnected())
     return;
   ExposureMode newMode =
-      (ExposureMode) pvs["EXPOSURE_TRIG_MODE"]->get().toInt();
+      (ExposureMode) pvs["EXPOSURETRIGGERMODE_MONITOR"]->get().toInt();
   if (newMode != _expMode)
     emit exposureModeChanged(_expMode=newMode);
 }
@@ -127,7 +127,7 @@ void MrtShutter::updateRepeats() {
 void MrtShutter::updateMinCycle() {
   if (!isConnected())
     return;
-  int newMinCycle = pvs["MINCYCLETIME_MONITOR"]->get().toInt();
+  double newMinCycle = 0.1 * pvs["MINCYCLETIME_MONITOR"]->get().toInt();
   if (newMinCycle != _minCycle)
     emit minCycleChanged(_minCycle=newMinCycle);
 }
@@ -200,7 +200,7 @@ void MrtShutter::trig(bool wait) {
        exposureMode() != SOFT ||
        ! progress() )
     return;
-  pvs["EXPOSURE_TRIGGER_EVENT"]->set(1);
+  pvs["SOFTWARETRIGGEREVENT_CMD"]->set(1);
   if (wait)
     qtWait(this, SIGNAL(progressChanged(int)), exposure() + cycle() );
 }
@@ -234,17 +234,21 @@ void MrtShutter::stop() {
   pvs["EXPOSURESTART_CMD"]->set(0);
 }
 
-void MrtShutter::setExposure(int val) {
-  pvs["EXPOSUREPERIOD_CMD"]->set(val);
+void MrtShutter::setExposure(double val) {
+  if (val + minCycle() > cycle()) {
+    setCycle(val + minCycle());
+    qtWait(this, SIGNAL(cycleChanged(double)), 500);
+  }
+  pvs["EXPOSUREPERIOD_CMD"]->set( (int) val * 10 );
 }
 
 void MrtShutter::setExposureMode(ExposureMode val) {
-  pvs["EXPOSURE_TRIG_MODE"]->set( (int) val );
+  pvs["EXPOSURETRIGGERMODE_CMD"]->set( (int) val );
 }
 
 
-void MrtShutter::setCycle(int val) {
-  pvs["CYCLEPERIOD_CMD"]->set(val);
+void MrtShutter::setCycle(double val) {
+  pvs["CYCLEPERIOD_CMD"]->set( (int) val * 10 );
 }
 
 void MrtShutter::setRepeats(int val) {
