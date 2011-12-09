@@ -45,11 +45,11 @@ private:
   ExposureMode _expMode;
   double _cycle;
   int _repeats;
-  double _minCycle;
   int _progress; // 0 - not running, >0 - current repetiotion
   State _state;
   bool _canStart;
   bool _valuesOK;
+  double _minRelax;
 
 public:
 
@@ -59,11 +59,11 @@ public:
   inline ExposureMode exposureMode() const {return _expMode;}
   inline double cycle() const {return _cycle;}
   inline int repeats() const {return _repeats;}
-  inline double minCycle() const {return _minCycle;}
   inline int progress() const {return _progress;}
   inline State state() const {return _state;}
   inline bool canStart() const {return _canStart;}
   inline bool valuesOK() const {return _valuesOK;}
+  inline double minRelax() const {return _minRelax;}
 
 public slots:
 
@@ -81,6 +81,7 @@ public slots:
 private slots:
   void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
 
+
 protected slots:
 
   void updateConnection();
@@ -88,11 +89,11 @@ protected slots:
   void updateExposureMode();
   void updateCycle();
   void updateRepeats();
-  void updateMinCycle();
   void updateProgress();
   void updateState();
   void updateCanStart();
   void updateValuesOK();
+  void updateMinRelax();
 
 
 signals:
@@ -101,7 +102,7 @@ signals:
   void exposureModeChanged(MrtShutter::ExposureMode);
   void cycleChanged(double);
   void repeatsChanged(int);
-  void minCycleChanged(double);
+  void minRelaxChanged(double);
   void progressChanged(int);
   void stateChanged(MrtShutter::State);
   void canStartChanged(bool);

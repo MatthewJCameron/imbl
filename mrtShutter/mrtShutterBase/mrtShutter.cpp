@@ -13,11 +13,11 @@ MrtShutter::MrtShutter(QObject * parent) :
   _exposure(0),
   _cycle(0),
   _repeats(0),
-  _minCycle(0),
   _progress(0),
   _state(BETWEEN),
   _canStart(false),
-  _valuesOK(false)
+  _valuesOK(false),
+  _minRelax(0)
 {
 
   //dwellTimer.setSingleShot(true);
@@ -30,12 +30,15 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(pvs["EXPOSUREPERIOD_MONITOR"],      SIGNAL(valueChanged(QVariant)) , SLOT(updateExposure()));
   connect(pvs["EXPOSUREREPEATS_MONITOR"],     SIGNAL(valueChanged(QVariant)) , SLOT(updateRepeats()));
   connect(pvs["CYCLEPERIOD_MONITOR"],         SIGNAL(valueChanged(QVariant)) , SLOT(updateCycle()));
-  connect(pvs["MINCYCLETIME_MONITOR"],        SIGNAL(valueChanged(QVariant)) , SLOT(updateMinCycle()));
   connect(pvs["EXPOSUREINPROGRESS_MONITOR"],  SIGNAL(valueChanged(QVariant)) , SLOT(updateProgress()));
   connect(pvs["REPETITIONSCOMPLETE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateProgress()));
   connect(pvs["VALUESTATUS_MONITOR"],         SIGNAL(valueChanged(QVariant)) , SLOT(updateValuesOK()));
   connect(pvs["PSSENABLE_MONITOR"],           SIGNAL(valueChanged(QVariant)) , SLOT(updateCanStart()));
   connect(pvs["EXPOSURETRIGGERMODE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateExposureMode()));
+  connect(pvs["MINCYCLETIME_MONITOR"],        SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
+  connect(pvs["BLADE2ACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
+  connect(pvs["BLADE1DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
+  connect(pvs["BLADE2DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
@@ -57,7 +60,6 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["EXPOSUREREPEATS_MONITOR"]     = new QEpicsPv(pvBaseName+"EXPOSUREREPEATS_MONITOR");
   _pvs["CYCLEPERIOD_CMD"]             = new QEpicsPv(pvBaseName+"CYCLEPERIOD_CMD");
   _pvs["CYCLEPERIOD_MONITOR"]         = new QEpicsPv(pvBaseName+"CYCLEPERIOD_MONITOR");
-  _pvs["MINCYCLETIME_MONITOR"]        = new QEpicsPv(pvBaseName+"MINCYCLETIME_MONITOR");
   _pvs["EXPOSUREINPROGRESS_MONITOR"]  = new QEpicsPv(pvBaseName+"EXPOSUREINPROGRESS_MONITOR");
   _pvs["REPETITIONSCOMPLETE_MONITOR"] = new QEpicsPv(pvBaseName+"REPETITIONSCOMPLETE_MONITOR");
   _pvs["VALUESTATUS_MONITOR"]         = new QEpicsPv(pvBaseName+"VALUESTATUS_MONITOR");
@@ -66,6 +68,11 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["EXPOSURETRIGGERMODE_CMD"]     = new QEpicsPv(pvBaseName+"EXPOSURETRIGGERMODE_CMD");
   _pvs["SOFTWARETRIGGEREVENT_CMD"]    = new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_CMD");
   _pvs["SOFTWARETRIGGEREVENT_MONITOR"]= new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_MONITOR");
+  _pvs["MINCYCLETIME_MONITOR"]        = new QEpicsPv(pvBaseName+"MINCYCLETIME_MONITOR");
+  _pvs["BLADE2ACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2ACTIVATIONTIME_MONITOR");
+  _pvs["BLADE1DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE1DEACTIVATIONTIME_MONITOR");
+  _pvs["BLADE2DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2DEACTIVATIONTIME_MONITOR");
+
 
   return _pvs;
 
@@ -82,7 +89,7 @@ void MrtShutter::updateConnection() {
     updateExposureMode();
     updateCycle();
     updateRepeats();
-    updateMinCycle();
+    updateMinRelax();
     updateProgress();
     updateState();
     updateValuesOK();
@@ -104,6 +111,8 @@ void MrtShutter::updateExposure() {
   double newExposure = 0.1 * pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
   if (newExposure != _exposure)
     emit exposureChanged(_exposure=newExposure);
+  if ( exposure() + minRelax() < cycle() )
+    setCycle(exposure() + minRelax());
 }
 
 void MrtShutter::updateExposureMode() {
@@ -124,12 +133,18 @@ void MrtShutter::updateRepeats() {
     emit repeatsChanged(_repeats=newRepeats);
 }
 
-void MrtShutter::updateMinCycle() {
+void MrtShutter::updateMinRelax() {
   if (!isConnected())
     return;
-  double newMinCycle = 0.1 * pvs["MINCYCLETIME_MONITOR"]->get().toInt();
-  if (newMinCycle != _minCycle)
-    emit minCycleChanged(_minCycle=newMinCycle);
+  double newMinRelax = 0.1 * (
+        pvs["MINCYCLETIME_MONITOR"]->get().toInt() +
+        pvs["BLADE2ACTIVATIONTIME_MONITOR"]->get().toInt() +
+        pvs["BLADE1DEACTIVATIONTIME_MONITOR"]->get().toInt() +
+        pvs["BLADE2DEACTIVATIONTIME_MONITOR"]->get().toInt() );
+  if (newMinRelax != _minRelax)
+    emit minRelaxChanged(_minRelax=newMinRelax);
+  if ( exposure() + minRelax() < cycle() )
+    setCycle(exposure() + minRelax());
 }
 
 void MrtShutter::updateProgress() {
@@ -235,11 +250,11 @@ void MrtShutter::stop() {
 }
 
 void MrtShutter::setExposure(double val) {
-  if (val + minCycle() > cycle()) {
-    setCycle(val + minCycle());
+  if ( val + _minRelax > cycle() ) {
+    setCycle(val + _minRelax);
     qtWait(this, SIGNAL(cycleChanged(double)), 500);
   }
-  pvs["EXPOSUREPERIOD_CMD"]->set( (int) val * 10 );
+  pvs["EXPOSUREPERIOD_CMD"]->set( (int)(10*val) );
 }
 
 void MrtShutter::setExposureMode(ExposureMode val) {
@@ -248,7 +263,7 @@ void MrtShutter::setExposureMode(ExposureMode val) {
 
 
 void MrtShutter::setCycle(double val) {
-  pvs["CYCLEPERIOD_CMD"]->set( (int) val * 10 );
+  pvs["CYCLEPERIOD_CMD"]->set( (int)(10*val) );
 }
 
 void MrtShutter::setRepeats(int val) {

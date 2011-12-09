@@ -35,7 +35,7 @@ void MrtShutterGui::init() {
 
   connect(component(), SIGNAL(exposureChanged(double)), ui->exposure, SLOT(setValue(double)));
   connect(component(), SIGNAL(cycleChanged(double)), ui->cycle, SLOT(setValue(double)));
-  connect(component(), SIGNAL(minCycleChanged(double)), ui->cycle, SLOT(setMin(double)));
+  connect(component(), SIGNAL(minRelaxChanged(double)), ui->cycle, SLOT(setMin(double)));
   connect(component(), SIGNAL(repeatsChanged(int)), ui->repititions, SLOT(setValue(int)));
   connect(component(), SIGNAL(repeatsChanged(int)), ui->progressBar, SLOT(setMaximum(int)));
   connect(component(), SIGNAL(progressChanged(int)), SLOT(updateProgress(int)));
@@ -62,6 +62,7 @@ void MrtShutterGui::updateConnection(bool con) {
     ui->exposure->setValue(component()->exposure());
     ui->cycle->setValue(component()->cycle());
     ui->repititions->setValue(component()->repeats());
+    ui->trig->setText("Trig");
   } else {
     ui->start->setText("Disconnected");
     ui->open->setText("Disconnected");
@@ -78,6 +79,8 @@ void MrtShutterGui::updateProgress(int prog) {
     return;
   wasProg = (bool) prog;
 
+
+
   ui->progressBar->setVisible( prog &&
                                component()->exposureMode() == MrtShutter::TIME );
   ui->open->setVisible( ! prog ||
@@ -90,6 +93,7 @@ void MrtShutterGui::updateProgress(int prog) {
 
   ui->exposure->setEnabled(!prog);
   ui->timerParameters->setEnabled(!prog);
+  ui->exposureMode->setEnabled(!prog);
 
   updateCanStart(component()->canStart());
 
