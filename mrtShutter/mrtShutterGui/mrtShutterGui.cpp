@@ -30,7 +30,7 @@ void MrtShutterGui::init() {
 
   connect(ui->start, SIGNAL(clicked()), SLOT(onStartStop()));
   connect(ui->open, SIGNAL(clicked()), SLOT(onOpenClose()));
-  connect(ui->exposureMode, SIGNAL(activated(int)), SLOT(onExposureMode()));
+  connect(ui->exposureMode, SIGNAL(indexEdited(int)), SLOT(onExposureMode()));
   connect(ui->trig, SIGNAL(clicked()), SLOT(onTrig()));
 
   connect(component(), SIGNAL(exposureChanged(double)), ui->exposure, SLOT(setValue(double)));

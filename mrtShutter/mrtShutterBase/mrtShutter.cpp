@@ -111,8 +111,6 @@ void MrtShutter::updateExposure() {
   double newExposure = 0.1 * pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
   if (newExposure != _exposure)
     emit exposureChanged(_exposure=newExposure);
-  if ( exposure() + minRelax() < cycle() )
-    setCycle(exposure() + minRelax());
 }
 
 void MrtShutter::updateExposureMode() {
@@ -143,8 +141,6 @@ void MrtShutter::updateMinRelax() {
         pvs["BLADE2DEACTIVATIONTIME_MONITOR"]->get().toInt() );
   if (newMinRelax != _minRelax)
     emit minRelaxChanged(_minRelax=newMinRelax);
-  if ( exposure() + minRelax() < cycle() )
-    setCycle(exposure() + minRelax());
 }
 
 void MrtShutter::updateProgress() {
@@ -163,10 +159,10 @@ void MrtShutter::updateProgress() {
   updateCanStart();
   */
 
-  // if (newProgress != _progress) // commented out to avoid the situation when change in
+  if (newProgress != _progress) // commented out to avoid the situation when change in
   // EXPOSUREINPROGRESS_MONITOR  _and_ REPETITIONSCOMPLETE_MONITOR does not influence the progress.
   // It happens when EXPOSUREINPROGRESS_MONITOR turns to false.
-  emit progressChanged(_progress=newProgress);
+    emit progressChanged(_progress=newProgress);
 
 }
 
@@ -238,7 +234,7 @@ void MrtShutter::start(bool beAwareOf1A) {
 }
 
 void MrtShutter::actual_start() {
-  if (! canStart() )
+  if ( ! canStart() )
     return;
   pvs["EXPOSURESTART_CMD"]->set(1);
 }
@@ -250,10 +246,8 @@ void MrtShutter::stop() {
 }
 
 void MrtShutter::setExposure(double val) {
-  if ( val + _minRelax > cycle() ) {
-    setCycle(val + _minRelax);
-    qtWait(this, SIGNAL(cycleChanged(double)), 500);
-  }
+  if ( exposure() + minRelax() >= cycle() )
+    setCycle( exposure() + minRelax() + 0.1 );
   pvs["EXPOSUREPERIOD_CMD"]->set( (int)(10*val) );
 }
 
