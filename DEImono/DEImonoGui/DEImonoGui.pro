@@ -22,6 +22,8 @@ INCLUDEPATH += ../../ \
                ../../component/componentGui \
                ../DEImonoBase
 
+LIBS += -L../DEImonoBase -lDEImono
+
 headers.files = $$HEADERS
 headers.path = $$INSTALLBASE/include/imbl
 INSTALLS += headers
