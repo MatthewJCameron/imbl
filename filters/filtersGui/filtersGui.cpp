@@ -180,6 +180,8 @@ void absorb(QVector<double> & inout, const QList<Absorber::Foil> & train) {
 
 static bool init_data() {
 
+  Q_INIT_RESOURCE(filters);
+
   QPolygonF data;
   loadData(":/flux.dat", data);
   if (data.size()<=100)

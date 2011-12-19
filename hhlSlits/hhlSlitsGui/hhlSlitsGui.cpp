@@ -279,7 +279,7 @@ void HhlSlitsGui::onVopGoalChanged() {
 
 void HhlSlitsGui::onVtbGoalChanged() {
   blockSetSignals(true);
-  QPair<double,double> hz = HhlSlits::pn2oc(ui->lpG->value(), ui->rpG->value());
+  QPair<double,double> hz = HhlSlits::pn2oc(ui->bpG->value(), ui->tpG->value());
   ui->voG->setValue(hz.first);
   ui->vpG->setValue(hz.second);
   blockSetSignals(false);
