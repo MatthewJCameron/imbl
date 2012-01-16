@@ -27,7 +27,7 @@ INCLUDEPATH += ../../ \
 
 LIBS += -L../monoBase -lmono
 
-headers.files = $$HEADERS
+headers.files = monoGui.h
 headers.path = $$INSTALLBASE/include/imbl
 INSTALLS += headers
 
