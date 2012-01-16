@@ -16,7 +16,6 @@ class DEImonoGui : public ComponentGui {
 private:
 
     Ui::DEImonoGui *ui;
-    QMotorStack * motors;
 
     static const double plankevXlighspeed;
 

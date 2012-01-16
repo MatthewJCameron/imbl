@@ -216,16 +216,14 @@ const bool FiltersGui::data_inited = init_data();
 
 FiltersGui::FiltersGui(QWidget *parent) :
   ComponentGui(new Filters(parent), true, parent),
-  ui(new Ui::Filters),
-  motors(new QMotorStack(this))
+  ui(new Ui::Filters)
 {
   init();
 }
 
 FiltersGui::FiltersGui(Filters * flt, QWidget *parent) :
   ComponentGui(flt, false, parent),
-  ui(new Ui::Filters),
-  motors(new QMotorStack(this))
+  ui(new Ui::Filters)
 {
   init();
 }
@@ -285,16 +283,14 @@ void FiltersGui::init() {
   arrow->setMinimumWidth(50);
   ui->paddles_layout->addWidget(arrow);
 
+  ui->motors->lock(true);
   foreach(Paddle* paddle, component()->paddles) {
     PaddleGui * paddleUI = new PaddleGui(paddle,this);
-    motors->addMotor(paddle->motor(), true, true);
+    ui->motors->addMotor(paddle->motor(), true, true);
     ui->paddles_layout->addWidget(paddleUI);
     connect(paddleUI, SIGNAL(selectedChanged(int)), SLOT(updateSelection()));
     paddles << paddleUI;
   }
-
-  motors->lock(true);
-  ui->advancedLayout->addWidget(motors);
 
   connect(component(), SIGNAL(trainChanged(QList<Absorber::Foil>)), SLOT(updateTrain()));
   connect(component(), SIGNAL(motionStateChanged(bool)), SLOT(updateMotion(bool)));

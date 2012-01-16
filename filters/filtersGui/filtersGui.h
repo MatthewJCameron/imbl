@@ -58,7 +58,6 @@ class FiltersGui : public ComponentGui {
 private:
 
   Ui::Filters *ui;
-  QMotorStack * motors;
   QList<PaddleGui*> paddles;
 
   QwtPlotCurve * wb_curve;

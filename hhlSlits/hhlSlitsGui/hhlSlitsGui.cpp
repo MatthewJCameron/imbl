@@ -122,8 +122,7 @@ SlitsVis::paintEvent(QPaintEvent *) {
 HhlSlitsGui:: HhlSlitsGui(HhlSlits * slt, QWidget *parent) :
   ComponentGui(slt, false, parent),
   vis(new SlitsVis(this)),
-  ui(new Ui::HhlSlitsGui),
-  motors(new QMotorStack(this))
+  ui(new Ui::HhlSlitsGui)
 {
   init();
 }
@@ -131,14 +130,12 @@ HhlSlitsGui:: HhlSlitsGui(HhlSlits * slt, QWidget *parent) :
 HhlSlitsGui::HhlSlitsGui(QWidget *parent) :
   ComponentGui(new HhlSlits(parent), true, parent),
   vis(new SlitsVis(this)),
-  ui(new Ui::HhlSlitsGui),
-  motors(new QMotorStack(this))
+  ui(new Ui::HhlSlitsGui)
 {
   init();
 }
 
 HhlSlitsGui::~HhlSlitsGui() {
-  delete motors;
   delete ui;
   delete vis;
 }
@@ -150,13 +147,11 @@ void HhlSlitsGui::init() {
   ui->advanced->hide();
   ui->visLayout->addWidget(vis);
 
-  motors->lock(true);
-  motors->addMotor(HhlSlits::vPos, true, true);
-  motors->addMotor(HhlSlits::vOpen, true, true);
-  motors->addMotor(HhlSlits::hLeft, true, true);
-  motors->addMotor(HhlSlits::hRight, true, true);
-
-  ui->advancedLayout->addWidget(motors);
+  ui->motors->lock(true);
+  ui->motors->addMotor(HhlSlits::vPos, true, true);
+  ui->motors->addMotor(HhlSlits::vOpen, true, true);
+  ui->motors->addMotor(HhlSlits::hLeft, true, true);
+  ui->motors->addMotor(HhlSlits::hRight, true, true);
 
   connect(component(), SIGNAL(geometryChanged(double,double,double,double)), SLOT(updateGeometry()));
   connect(component(), SIGNAL(limitStateChanged(HhlSlits::Limits)), SLOT(updateLimits(HhlSlits::Limits)));

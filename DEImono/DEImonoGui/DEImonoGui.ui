@@ -411,6 +411,9 @@
    <item>
     <widget class="QWidget" name="advanced" native="true">
      <layout class="QVBoxLayout" name="advancedLayout">
+      <property name="margin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QPushButton" name="showCalibration">
         <property name="text">
@@ -535,6 +538,16 @@
         </layout>
        </widget>
       </item>
+      <item>
+       <widget class="Line" name="line_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QMotorStack" name="motors" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -565,6 +578,12 @@
     <signal>valueEdited(double)</signal>
     <signal>escaped()</signal>
    </slots>
+  </customwidget>
+  <customwidget>
+   <class>QMotorStack</class>
+   <extends>QWidget</extends>
+   <header location="global">qmotorstack.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

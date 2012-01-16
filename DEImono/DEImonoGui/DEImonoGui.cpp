@@ -6,16 +6,14 @@ const double DEImonoGui::plankevXlighspeed = 12.398419; // h*c (keV)
 
 DEImonoGui::DEImonoGui(QWidget *parent) :
   ComponentGui(new DEImono(parent), true, parent),
-  ui(new Ui::DEImonoGui),
-  motors(new QMotorStack(this))
+  ui(new Ui::DEImonoGui)
 {
   init();
 }
 
 DEImonoGui::DEImonoGui(DEImono * mono, QWidget *parent) :
   ComponentGui(mono, true, parent),
-  ui(new Ui::DEImonoGui),
-  motors(new QMotorStack(this))
+  ui(new Ui::DEImonoGui)
 {
   init();
 }
@@ -27,11 +25,10 @@ void DEImonoGui::init() {
   ui->advanced->hide();
   ui->calibrationWidget->hide();
 
-  motors->lock(true);
-  motors->addMotor(DEImono::usMotor,true,true);
-  motors->addMotor(DEImono::dsMotor,true,true);
-  motors->addMotor(DEImono::zMotor,true,true);
-  ui->advancedLayout->addWidget(motors);
+  ui->motors->lock(true);
+  ui->motors->addMotor(DEImono::usMotor,true,true);
+  ui->motors->addMotor(DEImono::dsMotor,true,true);
+  ui->motors->addMotor(DEImono::zMotor,true,true);
 
   connect(component(), SIGNAL(energyChanged(double)), ui->energy, SLOT(setValue(double)));
   connect(component(), SIGNAL(motionChanged(bool)), SLOT(updateMotion(bool)));

@@ -59,7 +59,6 @@ private:
 
   SlitsVis * vis;
   Ui::HhlSlitsGui *ui;
-  QMotorStack * motors;
 
 private slots:
 

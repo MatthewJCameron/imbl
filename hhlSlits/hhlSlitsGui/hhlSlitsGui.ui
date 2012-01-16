@@ -366,6 +366,9 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QMotorStack" name="motors" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -396,6 +399,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QMotorStack</class>
+   <extends>QWidget</extends>
+   <header location="global">qmotorstack.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

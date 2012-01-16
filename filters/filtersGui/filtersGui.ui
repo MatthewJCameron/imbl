@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>251</height>
+    <height>294</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -52,6 +52,9 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="QMotorStack" name="motors" native="true"/>
+      </item>
      </layout>
     </widget>
    </item>
@@ -87,6 +90,12 @@
    <class>QwtPlot</class>
    <extends>QFrame</extends>
    <header>qwt_plot.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QMotorStack</class>
+   <extends>QWidget</extends>
+   <header location="global">qmotorstack.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
