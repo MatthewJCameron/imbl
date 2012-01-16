@@ -16,8 +16,8 @@ Shutter1Agui::Shutter1Agui(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateState()));
-  connect(component(), SIGNAL(relaxChanged()), SLOT(updateRelax()));
+  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(relaxChanged()), SLOT(updateStatuses()));
   updateConnection(false);
 }
 
@@ -28,8 +28,9 @@ Shutter1Agui::Shutter1Agui(Shutter1A * sht, QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateState()));
-  connect(component(), SIGNAL(relaxChanged()), SLOT(updateRelax()));
+  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(relaxChanged()), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(enabledChanged()), SLOT(updateStatuses()));
   updateConnection(component()->isConnected());
 }
 
@@ -40,13 +41,11 @@ Shutter1Agui::~Shutter1Agui() {
 void Shutter1Agui::updateConnection(bool con) {
   if ( !con )
     ui->label->setText("Disconnected");
-  else {
-    updateState();
-    updateRelax();
-  }
+  else
+    updateStatuses();
 }
 
-void Shutter1Agui::updateState() {
+void Shutter1Agui::updateStatuses() {
   switch ( component()->state() ) {
   case Shutter1A::OPENED:
     ui->open->setStyleSheet( styleTemplate.arg("0.0", "1.0", "128, 0, 0, 200") );
@@ -64,15 +63,12 @@ void Shutter1Agui::updateState() {
     setStyleSheet( "background-color: rgba(128, 128, 0, 200);" );
     break;
   }
+  ui->open->setEnabled( ! component()->isRelaxing() && component()->isEnabled() );
+  ui->close->setEnabled( ! component()->isRelaxing() && component()->isEnabled() );
   ui->label->setText( component()->objectName() + ":\n"
-                      + component()->description()
-                      + (component()->isRelaxing() ? " / Relaxing" : "") );
-}
-
-void Shutter1Agui::updateRelax() {
-  ui->open->setEnabled( ! component()->isRelaxing() );
-  ui->close->setEnabled( ! component()->isRelaxing() );
-  updateState();
+                      + component()->description() + "\n"
+                      + (component()->isEnabled() ? "En" : "Dis") + "abled\n"
+                      + (component()->isRelaxing() ? "Relaxing" : "") );
 }
 
 

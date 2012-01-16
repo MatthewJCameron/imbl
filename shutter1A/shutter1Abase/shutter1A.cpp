@@ -8,11 +8,15 @@ QEpicsPv * Shutter1A::opnSts = new QEpicsPv(Shutter1A::pvBaseName + "_OPEN_STS")
 QEpicsPv * Shutter1A::clsSts = new QEpicsPv(Shutter1A::pvBaseName + "_CLOSE_STS");
 QEpicsPv * Shutter1A::opnCmd = new QEpicsPv(Shutter1A::pvBaseName + "_OPEN_CMD");
 QEpicsPv * Shutter1A::clsCmd = new QEpicsPv(Shutter1A::pvBaseName + "_CLOSE_CMD");
+QEpicsPv * Shutter1A::enabledSts  = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
+QEpicsPv * Shutter1A::disabledSts = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
+
 
 
 Shutter1A::Shutter1A(QObject *parent) :
   Component("1A shutter", parent),
-  st(BETWEEN)
+  st(BETWEEN),
+  enabled(true)
 {
 
 
@@ -23,10 +27,14 @@ Shutter1A::Shutter1A(QObject *parent) :
   connect(clsSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(opnCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(clsCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(enabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(disabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(&timer, SIGNAL(timeout()), SIGNAL(relaxChanged()));
 
   connect(opnSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
   connect(clsSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
+  connect(enabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+  connect(disabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
 
   updateConnection();
 
@@ -38,16 +46,21 @@ Shutter1A::~Shutter1A() {
 void Shutter1A::updateConnection() {
   bool connection =
       opnSts->isConnected() && clsSts->isConnected() &&
-      opnCmd->isConnected() && clsCmd->isConnected();
+      opnCmd->isConnected() && clsCmd->isConnected() /* &&
+      enabledSts->isConnected() && disabledSts->isConnected() */; // NEW PSSDB
   setConnected(connection);
   if (isConnected()) {
     updateState();
+    updateEnabled();
     emit relaxChanged();
   }
 }
 
 
 void Shutter1A::updateState() {
+
+  if ( ! isConnected() )
+    return;
 
   if ( sender() == opnSts || sender() == clsSts ) {
     timer.start();
@@ -68,6 +81,15 @@ void Shutter1A::updateState() {
   }
   emit stateChanged(st);
 
+}
+
+
+void Shutter1A::updateEnabled() {
+  if ( ! isConnected() )
+    return;
+  bool newEnabled = enabledSts->get().toBool() && ! disabledSts->get().toBool();
+  if (newEnabled != enabled)
+    emit enabledChanged(enabled = newEnabled);
 }
 
 

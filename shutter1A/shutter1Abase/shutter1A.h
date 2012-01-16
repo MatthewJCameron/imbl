@@ -25,11 +25,14 @@ protected:
   QTimer timer;
 
   State st;
+  bool enabled;
 
   static QEpicsPv * opnSts;
   static QEpicsPv * clsSts;
   static QEpicsPv * opnCmd;
   static QEpicsPv * clsCmd;
+  static QEpicsPv * enabledSts;
+  static QEpicsPv * disabledSts;
 
 public:
 
@@ -38,6 +41,7 @@ public:
 
   inline State state() const {return st;}
   inline bool isRelaxing() const {return timer.isActive();}
+  inline bool isEnabled() const {return enabled;}
 
   static State stateS();
   static bool setOpenedS(bool opn, bool wait=false);
@@ -54,12 +58,13 @@ signals:
   void relaxChanged();
   void opened();
   void closed();
+  void enabledChanged(bool isenabled);
 
 protected slots:
 
   void updateState();
   void updateConnection();
-
+  void updateEnabled();
 
 };
 

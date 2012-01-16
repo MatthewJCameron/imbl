@@ -5,9 +5,7 @@
 const int ShutterFE::relaxTime = 5000; // msec
 const QString ShutterFE::pvBaseName = "SR08ID01PSS01:FE_SHUTTER";
 QEpicsPv * ShutterFE::opnSts = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_STS");
-// BUG !!!
-// SR08ID01PSS01:FE_SHUTTER_CLOSE_STS PV does not exist
-QEpicsPv * ShutterFE::clsSts = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSE_STS");
+QEpicsPv * ShutterFE::clsSts = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSED_STS");
 QEpicsPv * ShutterFE::opnCmd = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_CMD");
 QEpicsPv * ShutterFE::clsCmd = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSE_CMD");
 
@@ -38,7 +36,7 @@ ShutterFE::~ShutterFE() {
 
 void ShutterFE::updateConnection() {
   bool connection =
-      opnSts->isConnected() && /* clsSts->isConnected() && */ // see BUG above
+      opnSts->isConnected() && clsSts->isConnected() &&
       opnCmd->isConnected() && clsCmd->isConnected();
   setConnected(connection);
   if (isConnected()) {
@@ -55,7 +53,7 @@ void ShutterFE::updateState() {
     emit relaxChanged();
   }
 
-  if ( /* clsSts->get().toBool() == opnSts->get().toBool() */ false )  { // see BUG above
+  if ( clsSts->get().toBool() == opnSts->get().toBool() )  {
     st = BETWEEN;
     setDescription("Operation in proggress");
   } else if ( opnSts->get().toBool() ) {

@@ -1,0 +1,37 @@
+#-------------------------------------------------
+#
+# Project created by QtCreator 2011-08-26T11:38:30
+#
+#-------------------------------------------------
+
+QT       += core gui
+
+TARGET = monoGui
+TEMPLATE = lib
+
+
+SOURCES +=\
+        monoGui.cpp \
+    tuner.cpp
+
+HEADERS  += monoGui.h \
+    tuner.h
+
+FORMS    += monoGui.ui \
+    tuner.ui
+
+INCLUDEPATH += ../../ \
+               ../../component/componentBase \
+               ../../component/componentGui \
+               ../monoBase
+
+LIBS += -L../monoBase -lmono
+
+headers.files = $$HEADERS
+headers.path = $$INSTALLBASE/include/imbl
+INSTALLS += headers
+
+target.files = $$[TARGET]
+target.path = $$INSTALLBASE/lib/imbl
+INSTALLS += target
+

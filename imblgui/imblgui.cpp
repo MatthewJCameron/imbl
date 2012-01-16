@@ -9,6 +9,7 @@
 #include "shutter1Agui.h"
 #include "mrtShutterGui.h"
 #include "DEImonoGui.h"
+#include "monoGui.h"
 #include <timescan.h>
 
 #include <QDebug>
@@ -75,7 +76,9 @@ ImblGui::ImblGui(QWidget *parent) :
 
   blView->add(":/images/filter-mono.png", 955, 1666, 110);
 
-  blView->add(":/images/mono.png", 1, 1741, 1089);
+  MonoGui * monoW = new MonoGui(this);
+  ui->stackedWidget->addWidget(monoW);
+  blView->add(":/images/mono.png", monoW, 1, 1741, 1089);
 
   blView->add(":/images/mono-valve.png", 943, 3161, 449);
 

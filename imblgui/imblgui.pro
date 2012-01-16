@@ -29,6 +29,8 @@ INCLUDEPATH += ../ \
                ../hhlSlits/hhlSlitsGui \
                ../filters/filtersBase \
                ../filters/filtersGui \
+               ../mono/monoGui \
+               ../mono/monoBase \
                ../shutter1A/shutter1Agui \
                ../shutter1A/shutter1Abase \
                ../mrtShutter/mrtShutterGui \
@@ -46,6 +48,8 @@ LIBS += \
         -L../shutterFE/shutterFEgui -lshutterFEgui \
         -L../filters/filtersBase -lfilters \
         -L../filters/filtersGui -lfiltersGui \
+        -L../mono/monoBase -lmono \
+        -L../mono/monoGui -lmonoGui \
         -L../hhlSlits/hhlSlitsBase -lhhlSlits \
         -L../hhlSlits/hhlSlitsGui -lhhlSlitsGui \
         -L../shutter1A/shutter1Abase -lshutter1A \
