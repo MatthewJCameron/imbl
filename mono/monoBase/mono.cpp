@@ -1,8 +1,21 @@
 #include "mono.h"
 #include "error.h"
 
+
+static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
+static const double sqrt111 = sqrt(3);
+static const double sqrt311 = sqrt(11);
+
+double energy2bragg(double energy, Mono::Diffraction diff) {
+  if (energy <= 0.0)
+    return 0;
+  return asin(esinbq * (diff==Mono::Si111 ? sqrt111 : sqrt311) / energy )
+      * 180.0 / M_PI ;
+}
+
+
 const QHash<Mono::Motors,QCaMotor*> Mono::motors=Mono::init_motors();
-const QPair<double,double> Mono::energyRange = qMakePair<double,double>(17.0,200.0);
+const QPair<double,double> Mono::energyRange = qMakePair<double,double>(16.0,195.0);
 
 
 Mono::Mono(QObject *parent) :
@@ -51,6 +64,20 @@ QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   return motret;
 }
 
+double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
+  switch (crystal) {
+  case 1:
+    return energy2bragg(enrg, diff) + (diff == Si111 ? -1.0*alpha : alpha);
+  case 2:
+    return energy2bragg(enrg, diff) + (diff == Si111 ? alpha : -1.0*alpha);
+  default:
+    return 0;
+  }
+}
+
+
+
+
 void Mono::wait_stop() {
   while ( isMoving() )
     qtWait(this, SIGNAL(motionChanged()));
@@ -86,31 +113,45 @@ void Mono::updateMotion() {
 
 
 void Mono::updateBragg1() {
+
   if ( ! isConnected() )
     return;
-  if ( bragg() <= 0 || bragg() >= 90) {
-    warn("Meaningless bragg angle for the first crystal:" + QString::number(bragg()) + ".",
-         objectName());
+
+  const double mAngle = motors[Bragg1]->getUserPosition();
+  double bAngle;
+  if ( mAngle <= alpha ) {
+    _diff = Si111;
+    bAngle = mAngle + alpha;
+  } else {
+    _diff = Si311;
+    bAngle = mAngle - alpha;
+  }
+
+  if ( ( bAngle <= 0 || bAngle >= 90 ) ) {
+    if ( ! motors[Bragg1]->isMoving() )
+      warn("Meaningless bragg angle for the first crystal:" + QString::number(bAngle) + ".",
+           objectName());
     return;
   }
-  const double newEnergy = esinb / sin( M_PI * bragg() / 180);
+
+  const double newEnergy = esinbq * ( diffraction()==Si111 ? sqrt111 : sqrt311 )
+      / sin(bAngle*M_PI/180);
   if (newEnergy != _energy) {
     _energy = newEnergy;
     updateBragg2();
     updateX();
     emit energyChanged(_energy);
   }
+
 }
 
 
 void Mono::updateBragg2() {
-  if ( ! isConnected() )
+  if ( ! isConnected() || motors[Bragg1]->isMoving() )
     return;
-  double bragg2 = motors[Bragg2]->getUserPosition();
-  if (bragg2 <= 0 || bragg2 >= 90)
-    warn("Meaningless bragg angle for the second crystal:" + QString::number(bragg2) + ".",
-         objectName());
-  double newDBragg = 1.0e6*(bragg2-bragg())*M_PI/180.0; //murad
+  const double delta = motors[Bragg2]->getUserPosition()
+      - motorAngle(energy(), 2,diffraction());
+  const double newDBragg = 1.0e6*delta*M_PI/180.0; //murad
   if (newDBragg != _dBragg)
     emit dBraggChanged(_dBragg=newDBragg);
 }
@@ -119,7 +160,7 @@ void Mono::updateBragg2() {
 void Mono::updateX() {
   if ( ! isConnected() )
     return;
-  const double xDist = (zDist+dZ()) * tan(bragg());
+  const double xDist = (zDist+dZ()) / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
   const double newDX = motors[Xdist]->getUserPosition() - xDist;
   if (newDX != _dX)
     emit dXChanged(_dX=newDX);
@@ -200,36 +241,78 @@ void Mono::updateBend2() {
 }
 
 
+
+
+
+
+
+
 void Mono::setEnergy(double val, bool keepDBragg, bool keepDX) {
+  setEnergy(val, diffraction(), keepDBragg, keepDX);
+}
+
+
+void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool keepDX) {
+
   if ( ! isConnected() || isMoving() )
     return;
-  if ( val < energyRange.first || val > energyRange.second ) {
-    warn("Requested energy (" + QString::number(val) + "kEv) is out of the allowed range"
+
+  if ( enrg < energyRange.first || enrg > energyRange.second ) {
+    warn("Requested energy (" + QString::number(enrg) + "kEv) is out of the allowed range"
          " (" + QString::number(energyRange.first) + "," + QString::number(energyRange.second) +
          ")kEv. Ignoring the request.",
          objectName() );
     return;
   }
-  double braggD = 180 * asin(esinb/val) / M_PI ;
-  motors[Bragg1]->goUserPosition(braggD, QCaMotor::STARTED);
-  motors[Bragg2]->goUserPosition(braggD + ( keepDBragg ? dBragg() : 0 ),
-                          QCaMotor::STARTED);
-  motors[Xdist]->goUserPosition( (zDist+dZ()) * esinb / sqrt(val*val-esinb*esinb)
-                                 + ( keepDX ? dX() : 0 ), QCaMotor::STARTED);
+  if ( diff == Si111 && enrg > maxEnergy111 ) {
+    warn("Requested energy (" + QString::number(enrg) + "kEv) is greater than the"
+         "  maximum for the requested diffraction type Si[111]:"
+         " " + QString::number(maxEnergy111) + "kEv. Ignoring the request.",
+         objectName() );
+    return;
+  }
+  if ( diff == Si311 && enrg < minEnergy311 ) {
+    warn("Requested energy (" + QString::number(enrg) + "kEv) is smaller than the"
+         "  minimum for the requested diffraction type Si[311]:"
+         " " + QString::number(minEnergy311) + "kEv. Ignoring the request.",
+         objectName() );
+    return;
+  }
+
+  double braggA = energy2bragg(enrg, diff);
+  if ( braggA <= 0.0 || braggA >= 90.0 ) { // shoud never happen because of the ifs above.
+    warn("Impossible Bragg angle " + QString::number(braggA) + "."
+         " Likely to be developer's bug.");
+    return;
+  }
+
+  motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff),
+                                 QCaMotor::STARTED);
+  motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff)
+                                  + ( keepDBragg ? dBragg() : 0 ),
+                                  QCaMotor::STARTED);
+  motors[Xdist]->goUserPosition( (zDist+dZ()) / tan(2*braggA*M_PI/180) +
+                                 + ( keepDX ? dX() : 0 ),
+                                 QCaMotor::STARTED);
+
 }
 
 
 void Mono::setDBragg(double val) {
   if ( ! isConnected() || isMoving() )
     return;
-  motors[Bragg2]->goUserPosition(bragg() + val, QCaMotor::STARTED);
+  motors[Bragg2]->goUserPosition( motorAngle(energy(), 2, diffraction())
+                                  + val * 180 / (1.0e06 * M_PI),
+                                  QCaMotor::STARTED);
 }
 
 
 void Mono::setDX(double val) {
   if ( ! isConnected() || isMoving() )
     return;
-  motors[Xdist]->goUserPosition( (zDist+dZ()) * tan(bragg()) + val );
+  motors[Xdist]->goUserPosition
+      ( (zDist+dZ()) / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
+        QCaMotor::STARTED);
 }
 
 

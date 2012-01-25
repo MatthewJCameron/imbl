@@ -27,5 +27,9 @@
         <file>images/ccdstack.png</file>
         <file>images/ledstop1B.png</file>
         <file>images/imbl.png</file>
+        <file>images/DBLmono.png</file>
+        <file>images/filter-valve-joint.png</file>
+        <file>images/valve-mono-joint.png</file>
+        <file>images/mono-stop.png</file>
     </qresource>
 </RCC>

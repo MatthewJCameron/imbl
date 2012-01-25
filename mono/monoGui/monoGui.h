@@ -33,11 +33,15 @@ private slots:
 
   void onAdvancedControl();
   void onEnergySet();
-  void onEnergyTune(double val);
+  void onEnergyTune();
+  void onStopReset();
 
   void updateConnection(bool con);
   void updateMotion(bool moving);
   void updateInOut(Mono::InOutPosition iopos);
+  void updateEnergy();
+
+private:
 
 };
 

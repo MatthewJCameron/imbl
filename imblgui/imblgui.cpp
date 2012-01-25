@@ -74,15 +74,22 @@ ImblGui::ImblGui(QWidget *parent) :
   ui->stackedWidget->addWidget(filterW);
   blView->add(":/images/filter.png", filterW, 0, 1015, 2038);
 
-  blView->add(":/images/filter-mono.png", 955, 1666, 110);
+  blView->add(":/images/filter-valve-joint.png", 937, 1666, 147);
+
+  blView->add(":/images/mono-valve.png", 937, 1713, 449);
+
+  blView->add(":/images/valve-mono-joint.png", 899, 1770, 212);
+
+
 
   MonoGui * monoW = new MonoGui(this);
   ui->stackedWidget->addWidget(monoW);
-  blView->add(":/images/mono.png", monoW, 1, 1741, 1089);
+  //blView->add(":/images/DBLmono.png", monoW, 1, 1741, 1242);
+  //blView->add(":/images/DBLmono.png", monoW, 1, 1803, 1242);
+  blView->add(":/images/DBLmono.png", monoW, 1, 1892, 1242);
 
-  blView->add(":/images/mono-valve.png", 943, 3161, 449);
-
-  blView->add(":/images/mono-valve-stop.png", 943, 3220, 146);
+  //blView->add(":/images/mono-valve-stop.png", 943, 3220, 146);
+  blView->add(":/images/mono-stop.png", 916, 2926, 212);
 
   Shutter1Agui * sh1a = new Shutter1Agui(this);
   ui->stackedWidget->addWidget(sh1a);

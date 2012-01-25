@@ -11,14 +11,18 @@ class Mono : public Component {
 public:
 
   enum InOutPosition { INBEAM, OUTBEAM, BETWEEN, MOVING };
+  enum Diffraction { Si111, Si311 };
 
-  static const double esinb = 1.9769289; // E * sin (ThetaB) = esinb;
+  static const QPair<double,double> energyRange;
+  static const double maxEnergy111 = 100.0; // keV
+  static const double minEnergy311 = 31.0; // keV
+
 
 private:
 
+  static const double alpha = 14.75; // asymmetry angle (rad) "+" for 111 "-" for 311
   static const double zDist = 2.0; // desired Z-separation of crystals;
   static const double zOut = 40.0; // Z1 when the mono is out of the beam;
-  static const QPair<double,double> energyRange;
 
   enum Motors {
     Bragg1,
@@ -34,9 +38,11 @@ private:
 
   static const QHash<Motors,QCaMotor*> motors;
   static QHash<Motors,QCaMotor*> init_motors();
+  double motorAngle(double enrg, int crystal, Diffraction diff);
 
   bool iAmMoving;
   double _energy; // kev
+  Diffraction _diff;
   double _dBragg; // murad , displacement of the second crystal
   double _dX; // mm , X displacement of the stage
   double _dZ; // mm , Z displacement of the 2nd crystal
@@ -51,7 +57,7 @@ public:
   explicit Mono(QObject *parent = 0);
 
   inline double energy() const { return _energy; }
-  inline double bragg() const { return motors[Bragg1]->getUserPosition() ; }
+  inline Diffraction diffraction() const { return _diff; }
   inline double dBragg() const {return _dBragg;}
   inline double dX() const {return _dX;}
   inline double dZ() const {return _dZ;}
@@ -67,7 +73,8 @@ public:
 
 public slots:
 
-  void setEnergy(double val, bool keepDBragg=true, bool keepDX=true);
+  void setEnergy(double enrg, bool keepDBragg=true, bool keepDX=true);
+  void setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg=true, bool keepDX=true);
   void setDBragg(double val);
   void setDX(double val);
   void setDZ(double val);
@@ -111,5 +118,9 @@ signals:
   void inBeamChanged(Mono::InOutPosition);
 
 };
+
+
+double energy2bragg(double energy, Mono::Diffraction diff);
+
 
 #endif // MONO_H

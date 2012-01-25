@@ -35,3 +35,6 @@ target.files = $$[TARGET]
 target.path = $$INSTALLBASE/lib/imbl
 INSTALLS += target
 
+RESOURCES += \
+    monoGui.qrc
+
