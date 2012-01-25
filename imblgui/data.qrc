@@ -1,12 +1,9 @@
 <RCC>
     <qresource prefix="/">
         <file>images/fe-slit.png</file>
-        <file>images/filter-mono.png</file>
         <file>images/filter.png</file>
         <file>images/frontend.png</file>
-        <file>images/mono-valve-stop.png</file>
         <file>images/mono-valve.png</file>
-        <file>images/mono.png</file>
         <file>images/mrt.png</file>
         <file>images/slit-filter.png</file>
         <file>images/slit-IP.png</file>
@@ -24,7 +21,6 @@
         <file>images/ss.png</file>
         <file>images/table1.png</file>
         <file>images/table2.png</file>
-        <file>images/ccdstack.png</file>
         <file>images/ledstop1B.png</file>
         <file>images/imbl.png</file>
         <file>images/DBLmono.png</file>
