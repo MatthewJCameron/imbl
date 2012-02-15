@@ -9,7 +9,8 @@ SUBDIRS = \
     shutter1A \
     mrtShutter \
     DEImono \
-    imblgui
+    imblgui \
+    qimbl
 
 
 TEMPLATE = subdirs

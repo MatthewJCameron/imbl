@@ -85,7 +85,9 @@ void Shutter1A::updateState() {
 
 
 void Shutter1A::updateEnabled() {
-  if ( ! isConnected() )
+  if ( ! isConnected() ||
+       ! enabledSts->isConnected() || // remove with the new PSSDB
+       ! disabledSts->isConnected() ) // remove with the new PSSDB
     return;
   bool newEnabled = enabledSts->get().toBool() && ! disabledSts->get().toBool();
   if (newEnabled != enabled)
@@ -96,7 +98,7 @@ void Shutter1A::updateEnabled() {
 Shutter1A::State Shutter1A::stateS() {
   Shutter1A sht;
   if ( ! sht.getReady(2000) ) {
-    warn("Can't connect to the FE shutter.", sht.objectName());
+    warn("Can't connect to the 1A shutter.", sht.objectName());
     return BETWEEN;
   }
   return sht.state();
@@ -127,7 +129,7 @@ bool Shutter1A::close(bool wait) {
 bool Shutter1A::setOpenedS(bool opn, bool wait) {
   Shutter1A sht;
   if ( ! sht.getReady(2000) ) {
-    warn("Can't connect to the FE shutter.", sht.objectName());
+    warn("Can't connect to the 1A shutter.", sht.objectName());
     return BETWEEN;
   }
   return sht.setOpened(opn,wait);
