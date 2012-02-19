@@ -105,7 +105,6 @@ private:
 
   static const QString pvBaseName;
   static const QList<Paddle*> init();
-  inline const QList<Absorber::Foil> & train() const {return _train;}
 
   bool iAmMoving;
   QList<Absorber::Foil> _train;
@@ -114,6 +113,7 @@ public:
 
   Filters(QObject *parent = 0);
 
+  inline const QList<Absorber::Foil> & train() const {return _train;}
   inline bool isMoving() const {return iAmMoving;}
   QList<int> windows() const;
   bool isMissPositioned() const;
