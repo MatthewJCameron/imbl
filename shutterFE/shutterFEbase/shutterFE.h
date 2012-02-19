@@ -52,7 +52,7 @@ signals:
 
   void opened();
   void closed();
-  void stateChanged(State st);
+  void stateChanged(ShutterFE::State st);
   void relaxChanged();
 
 protected slots:

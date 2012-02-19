@@ -15,7 +15,7 @@ ShutterFEgui::ShutterFEgui(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateState()));
+  connect(component(), SIGNAL(stateChanged(ShutterFE::State)), SLOT(updateState()));
   connect(component(), SIGNAL(relaxChanged()), SLOT(updateRelax()));
   updateConnection(component()->isConnected());
 }

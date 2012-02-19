@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/">
+        <file>s_blue.svg</file>
+        <file>s_green.svg</file>
+        <file>s_red.svg</file>
+        <file>s_yellow.svg</file>
+        <file>s_gray.svg</file>
+        <file>imbl.png</file>
+        <file>s_black.svg</file>
+    </qresource>
+</RCC>

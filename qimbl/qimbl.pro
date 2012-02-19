@@ -20,6 +20,7 @@ FORMS    += qimbl.ui
 QMAKE_LFLAGS += -Wl,-rpath,\'\$$ORIGIN/../lib/imbl\'
 
 INCLUDEPATH += ../ \
+               ../hutch \
                ../shutterFE/shutterFEgui \
                ../shutterFE/shutterFEbase \
                ../hhlSlits/hhlSlitsBase \
@@ -38,7 +39,9 @@ INCLUDEPATH += ../ \
                ../component/componentGui
 
 LIBS += \
+        -lqtpv \
         -lTimeScanMX \
+        -L../hutch -lhutch \
         -L../shutterFE/shutterFEbase -lshutterFE \
         -L../shutterFE/shutterFEgui -lshutterFEgui \
         -L../filters/filtersBase -lfilters \
@@ -59,4 +62,7 @@ LIBS += \
 target.files = $$[TARGET]
 target.path = $$INSTALLBASE/bin
 INSTALLS += target
+
+RESOURCES += \
+    qimbl.qrc
 

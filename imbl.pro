@@ -9,6 +9,7 @@ SUBDIRS = \
     shutter1A \
     mrtShutter \
     DEImono \
+    hutch \
     imblgui \
     qimbl
 
