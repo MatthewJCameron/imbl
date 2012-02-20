@@ -2,6 +2,7 @@
 #define QIMBL_H
 
 #include <QtGui/QMainWindow>
+#include <QLabel>
 #include "shutterFE.h"
 #include "mrtShutter.h"
 #include "hhlSlits.h"
@@ -36,13 +37,7 @@ private:
   QEpicsPv * blmode2;
   QEpicsPv * blmode3;
 
-  Hutch * h1A;
-  Hutch * h1B;
-  Hutch * h2A;
-  Hutch * h2B;
-  Hutch * tunnel;
-  Hutch * h3A;
-  Hutch * h3B;
+  QHash < Hutch*, QPair<QLabel*,QLabel*> > hutches;
 
   ShutterFE * shfe;
   MrtShutter * shmrt;

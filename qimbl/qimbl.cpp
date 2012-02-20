@@ -44,13 +44,6 @@ Qimbl::Qimbl(QWidget *parent) :
   blmode1(new QEpicsPv("SR08ID01PSS01:BL_OPMODE1_STS")),
   blmode2(new QEpicsPv("SR08ID01PSS01:BL_OPMODE2_STS")),
   blmode3(new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS")),
-  h1A(new Hutch(Hutch::H1A)),
-  h1B(new Hutch(Hutch::H1B)),
-  h2A(new Hutch(Hutch::H2A)),
-  h2B(new Hutch(Hutch::H2B)),
-  tunnel(new Hutch(Hutch::TUN)),
-  h3A(new Hutch(Hutch::H3A)),
-  h3B(new Hutch(Hutch::H3B)),
   shfe(new ShutterFE(this)),
   shmrt(new MrtShutter(this)),
   slits(new HhlSlits(this)),
@@ -85,27 +78,19 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(wigglergap, SIGNAL(valueUpdated(QVariant)), SLOT(update_wigglergap()));
   connect(wigglergap, SIGNAL(connectionChanged(bool)), SLOT(update_wigglergap()));
 
-  connect(h1A, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h1A, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h1A, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(h1B, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h1B, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h1B, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(h2A, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h2A, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h2A, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(h2B, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h2B, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h2B, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(tunnel, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(tunnel, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(tunnel, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(h3A, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h3A, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h3A, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
-  connect(h3B, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
-  connect(h3B, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
-  connect(h3B, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
+  hutches.insert( new Hutch(Hutch::H1A), qMakePair(ui->st1A, ui->label_1A) );
+  hutches.insert( new Hutch(Hutch::H1B), qMakePair(ui->st1B, ui->label_1B) );
+  hutches.insert( new Hutch(Hutch::H2A), qMakePair(ui->st2A, ui->label_2A) );
+  hutches.insert( new Hutch(Hutch::H2B), qMakePair(ui->st2B, ui->label_2B) );
+  hutches.insert( new Hutch(Hutch::TUN), qMakePair(ui->stT,  ui->label_T)  );
+  hutches.insert( new Hutch(Hutch::H3A), qMakePair(ui->st3A, ui->label_3A) );
+  hutches.insert( new Hutch(Hutch::H3B), qMakePair(ui->st3B, ui->label_3B) );
+  foreach(Hutch * hut, hutches.keys()) {
+    connect(hut, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
+    connect(hut, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
+    connect(hut, SIGNAL(stackChanged(Hutch::StackColor)), SLOT(update_hutches()));
+    connect(hut, SIGNAL(connectionChanged(bool)), SLOT(update_hutches()));
+  }
 
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
@@ -158,43 +143,35 @@ Qimbl::~Qimbl() {
 }
 
 
-static void updateOneHutch(Hutch * hut, QLabel * lab) {
+static void updateOneHutch(Hutch * hut, QPair<QLabel*,QLabel*> & lab) {
   if ( ! hut->isConnected() ) {
-    lab->setStyleSheet(nolink_style);
-    lab->setText(nolink_string);
+    lab.first->setStyleSheet(nolink_style);
+    lab.first->setText(nolink_string);
+    lab.second->setEnabled(false);
   } else {
-    lab->setEnabled(hut->isEnabled());
+    lab.second->setEnabled(hut->isEnabled());
     switch (hut->stack()) {
-      case Hutch::OFF :
-        lab->setStyleSheet(gray_style);
-      case Hutch::GREEN :
-        lab->setStyleSheet(green_style);
-      case Hutch::RED :
-        lab->setStyleSheet(red_style);
-      case Hutch::AMBER :
-        lab->setStyleSheet(yellow_style);
+    case Hutch::OFF : lab.first->setStyleSheet(gray_style); break;
+    case Hutch::GREEN : lab.first->setStyleSheet(green_style); break;
+    case Hutch::RED : lab.first->setStyleSheet(red_style); break;
+    case Hutch::AMBER : lab.first->setStyleSheet(yellow_style); break;
     }
     switch (hut->state()) {
-      case Hutch::OPEN :
-        lab->setText("Open");
-      case Hutch::CLOSED :
-        lab->setText("Closed");
-      case Hutch::LOCKED :
-        lab->setText("Locked");
-      case Hutch::SEARCHED :
-        lab->setText("Searched");
+    case Hutch::OPEN : lab.first->setText("Open"); break;
+    case Hutch::CLOSED : lab.first->setText("Closed"); break;
+    case Hutch::LOCKED : lab.first->setText("Locked"); break;
+    case Hutch::SEARCHED : lab.first->setText("Searched"); break;
     }
   }
 }
 
 void Qimbl::update_hutches() {
-  updateOneHutch(h1A,ui->st1A);
-  updateOneHutch(h1B,ui->st1B);
-  updateOneHutch(h2A,ui->st2A);
-  updateOneHutch(h2B,ui->st2B);
-  updateOneHutch(tunnel,ui->stT);
-  updateOneHutch(h3A,ui->st3A);
-  updateOneHutch(h3B,ui->st3B);
+  Hutch * sndr = static_cast<Hutch*>(sender());
+  if (sndr)
+    updateOneHutch(sndr, hutches[sndr]);
+  else
+    foreach(Hutch * hut, hutches.keys())
+      updateOneHutch(hut, hutches[hut]);
 }
 
 

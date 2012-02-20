@@ -95,6 +95,11 @@ void Hutch::updateConnection() {
   foreach(QEpicsPv * pv, findChildren<QEpicsPv*>())
     connection &= pv->isConnected();
   setConnected(connection);
+  if (isConnected()) {
+    updateStack();
+    updateState();
+    updateEnabled();
+  }
 }
 
 
@@ -103,10 +108,7 @@ void Hutch::updateStack() {
     return;
 
   StackColor newStack;
-  if ( 1 < stackG->get().toInt() + stackR->get().toInt() + stackA->get().toInt() ) {
-    warn("Inconsistent data for stack color", objectName());
-    newStack = OFF;
-  } else if ( stackR->get().toBool() )
+  if ( stackR->get().toBool() )
     newStack = RED;
   else if ( stackA->get().toBool() )
     newStack = AMBER;
