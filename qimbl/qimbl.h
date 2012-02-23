@@ -5,10 +5,11 @@
 #include <QLabel>
 #include "shutterFE.h"
 #include "mrtShutter.h"
-#include "hhlSlits.h"
-#include "filters.h"
-#include "mono.h"
+#include "hhlSlitsGui.h"
+#include "filtersGui.h"
+#include "monoGui.h"
 #include "hutch.h"
+#include "valuebar.h"
 #include <qtpv.h>
 
 namespace Ui {
@@ -37,18 +38,25 @@ private:
   QEpicsPv * blmode2;
   QEpicsPv * blmode3;
 
-  QHash < Hutch*, QPair<QLabel*,QLabel*> > hutches;
+  QHash < Hutch*, QLabel* > hutches;
 
   ShutterFE * shfe;
   MrtShutter * shmrt;
-  HhlSlits * slits;
-  Filters * filters;
-  Mono * mono;
+  HhlSlitsGui * slits;
+  FiltersGui * filters;
+  MonoGui * mono;
 
-
+  static const QStringList vacMonitors;
+  static const QStringList tempMonitors;
+  static const QStringList flowMonitors;
+  QList<ValueBar*> vacBars;
+  QList<ValueBar*> tempBars;
+  QList<ValueBar*> flowBars;
 
 
 private slots:
+
+  void chooseComponent(QAbstractButton* but);
 
   void update_rfstat();
   void update_rfcurrent();
@@ -63,7 +71,14 @@ private slots:
   void update_slits();
   void update_filters();
   void update_mono();
+  void update_vacuum();
+  void update_temperature();
+  void update_flow();
+
 
 };
+
+
+
 
 #endif // QIMBL_H

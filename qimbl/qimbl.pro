@@ -6,16 +6,22 @@
 
 QT       += core gui
 
+CONFIG += qwt
 TARGET = qimbl
 TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        qimbl.cpp
+           qimbl.cpp \
+           valuebar.cpp \
+           columnresizer.cpp
 
-HEADERS  += qimbl.h
+HEADERS  += qimbl.h \
+            valuebar.h \
+    columnresizer.h
 
-FORMS    += qimbl.ui
+FORMS    += qimbl.ui \
+            valuebar.ui
 
 QMAKE_LFLAGS += -Wl,-rpath,\'\$$ORIGIN/../lib/imbl\'
 

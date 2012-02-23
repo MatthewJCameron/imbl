@@ -1,6 +1,7 @@
 #include "qimbl.h"
 #include "ui_qimbl.h"
 #include "error.h"
+#include "columnresizer.h"
 
 
 
@@ -18,6 +19,9 @@ static const QString gray_style=
 static const QString yellow_style=
     "border-image: url(:/s_yellow.svg);"
     "color: rgb(0, 0, 0);";
+static const QString orange_style=
+    "border-image: url(:/s_orange.svg);"
+    "color: rgb(0, 0, 0);";
 static const QString red_style=
     "border-image: url(:/s_red.svg);"
     "color: rgb(0, 0, 0);";
@@ -28,6 +32,28 @@ static const QString green_style=
 static const QString shutter_open_string="Opened";
 static const QString shutter_closed_string="Closed";
 
+
+static void set_nolink_style(QLabel* lab) {
+  lab->setStyleSheet(nolink_style);
+  lab->setText(nolink_string);
+}
+
+
+
+const QStringList Qimbl::vacMonitors =
+    ( QStringList()
+      << "SR08ID01CCG01:PRESSURE_MONITOR"
+      << "SR08ID01CCG02:PRESSURE_MONITOR"
+      << "SR08FE01CCG01:PRESSURE_MONITOR"
+      << "SR08FE01CCG02:PRESSURE_MONITOR" ) ;
+const QStringList Qimbl::tempMonitors =
+    ( QStringList()
+      << "SR08FE01TES01:TEMPERATURE_MONITOR"
+      << "SR08FE01TES02:TEMPERATURE_MONITOR") ;
+const QStringList Qimbl::flowMonitors =
+    ( QStringList()
+      << "FLOW_MONITOR_1"
+      << "FLOW_MONITOR_2") ;
 
 
 Qimbl::Qimbl(QWidget *parent) :
@@ -46,12 +72,14 @@ Qimbl::Qimbl(QWidget *parent) :
   blmode3(new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS")),
   shfe(new ShutterFE(this)),
   shmrt(new MrtShutter(this)),
-  slits(new HhlSlits(this)),
-  filters(new Filters(this)),
-  mono(new Mono(this))
+  slits(new HhlSlitsGui(this)),
+  filters(new FiltersGui(this)),
+  mono(new MonoGui(this))
 {
 
   ui->setupUi(this);
+  connect(ui->chooseComponent, SIGNAL(buttonClicked(QAbstractButton*)),
+          SLOT(chooseComponent(QAbstractButton*)));
 
   connect(bl_enabled, SIGNAL(valueUpdated(QVariant)), SLOT(update_bl_status()));
   connect(bl_enabled, SIGNAL(connectionChanged(bool)), SLOT(update_bl_status()));
@@ -66,25 +94,22 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(rfstat, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfstat()));
   connect(rfstat, SIGNAL(connectionChanged(bool)), SLOT(update_rfstat()));
 
-  ui->rfcurrent->setSpecialValueText(nolink_string);
   connect(rfcurrent, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfcurrent()));
   connect(rfcurrent, SIGNAL(connectionChanged(bool)), SLOT(update_rfcurrent()));
 
-  ui->rfenergy->setSpecialValueText(nolink_string);
   connect(rfenergy, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfenergy()));
   connect(rfenergy, SIGNAL(connectionChanged(bool)), SLOT(update_rfenergy()));
 
-  ui->wigglergap->setSpecialValueText(nolink_string);
   connect(wigglergap, SIGNAL(valueUpdated(QVariant)), SLOT(update_wigglergap()));
   connect(wigglergap, SIGNAL(connectionChanged(bool)), SLOT(update_wigglergap()));
 
-  hutches.insert( new Hutch(Hutch::H1A), qMakePair(ui->st1A, ui->label_1A) );
-  hutches.insert( new Hutch(Hutch::H1B), qMakePair(ui->st1B, ui->label_1B) );
-  hutches.insert( new Hutch(Hutch::H2A), qMakePair(ui->st2A, ui->label_2A) );
-  hutches.insert( new Hutch(Hutch::H2B), qMakePair(ui->st2B, ui->label_2B) );
-  hutches.insert( new Hutch(Hutch::TUN), qMakePair(ui->stT,  ui->label_T)  );
-  hutches.insert( new Hutch(Hutch::H3A), qMakePair(ui->st3A, ui->label_3A) );
-  hutches.insert( new Hutch(Hutch::H3B), qMakePair(ui->st3B, ui->label_3B) );
+  hutches.insert( new Hutch(Hutch::H1A), ui->st1A);
+  hutches.insert( new Hutch(Hutch::H1B), ui->st1B);
+  hutches.insert( new Hutch(Hutch::H2A), ui->st2A);
+  hutches.insert( new Hutch(Hutch::H2B), ui->st2B);
+  hutches.insert( new Hutch(Hutch::TUN), ui->stT );
+  hutches.insert( new Hutch(Hutch::H3A), ui->st3A);
+  hutches.insert( new Hutch(Hutch::H3B), ui->st3B);
   foreach(Hutch * hut, hutches.keys()) {
     connect(hut, SIGNAL(enabledChanged(bool)), SLOT(update_hutches()));
     connect(hut, SIGNAL(stateChanged(Hutch::State)), SLOT(update_hutches()));
@@ -98,26 +123,60 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shmrt, SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(shmrt, SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
 
-  connect(slits, SIGNAL(geometryChanged(double,double,double,double)), SLOT(update_slits()));
-  connect(slits, SIGNAL(limitStateChanged(HhlSlits::Limits)), SLOT(update_slits()));
-  connect(slits, SIGNAL(motionStateChanged(bool)), SLOT(update_slits()));
-  connect(slits, SIGNAL(connectionChanged(bool)), SLOT(update_slits()));
+  ui->control->addWidget(slits);
+  connect(slits->component(), SIGNAL(geometryChanged(double,double,double,double)), SLOT(update_slits()));
+  connect(slits->component(), SIGNAL(limitStateChanged(HhlSlits::Limits)), SLOT(update_slits()));
+  connect(slits->component(), SIGNAL(motionStateChanged(bool)), SLOT(update_slits()));
+  connect(slits->component(), SIGNAL(connectionChanged(bool)), SLOT(update_slits()));
 
-  if (filters->paddles.size() != 5) // shoud never happen
+  ui->control->addWidget(filters);
+  if (filters->component()->paddles.size() != 5) // shoud never happen
     throw_error("Unexpected number of filter foils ("
-                + QString::number(filters->paddles.size())
+                + QString::number(filters->component()->paddles.size())
                 + " instead of 5).\n"
                 "This should never happen, please report to the developer"   );
-  connect(filters, SIGNAL(motionStateChanged(bool)), SLOT(update_filters()));
-  connect(filters, SIGNAL(trainChanged(QList<Absorber::Foil>)), SLOT(update_filters()));
-  connect(filters, SIGNAL(connectionChanged(bool)), SLOT(update_filters()));
+  connect(filters->component(), SIGNAL(motionStateChanged(bool)), SLOT(update_filters()));
+  connect(filters->component(), SIGNAL(trainChanged(QList<Absorber::Foil>)), SLOT(update_filters()));
+  connect(filters->component(), SIGNAL(connectionChanged(bool)), SLOT(update_filters()));
 
-  connect(mono, SIGNAL(motionChanged(bool)), SLOT(update_mono()));
-  connect(mono, SIGNAL(energyChanged(double)), SLOT(update_mono()));
-  connect(mono, SIGNAL(bend1Changed(double)), SLOT(update_mono()));
-  connect(mono, SIGNAL(bend2Changed(double)), SLOT(update_mono()));
-  connect(mono, SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
-  connect(mono, SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
+  ui->control->addWidget(mono);
+  connect(mono->component(), SIGNAL(motionChanged(bool)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(energyChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend1Changed(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend2Changed(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
+
+  ColumnResizer* resizer;
+  int row;
+
+  row=1;
+  resizer = new ColumnResizer(this);
+  foreach(QString str, vacMonitors) {
+    ValueBar * vb = new ValueBar(str);
+    vb->setLogarithmic(true);
+    vb->setMin(1.0e-09);
+    ui->monitorsLayout->addWidget(vb, row++,0);
+    vacBars << vb;
+    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_vacuum()));
+    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
+  }
+  row=1;
+  foreach(QString str, tempMonitors) {
+    ValueBar * vb = new ValueBar(str);
+    ui->monitorsLayout->addWidget(vb, row++,1);
+    tempBars << vb;
+    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_temperature()));
+    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
+  }
+  row=1;
+  foreach(QString str, flowMonitors) {
+    ValueBar * vb = new ValueBar(str);
+    ui->monitorsLayout->addWidget(vb, row++,2);
+    flowBars << vb;
+    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_flow()));
+    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
+  }
 
 
 
@@ -134,6 +193,12 @@ Qimbl::Qimbl(QWidget *parent) :
   update_slits();
   update_filters();
   update_mono();
+  update_vacuum();
+  update_temperature();
+  update_flow();
+
+
+  ui->chooseMonitors->click();
 
 }
 
@@ -143,24 +208,35 @@ Qimbl::~Qimbl() {
 }
 
 
-static void updateOneHutch(Hutch * hut, QPair<QLabel*,QLabel*> & lab) {
+void Qimbl::chooseComponent(QAbstractButton* but) {
+  if (but == ui->chooseFilters)
+    ui->control->setCurrentWidget(filters);
+  else if (but == ui->chooseMono)
+    ui->control->setCurrentWidget(mono);
+  else if (but == ui->chooseSlits)
+    ui->control->setCurrentWidget(slits);
+  else if (but == ui->chooseMonitors)
+    ui->control->setCurrentWidget(ui->monitors);
+}
+
+
+static void updateOneHutch(Hutch * hut, QLabel* lab) {
   if ( ! hut->isConnected() ) {
-    lab.first->setStyleSheet(nolink_style);
-    lab.first->setText(nolink_string);
-    lab.second->setEnabled(false);
+    set_nolink_style(lab);
   } else {
-    lab.second->setEnabled(hut->isEnabled());
     switch (hut->stack()) {
-    case Hutch::OFF : lab.first->setStyleSheet(gray_style); break;
-    case Hutch::GREEN : lab.first->setStyleSheet(green_style); break;
-    case Hutch::RED : lab.first->setStyleSheet(red_style); break;
-    case Hutch::AMBER : lab.first->setStyleSheet(yellow_style); break;
+    // Here inconsistence between the stack color
+    // and *_style color is intentional
+    case Hutch::OFF : lab->setStyleSheet(gray_style); break;
+    case Hutch::GREEN : lab->setStyleSheet(red_style); break;
+    case Hutch::RED : lab->setStyleSheet(green_style); break;
+    case Hutch::AMBER : lab->setStyleSheet(orange_style); break;
     }
     switch (hut->state()) {
-    case Hutch::OPEN : lab.first->setText("Open"); break;
-    case Hutch::CLOSED : lab.first->setText("Closed"); break;
-    case Hutch::LOCKED : lab.first->setText("Locked"); break;
-    case Hutch::SEARCHED : lab.first->setText("Searched"); break;
+    case Hutch::OPEN : lab->setText("Open"); break;
+    case Hutch::CLOSED : lab->setText("Closed"); break;
+    case Hutch::LOCKED : lab->setText("Locked"); break;
+    case Hutch::SEARCHED : lab->setText("Searched"); break;
     }
   }
 }
@@ -176,21 +252,10 @@ void Qimbl::update_hutches() {
 
 
 void Qimbl::update_bl_mode() {
-  ui->st2A->setDisabled(false);
-  ui->label_2A->setDisabled(false);
-  ui->st2B->setDisabled(false);
-  ui->label_2B->setDisabled(false);
-  ui->stT->setDisabled(false);
-  ui->label_T->setDisabled(false);
-  ui->st3A->setDisabled(false);
-  ui->label_3A->setDisabled(false);
-  ui->st3B->setDisabled(false);
-  ui->label_3B->setDisabled(false);
   if ( ! blmode1->isConnected() ||
        ! blmode2->isConnected() ||
        ! blmode3->isConnected() ) {
-    ui->blMode->setStyleSheet(nolink_style);
-    ui->blMode->setText(nolink_string);
+    set_nolink_style(ui->blMode);
   } else if ( 1 !=
               blmode1->get().toInt() +
               blmode2->get().toInt() +
@@ -199,27 +264,11 @@ void Qimbl::update_bl_mode() {
     ui->blMode->setText("Inconsistent data");
   } else {
     ui->blMode->setStyleSheet("");
-    if ( blmode1->get().toBool() ) {
+    if ( blmode1->get().toBool() )
       ui->blMode->setText("1");
-      ui->st2A->setDisabled(true);
-      ui->label_2A->setDisabled(true);
-      ui->st2B->setDisabled(true);
-      ui->label_2B->setDisabled(true);
-      ui->stT->setDisabled(true);
-      ui->label_T->setDisabled(true);
-      ui->st3A->setDisabled(true);
-      ui->label_3A->setDisabled(true);
-      ui->st3B->setDisabled(true);
-      ui->label_3B->setDisabled(true);
-    } else if ( blmode2->get().toBool() ) {
+    else if ( blmode2->get().toBool() )
       ui->blMode->setText("2");
-      ui->stT->setDisabled(true);
-      ui->label_T->setDisabled(true);
-      ui->st3A->setDisabled(true);
-      ui->label_3A->setDisabled(true);
-      ui->st3B->setDisabled(true);
-      ui->label_3B->setDisabled(true);
-    } else
+    else
       ui->blMode->setText("3");
   }
 }
@@ -228,8 +277,7 @@ void Qimbl::update_bl_mode() {
 void Qimbl::update_bl_status() {
   if ( ! bl_enabled->isConnected() ||
        ! bl_disabled->isConnected()) {
-    ui->blSt->setStyleSheet(nolink_style);
-    ui->blSt->setText(nolink_string);
+    set_nolink_style(ui->blSt);
   } else if ( bl_enabled->get().toBool() &&
               ! bl_disabled->get().toBool() ) {
     ui->blSt->setStyleSheet(green_style);
@@ -248,8 +296,7 @@ void Qimbl::update_bl_status() {
 void Qimbl::update_eps_status() {
   if ( ! eps_enabled->isConnected() ||
        ! eps_disabled->isConnected()) {
-    ui->epsSt->setStyleSheet(nolink_style);
-    ui->epsSt->setText(nolink_string);
+    set_nolink_style(ui->epsSt);
   } else if ( eps_enabled->get().toBool() &&
               ! eps_disabled->get().toBool() ) {
     ui->epsSt->setStyleSheet(green_style);
@@ -267,8 +314,7 @@ void Qimbl::update_eps_status() {
 
 void Qimbl::update_rfstat() {
   if ( ! rfstat->isConnected() ) {
-    ui->rfSt->setStyleSheet(nolink_style);
-    ui->rfSt->setText(nolink_string);
+    set_nolink_style(ui->rfSt);
   } else if ( ! rfstat->getEnum().size() ||
               rfstat->get().toInt() >= rfstat->getEnum().size() ) { // should never happen
     ui->rfSt->setStyleSheet("color: rgb(255, 0, 0);");
@@ -295,47 +341,43 @@ void Qimbl::update_rfstat() {
 
 void Qimbl::update_rfcurrent() {
   if ( ! rfcurrent->isConnected() ) {
-    ui->rfcurrent->setStyleSheet(nolink_style);
-    ui->rfcurrent->setValue(ui->rfcurrent->minimum());
+    set_nolink_style(ui->rfcurrent);
   } else {
     ui->rfcurrent->setStyleSheet("");
-    ui->rfcurrent->setValue(rfcurrent->get().toDouble());
+    ui->rfcurrent->setText( QString::number(rfcurrent->get().toDouble(), 'f', 3) + "mA" );
   }
 }
 
 void Qimbl::update_rfenergy() {
   if ( ! rfenergy->isConnected() ) {
-    ui->rfenergy->setStyleSheet(nolink_style);
-    ui->rfenergy->setValue(ui->rfenergy->minimum());
+    set_nolink_style(ui->rfenergy);
   } else {
     ui->rfenergy->setStyleSheet("");
-    ui->rfenergy->setValue(rfenergy->get().toDouble());
+    ui->rfenergy->setText(QString::number(rfenergy->get().toDouble(), 'f', 3) + "keV");
   }
 }
 
 void Qimbl::update_wigglergap() {
   if ( ! wigglergap->isConnected() ) {
-    ui->wigglergap->setStyleSheet(nolink_style);
-    ui->wigglergap->setValue(ui->wigglergap->minimum());
+    set_nolink_style(ui->wigglergap);
   } else {
     ui->wigglergap->setStyleSheet("");
-    ui->wigglergap->setValue(wigglergap->get().toDouble());
+    ui->wigglergap->setText(QString::number(wigglergap->get().toDouble(), 'f', 3) + "mm");
   }
 }
 
 
 void Qimbl::update_shfe() {
   if ( ! shfe->isConnected() ) {
-    ui->shfeSt->setStyleSheet(nolink_style);
-    ui->shfeSt->setText(nolink_string);
+    set_nolink_style(ui->shfeSt);
   } else
     switch (shfe->state()) {
       case ShutterFE::CLOSED :
-        ui->shfeSt->setStyleSheet(green_style);
+        ui->shfeSt->setStyleSheet(red_style);
         ui->shfeSt->setText(shutter_closed_string);
         break;
       case ShutterFE::OPENED :
-        ui->shfeSt->setStyleSheet(red_style);
+        ui->shfeSt->setStyleSheet(green_style);
         ui->shfeSt->setText(shutter_open_string);
         break;
       case ShutterFE::BETWEEN :
@@ -347,19 +389,18 @@ void Qimbl::update_shfe() {
 
 void Qimbl::update_shmrt() {
   if ( ! shmrt->isConnected() ) {
-    ui->shmrtSt->setStyleSheet(nolink_style);
-    ui->shmrtSt->setText(nolink_string);
+    set_nolink_style(ui->shmrtSt);
   } else if ( shmrt->progress() ) {
     ui->shmrtSt->setStyleSheet(red_style);
     ui->shmrtSt->setText("Running: " + QString::number(shmrt->progress()));
   } else
     switch (shmrt->state()) {
       case MrtShutter::CLOSED :
-        ui->shmrtSt->setStyleSheet(green_style);
+        ui->shmrtSt->setStyleSheet(red_style);
         ui->shmrtSt->setText(shutter_closed_string);
         break;
       case ShutterFE::OPENED :
-        ui->shmrtSt->setStyleSheet(red_style);
+        ui->shmrtSt->setStyleSheet(green_style);
         ui->shmrtSt->setText(shutter_open_string);
         break;
       case ShutterFE::BETWEEN :
@@ -370,15 +411,19 @@ void Qimbl::update_shmrt() {
 
 
 void Qimbl::update_slits() {
-  if ( ! slits->isConnected() ) {
+  if ( ! slits->component()->isConnected() ) {
     ui->slitsStW->show();
-    ui->slitsSt->setStyleSheet(nolink_style);
-    ui->slitsSt->setText(nolink_string);
-  } else if ( slits->isMoving() ) {
+    set_nolink_style(ui->slitsSt);
+    set_nolink_style(ui->slitsH);
+    set_nolink_style(ui->slitsW);
+    set_nolink_style(ui->slitsY);
+    set_nolink_style(ui->slitsZ);
+    return;
+  } else if ( slits->component()->isMoving() ) {
     ui->slitsStW->show();
     ui->slitsSt->setStyleSheet("");
     ui->slitsSt->setText(inprogress_string);
-  } else if ( slits->limits() ) {
+  } else if ( slits->component()->limits() ) {
     ui->slitsStW->show();
     ui->slitsSt->setStyleSheet("");
     ui->slitsSt->setText("on limit(s)");
@@ -387,20 +432,26 @@ void Qimbl::update_slits() {
     ui->slitsSt->setStyleSheet("");
     ui->slitsSt->setText("");
   }
-  ui->slitsH->setValue(slits->height());
-  ui->slitsW->setValue(slits->width());
-  ui->slitsY->setValue(slits->hCenter());
-  ui->slitsZ->setValue(slits->vCenter());
+  ui->slitsH->setStyleSheet("");
+  ui->slitsW->setStyleSheet("");
+  ui->slitsY->setStyleSheet("");
+  ui->slitsZ->setStyleSheet("");
+  ui->slitsH->setText(QString::number(slits->component()->height(), 'f', 3) + "mm");
+  ui->slitsW->setText(QString::number(slits->component()->width(), 'f', 3) + "mm");
+  ui->slitsY->setText(QString::number(slits->component()->hCenter(), 'f', 3) + "mm");
+  ui->slitsZ->setText(QString::number(slits->component()->vCenter(), 'f', 3) + "mm");
 }
 
 
 static void describePaddle(const Paddle * pad, QLabel * lab) {
-  if ( pad->window() <0 ) { // misspositioned
+  if ( ! pad->isConnected() ) {
+    set_nolink_style(lab);
+  } else if ( pad->window() <0 ) { // misspositioned
     lab->setStyleSheet(red_style);
     lab->setText("Misspositioned!");
   } else if ( pad->isMoving() ) {
     lab->setStyleSheet("");
-    lab->setText(QString::number(pad->motor()->getUserPosition()));
+    lab->setText(QString::number(pad->motor()->getUserPosition(), 'f', 3) + "mm");
   } else {
     lab->setStyleSheet("");
     lab->setText(pad->absorber().description());
@@ -408,15 +459,14 @@ static void describePaddle(const Paddle * pad, QLabel * lab) {
 }
 
 void Qimbl::update_filters() {
-  if ( ! filters->isConnected() ) {
+  if ( ! filters->component()->isConnected() ) {
     ui->filtersStW->show();
-    ui->filtersSt->setStyleSheet(nolink_style);
-    ui->filtersSt->setText(nolink_string);
-  } else if ( filters->isMoving() ) {
+    set_nolink_style(ui->filtersSt);
+  } else if ( filters->component()->isMoving() ) {
     ui->filtersStW->show();
     ui->filtersSt->setStyleSheet("");
     ui->filtersSt->setText(inprogress_string);
-  } else if ( filters->isMissPositioned() ) {
+  } else if ( filters->component()->isMissPositioned() ) {
     ui->filtersStW->show();
     ui->filtersSt->setStyleSheet(red_style);
     ui->filtersSt->setText("Check it!");
@@ -425,24 +475,35 @@ void Qimbl::update_filters() {
     ui->filtersSt->setStyleSheet("");
     ui->filtersSt->setText("");
   }
-  describePaddle(filters->paddles[0], ui->filter1);
-  describePaddle(filters->paddles[1], ui->filter2);
-  describePaddle(filters->paddles[2], ui->filter3);
-  describePaddle(filters->paddles[3], ui->filter4);
-  describePaddle(filters->paddles[4], ui->filter5);
+  describePaddle(filters->component()->paddles[0], ui->filter1);
+  describePaddle(filters->component()->paddles[1], ui->filter2);
+  describePaddle(filters->component()->paddles[2], ui->filter3);
+  describePaddle(filters->component()->paddles[3], ui->filter4);
+  describePaddle(filters->component()->paddles[4], ui->filter5);
 }
 
 
 void Qimbl::update_mono() {
-  if ( ! mono->isConnected() ) {
+  if ( ! mono->component()->isConnected() ) {
     ui->monoStW->show();
-    ui->monoSt->setStyleSheet(nolink_style);
-    ui->monoSt->setText(nolink_string);
-  } else if ( mono->isMoving() ) {
+    set_nolink_style(ui->monoSt);
+    set_nolink_style(ui->monoPos);
+    set_nolink_style(ui->energy);
+    set_nolink_style(ui->hkl);
+    set_nolink_style(ui->bend1);
+    set_nolink_style(ui->bend2);
+    return;
+  }
+  ui->monoPos->setStyleSheet("");
+  ui->energy->setStyleSheet("");
+  ui->hkl->setStyleSheet("");
+  ui->bend1->setStyleSheet("");
+  ui->bend2->setStyleSheet("");
+  if ( mono->component()->isMoving() ) {
     ui->monoStW->show();
     ui->monoSt->setStyleSheet("");
     ui->monoSt->setText(inprogress_string);
-  } else if ( mono->inBeam() == Mono::BETWEEN ) {
+  } else if ( mono->component()->inBeam() == Mono::BETWEEN ) {
     ui->monoStW->show();
     ui->monoSt->setStyleSheet(red_style);
     ui->monoSt->setText("Stopped in between");
@@ -451,7 +512,7 @@ void Qimbl::update_mono() {
     ui->monoSt->setStyleSheet("");
     ui->monoSt->setText("");
   }
-  switch ( mono->inBeam() ) {
+  switch ( mono->component()->inBeam() ) {
     case Mono::INBEAM :
       ui->monoPos->setStyleSheet("");
       ui->monoPos->setText("In beam");
@@ -469,8 +530,8 @@ void Qimbl::update_mono() {
       ui->monoPos->setText("Moving");
       break;
   }
-  ui->energy->setValue(mono->energy());
-  switch (mono->diffraction()) {
+  ui->energy->setText(QString::number(mono->component()->energy()));
+  switch (mono->component()->diffraction()) {
     case Mono::Si111 :
       ui->hkl->setText("1,1,1");
       break;
@@ -478,12 +539,75 @@ void Qimbl::update_mono() {
       ui->hkl->setText("3,1,1");
       break;
   }
-  ui->bend1->setValue(mono->bend1());
-  ui->bend2->setValue(mono->bend2());
+  ui->bend1->setText(QString::number(mono->component()->bend1()));
+  ui->bend2->setText(QString::number(mono->component()->bend2()));
 }
 
 
+void Qimbl::update_vacuum() {
+  ValueBar::Health health = ValueBar::OK;
+  foreach (ValueBar * vb, vacBars)
+    if (vb->health() > health)
+      health = vb->health();
+  switch (health) {
+    case ValueBar::OK :
+      ui->vacSt->setStyleSheet(green_style);
+      ui->vacSt->setText("All OK");
+      break;
+    case ValueBar::WARN :
+      ui->vacSt->setStyleSheet(yellow_style);
+      ui->vacSt->setText("Warn!");
+      break;
+    case ValueBar::ALARM :
+      ui->vacSt->setStyleSheet(red_style);
+      ui->vacSt->setText("Alarm!!!");
+      break;
+  }
+}
 
+
+void Qimbl::update_temperature() {
+  ValueBar::Health health = ValueBar::OK;
+  foreach (ValueBar * vb, tempBars)
+    if (vb->health() > health)
+      health = vb->health();
+  switch (health) {
+    case ValueBar::OK :
+      ui->tempSt->setStyleSheet(green_style);
+      ui->tempSt->setText("All OK");
+      break;
+    case ValueBar::WARN :
+      ui->tempSt->setStyleSheet(yellow_style);
+      ui->tempSt->setText("Warn!");
+      break;
+    case ValueBar::ALARM :
+      ui->tempSt->setStyleSheet(red_style);
+      ui->tempSt->setText("Alarm!!!");
+      break;
+  }
+}
+
+
+void Qimbl::update_flow() {
+  ValueBar::Health health = ValueBar::OK;
+  foreach (ValueBar * vb, flowBars)
+    if (vb->health() > health)
+      health = vb->health();
+  switch (health) {
+    case ValueBar::OK :
+      ui->flowSt->setStyleSheet(green_style);
+      ui->flowSt->setText("All OK");
+      break;
+    case ValueBar::WARN :
+      ui->flowSt->setStyleSheet(yellow_style);
+      ui->flowSt->setText("Warn!");
+      break;
+    case ValueBar::ALARM :
+      ui->flowSt->setStyleSheet(red_style);
+      ui->flowSt->setText("Alarm!!!");
+      break;
+  }
+}
 
 
 
