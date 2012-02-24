@@ -202,6 +202,7 @@ static bool init_data() {
   loadMu(Absorber::Silver, mu[Absorber::Silver], energies);
   loadMu(Absorber::Gold, mu[Absorber::Gold], energies);
   loadMu(Absorber::Molybdenum, mu[Absorber::Molybdenum], energies);
+  loadMu(Absorber::Carborundum, mu[Absorber::Carborundum], energies);
 
   energies = energies * 0.001; // eV -> keV
 

@@ -4,6 +4,7 @@
 #include <QtGui/QMainWindow>
 #include <QLabel>
 #include "shutterFE.h"
+#include "shutter1A.h"
 #include "mrtShutter.h"
 #include "hhlSlitsGui.h"
 #include "filtersGui.h"
@@ -41,7 +42,7 @@ private:
   QHash < Hutch*, QLabel* > hutches;
 
   ShutterFE * shfe;
-  MrtShutter * shmrt;
+  Shutter1A * sh1A;
   HhlSlitsGui * slits;
   FiltersGui * filters;
   MonoGui * mono;
@@ -67,6 +68,7 @@ private slots:
   void update_bl_mode();
   void update_hutches();
   void update_shfe();
+  void update_sh1A();
   void update_shmrt();
   void update_slits();
   void update_filters();

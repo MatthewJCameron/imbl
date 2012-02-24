@@ -54,7 +54,7 @@ public slots:
 
 signals:
 
-  void stateChanged(State st);
+  void stateChanged(Shutter1A::State st);
   void relaxChanged();
   void opened();
   void closed();

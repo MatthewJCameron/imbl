@@ -15,7 +15,8 @@ public:
     Copper,
     Silver,
     Gold,
-    Molybdenum
+    Molybdenum,
+    Carborundum
   };
   typedef QPair<Material, double> Foil;
 private:

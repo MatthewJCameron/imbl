@@ -31,6 +31,9 @@ static const QString green_style=
 
 static const QString shutter_open_string="Opened";
 static const QString shutter_closed_string="Closed";
+static const QString shutter_through_string="<----------";
+static const QString shInd_c_style="background-color: rgb(255, 0, 0);";
+static const QString shInd_o_style="background-color: rgb(0, 255, 0);";
 
 
 static void set_nolink_style(QLabel* lab) {
@@ -71,7 +74,7 @@ Qimbl::Qimbl(QWidget *parent) :
   blmode2(new QEpicsPv("SR08ID01PSS01:BL_OPMODE2_STS")),
   blmode3(new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS")),
   shfe(new ShutterFE(this)),
-  shmrt(new MrtShutter(this)),
+  sh1A(new Shutter1A(this)),
   slits(new HhlSlitsGui(this)),
   filters(new FiltersGui(this)),
   mono(new MonoGui(this))
@@ -120,8 +123,11 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
 
-  connect(shmrt, SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
-  connect(shmrt, SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
+  connect(sh1A, SIGNAL(stateChanged(Shutter1A::State)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_sh1A()));
+
+  connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
+  connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
 
   ui->control->addWidget(slits);
   connect(slits->component(), SIGNAL(geometryChanged(double,double,double,double)), SLOT(update_slits()));
@@ -189,6 +195,7 @@ Qimbl::Qimbl(QWidget *parent) :
   update_bl_mode();
   update_hutches();
   update_shfe();
+  update_sh1A();
   update_shmrt();
   update_slits();
   update_filters();
@@ -217,6 +224,8 @@ void Qimbl::chooseComponent(QAbstractButton* but) {
     ui->control->setCurrentWidget(slits);
   else if (but == ui->chooseMonitors)
     ui->control->setCurrentWidget(ui->monitors);
+  else if (but == ui->chooseShutters)
+    ui->control->setCurrentWidget(ui->shutters);
 }
 
 
@@ -348,14 +357,16 @@ void Qimbl::update_rfcurrent() {
   }
 }
 
+
 void Qimbl::update_rfenergy() {
   if ( ! rfenergy->isConnected() ) {
     set_nolink_style(ui->rfenergy);
   } else {
     ui->rfenergy->setStyleSheet("");
-    ui->rfenergy->setText(QString::number(rfenergy->get().toDouble(), 'f', 3) + "keV");
+    ui->rfenergy->setText(QString::number(rfenergy->get().toDouble(), 'f', 3) + "GeV");
   }
 }
+
 
 void Qimbl::update_wigglergap() {
   if ( ! wigglergap->isConnected() ) {
@@ -370,43 +381,117 @@ void Qimbl::update_wigglergap() {
 void Qimbl::update_shfe() {
   if ( ! shfe->isConnected() ) {
     set_nolink_style(ui->shfeSt);
-  } else
+    set_nolink_style(ui->shIndFE_c);
+    set_nolink_style(ui->shIndFE_o);
+  } else {
     switch (shfe->state()) {
       case ShutterFE::CLOSED :
         ui->shfeSt->setStyleSheet(red_style);
         ui->shfeSt->setText(shutter_closed_string);
+        ui->shIndFE_c->setStyleSheet(shInd_c_style);
+        ui->shIndFE_c->setText(shutter_closed_string);
+        ui->shIndFE_o->setStyleSheet(shInd_c_style);
+        ui->shIndFE_o->setText("");
+        ui->shfeControl->setText("Open");
         break;
       case ShutterFE::OPENED :
         ui->shfeSt->setStyleSheet(green_style);
         ui->shfeSt->setText(shutter_open_string);
+        ui->shIndFE_c->setStyleSheet("");
+        ui->shIndFE_c->setText(shutter_through_string);
+        ui->shIndFE_o->setStyleSheet(shInd_o_style);
+        ui->shIndFE_o->setText(shutter_open_string);
+        ui->shfeControl->setText("Close");
         break;
       case ShutterFE::BETWEEN :
         ui->shfeSt->setText(inprogress_string);
         break;
     }
+  }
 }
 
 
+void Qimbl::update_sh1A() {
+  if ( ! sh1A->isConnected() ) {
+    set_nolink_style(ui->shpsSt);
+    set_nolink_style(ui->shssSt);
+    set_nolink_style(ui->shIndPS_c);
+    set_nolink_style(ui->shIndPS_o);
+    set_nolink_style(ui->shIndSS_c);
+    set_nolink_style(ui->shIndSS_o);
+  } else {
+    switch (sh1A->state()) {
+      case ShutterFE::CLOSED :
+        ui->shpsSt->setStyleSheet(red_style);
+        ui->shpsSt->setText(shutter_closed_string);
+        ui->shssSt->setStyleSheet(red_style);
+        ui->shssSt->setText(shutter_closed_string);
+        ui->shIndPS_c->setStyleSheet(shInd_c_style);
+        ui->shIndPS_c->setText(shutter_closed_string);
+        ui->shIndPS_o->setStyleSheet(shInd_c_style);
+        ui->shIndPS_o->setText("");
+        ui->shIndSS_c->setStyleSheet(shInd_c_style);
+        ui->shIndSS_c->setText(shutter_closed_string);
+        ui->shIndSS_o->setStyleSheet(shInd_c_style);
+        ui->shIndSS_o->setText("");
+        ui->sh1AControl->setText("Open");
+        break;
+      case ShutterFE::OPENED :
+        ui->shpsSt->setStyleSheet(green_style);
+        ui->shpsSt->setText(shutter_open_string);
+        ui->shssSt->setStyleSheet(green_style);
+        ui->shssSt->setText(shutter_open_string);
+        ui->shIndPS_c->setStyleSheet("");
+        ui->shIndPS_c->setText(shutter_through_string);
+        ui->shIndPS_o->setStyleSheet(shInd_o_style);
+        ui->shIndPS_o->setText(shutter_open_string);
+        ui->shIndSS_c->setStyleSheet("");
+        ui->shIndSS_c->setText(shutter_through_string);
+        ui->shIndSS_o->setStyleSheet(shInd_o_style);
+        ui->shIndSS_o->setText(shutter_open_string);
+        ui->sh1AControl->setText("Close");
+        break;
+      case ShutterFE::BETWEEN :
+        ui->shpsSt->setText(inprogress_string);
+        ui->shssSt->setText(inprogress_string);
+        break;
+    }
+  }
+}
+
+
+
 void Qimbl::update_shmrt() {
-  if ( ! shmrt->isConnected() ) {
+  if ( ! ui->shmrt->component()->isConnected() ) {
     set_nolink_style(ui->shmrtSt);
-  } else if ( shmrt->progress() ) {
+    set_nolink_style(ui->shIndMRT_c);
+    set_nolink_style(ui->shIndMRT_o);
+  } else if ( ui->shmrt->component()->progress() ) {
     ui->shmrtSt->setStyleSheet(red_style);
-    ui->shmrtSt->setText("Running: " + QString::number(shmrt->progress()));
-  } else
-    switch (shmrt->state()) {
+    ui->shmrtSt->setText("Running: " + QString::number(ui->shmrt->component()->progress()));
+  } else {
+    switch (ui->shmrt->component()->state()) {
       case MrtShutter::CLOSED :
         ui->shmrtSt->setStyleSheet(red_style);
         ui->shmrtSt->setText(shutter_closed_string);
+        ui->shIndMRT_c->setStyleSheet(shInd_c_style);
+        ui->shIndMRT_c->setText(shutter_closed_string);
+        ui->shIndMRT_o->setStyleSheet(shInd_c_style);
+        ui->shIndMRT_o->setText("");
         break;
-      case ShutterFE::OPENED :
+      case MrtShutter::OPENED :
         ui->shmrtSt->setStyleSheet(green_style);
         ui->shmrtSt->setText(shutter_open_string);
+        ui->shIndMRT_c->setStyleSheet("");
+        ui->shIndMRT_c->setText(shutter_through_string);
+        ui->shIndMRT_o->setStyleSheet(shInd_o_style);
+        ui->shIndMRT_o->setText(shutter_open_string);
         break;
-      case ShutterFE::BETWEEN :
+      case MrtShutter::BETWEEN :
         ui->shmrtSt->setText(inprogress_string);
         break;
     }
+  }
 }
 
 

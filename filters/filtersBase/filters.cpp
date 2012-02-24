@@ -11,6 +11,7 @@ QString materialName(Absorber::Material material){
   case Absorber::Silver: return "Ag";
   case Absorber::Gold: return "Au";
   case Absorber::Molybdenum: return "Mo";
+  case Absorber::Carborundum: return "SiC";
   default : return "";
   }
 }
@@ -157,9 +158,11 @@ const QList<Paddle*> Filters::init() {
 
   _paddles << new Paddle(pvBaseName+"02:MTR01", QList<Paddle::Window>()
                          << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
-                         << Paddle::Window(68.5,   Absorber(Absorber::Aluminium, 0.2) )
-                         << Paddle::Window(133.77, Absorber(Absorber::Graphite, 1.0) )
-                         << Paddle::Window(198.6,  Absorber(Absorber::Graphite, 1.5) ),
+                         << Paddle::Window(68.5,   Absorber(Absorber::Carborundum, 0.25) )
+                         << Paddle::Window(133.77, Absorber(Absorber::Carborundum, 0.5) )
+                         << Paddle::Window(198.6,  Absorber( QList<Absorber::Foil>()
+                                                             << Absorber::Foil(Absorber::Carborundum, 0.5)
+                                                             << Absorber::Foil(Absorber::Carborundum, 0.5) ) ),
                          M_PI/4.0 );
 
   _paddles << new Paddle(pvBaseName+"03:MTR01", QList<Paddle::Window>()
@@ -177,7 +180,7 @@ const QList<Paddle*> Filters::init() {
                          << Paddle::Window(60.4,  Absorber(Absorber::Aluminium, 0.5) )
                          << Paddle::Window(125.9, Absorber(Absorber::Aluminium, 1.0) )
                          << Paddle::Window(190.7, Absorber(Absorber::Copper, 0.5) ),
-                         M_PI/6.0);
+                         M_PI/4.0);
 
   _paddles << new Paddle(pvBaseName+"05:MTR01", QList<Paddle::Window>()
                          << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
