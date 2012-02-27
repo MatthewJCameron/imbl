@@ -81,6 +81,17 @@ private slots:
 };
 
 
+class QLabelLine : public QLabel {
+public:
+  inline explicit QLabelLine(QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(parent,f) {}
+  inline explicit QLabelLine (const QString & text, QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(text,parent,f) {}
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
+
+
 
 
 #endif // QIMBL_H

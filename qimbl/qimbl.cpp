@@ -31,9 +31,12 @@ static const QString green_style=
 
 static const QString shutter_open_string="Opened";
 static const QString shutter_closed_string="Closed";
-static const QString shutter_through_string="<----------";
-static const QString shInd_c_style="background-color: rgb(255, 0, 0);";
-static const QString shInd_o_style="background-color: rgb(0, 255, 0);";
+static const QString shInd_c_style =
+    "background-color: rgb(255, 0, 0);"
+    "color: rgb(0, 0, 0);";
+static const QString shInd_o_style =
+    "background-color: rgb(0, 255, 0);"
+    "color: rgb(0, 0, 0);";
 
 
 static void set_nolink_style(QLabel* lab) {
@@ -148,8 +151,10 @@ Qimbl::Qimbl(QWidget *parent) :
   ui->control->addWidget(mono);
   connect(mono->component(), SIGNAL(motionChanged(bool)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(energyChanged(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend1Changed(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend2Changed(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend1frontChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend2frontChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend1backChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend2backChanged(double)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
 
@@ -184,6 +189,19 @@ Qimbl::Qimbl(QWidget *parent) :
     resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
   }
 
+
+  ui->shIndV1A_c->setStyleSheet("");
+  ui->shIndV1A_c->setText("");
+  ui->shIndV1A_o->setStyleSheet(shInd_o_style);
+  ui->shIndV1A_o->setText(shutter_open_string);
+  ui->shIndVT1_c->setStyleSheet("");
+  ui->shIndVT1_c->setText("");
+  ui->shIndVT1_o->setStyleSheet(shInd_o_style);
+  ui->shIndVT1_o->setText(shutter_open_string);
+  ui->shIndVT2_c->setStyleSheet("");
+  ui->shIndVT2_c->setText("");
+  ui->shIndVT2_o->setStyleSheet(shInd_o_style);
+  ui->shIndVT2_o->setText(shutter_open_string);
 
 
   update_rfstat();
@@ -398,7 +416,7 @@ void Qimbl::update_shfe() {
         ui->shfeSt->setStyleSheet(green_style);
         ui->shfeSt->setText(shutter_open_string);
         ui->shIndFE_c->setStyleSheet("");
-        ui->shIndFE_c->setText(shutter_through_string);
+        ui->shIndFE_c->setText("");
         ui->shIndFE_o->setStyleSheet(shInd_o_style);
         ui->shIndFE_o->setText(shutter_open_string);
         ui->shfeControl->setText("Close");
@@ -442,11 +460,11 @@ void Qimbl::update_sh1A() {
         ui->shssSt->setStyleSheet(green_style);
         ui->shssSt->setText(shutter_open_string);
         ui->shIndPS_c->setStyleSheet("");
-        ui->shIndPS_c->setText(shutter_through_string);
+        ui->shIndPS_c->setText("");
         ui->shIndPS_o->setStyleSheet(shInd_o_style);
         ui->shIndPS_o->setText(shutter_open_string);
         ui->shIndSS_c->setStyleSheet("");
-        ui->shIndSS_c->setText(shutter_through_string);
+        ui->shIndSS_c->setText("");
         ui->shIndSS_o->setStyleSheet(shInd_o_style);
         ui->shIndSS_o->setText(shutter_open_string);
         ui->sh1AControl->setText("Close");
@@ -483,12 +501,14 @@ void Qimbl::update_shmrt() {
         ui->shmrtSt->setStyleSheet(green_style);
         ui->shmrtSt->setText(shutter_open_string);
         ui->shIndMRT_c->setStyleSheet("");
-        ui->shIndMRT_c->setText(shutter_through_string);
+        ui->shIndMRT_c->setText("");
         ui->shIndMRT_o->setStyleSheet(shInd_o_style);
         ui->shIndMRT_o->setText(shutter_open_string);
         break;
       case MrtShutter::BETWEEN :
         ui->shmrtSt->setText(inprogress_string);
+        ui->shIndMRT_c->setText(inprogress_string);
+        ui->shIndMRT_o->setText(inprogress_string);
         break;
     }
   }
@@ -624,8 +644,10 @@ void Qimbl::update_mono() {
       ui->hkl->setText("3,1,1");
       break;
   }
-  ui->bend1->setText(QString::number(mono->component()->bend1()));
-  ui->bend2->setText(QString::number(mono->component()->bend2()));
+  ui->bend1->setText(QString::number(mono->component()->bend1front()) + "/" +
+                     QString::number(mono->component()->bend1back()));
+  ui->bend2->setText(QString::number(mono->component()->bend2front()) + "/" +
+                     QString::number(mono->component()->bend2back()));
 }
 
 
@@ -696,6 +718,19 @@ void Qimbl::update_flow() {
 
 
 
+
+void QLabelLine::paintEvent( QPaintEvent * event ) {
+  QLabel::paintEvent(event);
+  if ( ! text().isEmpty() )
+    return;
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(3);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  painter.drawLine(rect().left(), rect().height()/2,
+                   rect().right(), rect().height()/2);
+}
 
 
 

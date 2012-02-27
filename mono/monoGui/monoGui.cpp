@@ -36,8 +36,10 @@ void MonoGui::init() {
   connect(component(), SIGNAL(dZChanged(double)), ui->z2tuner, SLOT(setValue(double)));
   connect(component(), SIGNAL(tilt1Changed(double)), ui->tilt1, SLOT(setValue(double)));
   connect(component(), SIGNAL(tilt2Changed(double)), ui->tilt2, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend1Changed(double)), ui->bend1, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend2Changed(double)), ui->bend2, SLOT(setValue(double)));
+  connect(component(), SIGNAL(bend1frontChanged(double)), ui->bend1front, SLOT(setValue(double)));
+  connect(component(), SIGNAL(bend2frontChanged(double)), ui->bend2front, SLOT(setValue(double)));
+  connect(component(), SIGNAL(bend1backChanged(double)), ui->bend1back, SLOT(setValue(double)));
+  connect(component(), SIGNAL(bend2backChanged(double)), ui->bend2back, SLOT(setValue(double)));
   connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(updateInOut(Mono::InOutPosition)));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
@@ -47,8 +49,10 @@ void MonoGui::init() {
   connect(ui->energy, SIGNAL(valueEdited(double)),  SLOT(onEnergySet()));
   connect(ui->tuneBragg, SIGNAL(valueChanged(double)), component(), SLOT(setDBragg(double)));
   connect(ui->tuneX, SIGNAL(valueChanged(double)), component(), SLOT(setDX(double)));
-  connect(ui->bend1, SIGNAL(valueChanged(double)), component(), SLOT(setBend1(double)));
-  connect(ui->bend2, SIGNAL(valueChanged(double)), component(), SLOT(setBend2(double)));
+  connect(ui->bend1front, SIGNAL(valueChanged(double)), component(), SLOT(setBend1front(double)));
+  connect(ui->bend2front, SIGNAL(valueChanged(double)), component(), SLOT(setBend2front(double)));
+  connect(ui->bend1back, SIGNAL(valueChanged(double)), component(), SLOT(setBend1back(double)));
+  connect(ui->bend2back, SIGNAL(valueChanged(double)), component(), SLOT(setBend2back(double)));
   connect(ui->tilt1, SIGNAL(valueChanged(double)), component(), SLOT(setTilt1(double)));
   connect(ui->tilt2, SIGNAL(valueChanged(double)), component(), SLOT(setTilt2(double)));
   connect(ui->z2tuner, SIGNAL(valueChanged(double)), component(), SLOT(setDZ(double)));
@@ -87,15 +91,14 @@ void MonoGui::updateConnection(bool con) {
 
 void MonoGui::onEnergyTune() {
   const double enrg = ui->energy->value();
-  ui->wave->setValue( 12.398419 / enrg ); // 12.398419 = h*c (keV)
+  //ui->wave->setValue( 12.398419 / enrg ); // 12.398419 = h*c (keV)
   ui->si311->setDisabled(enrg < Mono::minEnergy311);
   ui->si111->setDisabled(enrg > Mono::maxEnergy111);
   if ( enrg < Mono::minEnergy311 && ui->si311->isChecked() )
     ui->si111->setChecked(true);
   if ( enrg > Mono::maxEnergy111 && ui->si111->isChecked() )
     ui->si311->setChecked(true);
-  ui->angle->setValue(
-        energy2bragg(enrg, ui->si111->isChecked() ? Mono::Si111 : Mono::Si311) );
+  //ui->angle->setValue(energy2bragg(enrg, ui->si111->isChecked() ? Mono::Si111 : Mono::Si311) );
 }
 
 
@@ -135,8 +138,10 @@ void MonoGui::onStopReset() {
     updateEnergy();
     ui->tilt1->setValue(component()->tilt1());
     ui->tilt2->setValue(component()->tilt2());
-    ui->bend1->setValue(component()->bend1());
-    ui->bend2->setValue(component()->bend2());
+    ui->bend1front->setValue(component()->bend1front());
+    ui->bend2front->setValue(component()->bend2front());
+    ui->bend1back->setValue(component()->bend1back());
+    ui->bend2back->setValue(component()->bend2back());
     ui->z2tuner->setValue(component()->dZ());
     ui->tuneBragg->setValue(component()->dBragg());
     ui->tuneX->setValue(component()->dX());

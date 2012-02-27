@@ -151,15 +151,7 @@ void MrtShutter::updateProgress() {
   int newProgress  =  pvs["EXPOSUREINPROGRESS_MONITOR"]->get().toBool()  ?
                       pvs["REPETITIONSCOMPLETE_MONITOR"]->get().toInt() + 1   :   0;
 
-  /*
-  if ( newProgress && ! _progress )
-    startTime.start();
-  else if ( ! newProgress && _progress )
-    dwellTimer.start(startTime.elapsed()+500);
-  updateCanStart();
-  */
-
-  if (newProgress != _progress) // commented out to avoid the situation when change in
+  // if (newProgress != _progress) // commented out to avoid the situation when change in
   // EXPOSUREINPROGRESS_MONITOR  _and_ REPETITIONSCOMPLETE_MONITOR does not influence the progress.
   // It happens when EXPOSUREINPROGRESS_MONITOR turns to false.
     emit progressChanged(_progress=newProgress);

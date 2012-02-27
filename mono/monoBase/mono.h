@@ -32,8 +32,10 @@ private:
     Z1, // 0 when in beam
     Z2, // 0 when in beam
     Xdist,
-    Bend1,
-    Bend2
+    Bend1f,
+    Bend2f,
+    Bend1b,
+    Bend2b
   };
 
   static const QHash<Motors,QCaMotor*> motors;
@@ -48,8 +50,10 @@ private:
   double _dZ; // mm , Z displacement of the 2nd crystal
   double _tilt1; // mum
   double _tilt2; // mum
-  double _bend1; // mum
-  double _bend2; // mum
+  double _bend1f; // mum
+  double _bend2f; // mum
+  double _bend1b; // mum
+  double _bend2b; // mum
   InOutPosition _inBeam;
 
 public:
@@ -63,8 +67,10 @@ public:
   inline double dZ() const {return _dZ;}
   inline double tilt1() {return _tilt1;}
   inline double tilt2() {return _tilt2;}
-  inline double bend1() {return _bend1;}
-  inline double bend2() {return _bend2;}
+  inline double bend1front() {return _bend1f;}
+  inline double bend2front() {return _bend2f;}
+  inline double bend1back() {return _bend1b;}
+  inline double bend2back() {return _bend2b;}
   inline InOutPosition inBeam() {return _inBeam;}
 
   inline bool isMoving() const { return iAmMoving; }
@@ -80,8 +86,10 @@ public slots:
   void setDZ(double val);
   void setTilt1(double val);
   void setTilt2(double val);
-  void setBend1(double val);
-  void setBend2(double val);
+  void setBend1front(double val);
+  void setBend2front(double val);
+  void setBend1back(double val);
+  void setBend2back(double val);
   void setInBeam(bool val);
   inline void moveIn() { setInBeam(true); }
   inline void moveOut() { setInBeam(false); }
@@ -100,8 +108,11 @@ private slots:
   void updateZ1();
   void updateZ2();
   void updateX();
-  void updateBend1();
-  void updateBend2();
+  void updateBend1f();
+  void updateBend2f();
+  void updateBend1b();
+  void updateBend2b();
+
 
 signals:
 
@@ -113,8 +124,10 @@ signals:
   void dZChanged(double);
   void tilt1Changed(double);
   void tilt2Changed(double);
-  void bend1Changed(double);
-  void bend2Changed(double);
+  void bend1frontChanged(double);
+  void bend2frontChanged(double);
+  void bend1backChanged(double);
+  void bend2backChanged(double);
   void inBeamChanged(Mono::InOutPosition);
 
 };

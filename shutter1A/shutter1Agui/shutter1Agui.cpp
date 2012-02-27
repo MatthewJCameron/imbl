@@ -16,7 +16,7 @@ Shutter1Agui::Shutter1Agui(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(stateChanged(Shutter1A::State)), SLOT(updateStatuses()));
   connect(component(), SIGNAL(relaxChanged()), SLOT(updateStatuses()));
   updateConnection(false);
 }
