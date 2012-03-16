@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>453</width>
-    <height>510</height>
+    <width>659</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -63,31 +63,31 @@
         <property name="spacing">
          <number>1</number>
         </property>
+        <item row="6" column="1" colspan="2">
+         <widget class="QLabel" name="label_8">
+          <property name="text">
+           <string>second</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>ΔX</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Energy</string>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="4" rowspan="2">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Diffraction</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QRadioButton" name="si311">
-          <property name="toolTip">
-           <string>For 31-195 kEv</string>
-          </property>
-          <property name="text">
-           <string>Si&lt;311&gt;</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">diffractions</string>
-          </attribute>
          </widget>
         </item>
         <item row="0" column="1" colspan="2">
@@ -112,32 +112,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_3">
-          <property name="text">
-           <string>Z separation</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="Tuner" name="z2tuner" native="true"/>
-        </item>
-        <item row="1" column="5">
-         <widget class="QRadioButton" name="si111">
-          <property name="toolTip">
-           <string>For 16-100 kEv</string>
-          </property>
-          <property name="text">
-           <string>Si&lt;111&gt;</string>
-          </property>
-          <attribute name="buttonGroup">
-           <string notr="true">diffractions</string>
-          </attribute>
-         </widget>
-        </item>
-        <item row="8" column="4" colspan="2">
-         <widget class="Tuner" name="bend1back" native="true"/>
-        </item>
         <item row="4" column="0">
          <widget class="QLabel" name="label_11">
           <property name="sizePolicy">
@@ -151,39 +125,10 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="4" colspan="2">
-         <widget class="Tuner" name="bend1front" native="true"/>
-        </item>
-        <item row="6" column="1" colspan="2">
-         <widget class="QLabel" name="label_8">
-          <property name="text">
-           <string>second</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1" colspan="2">
-         <widget class="Tuner" name="tuneBragg" native="true"/>
-        </item>
-        <item row="4" column="4" colspan="2">
-         <widget class="Tuner" name="tuneX" native="true"/>
-        </item>
         <item row="3" column="1">
          <widget class="QLabel" name="label_2">
           <property name="text">
            <string>Δθ</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="4">
-         <widget class="QLabel" name="label_4">
-          <property name="text">
-           <string>ΔX</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -216,12 +161,6 @@
            <enum>Qt::Horizontal</enum>
           </property>
          </widget>
-        </item>
-        <item row="8" column="1" colspan="2">
-         <widget class="Tuner" name="bend2back" native="true"/>
-        </item>
-        <item row="10" column="1" colspan="2">
-         <widget class="Tuner" name="tilt2" native="true"/>
         </item>
         <item row="10" column="0">
          <widget class="QLabel" name="label_10">
@@ -259,22 +198,6 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="4" colspan="2">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>first</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="1" colspan="2">
-         <widget class="Tuner" name="bend2front" native="true"/>
-        </item>
-        <item row="10" column="4" colspan="2">
-         <widget class="Tuner" name="tilt1" native="true"/>
-        </item>
         <item row="9" column="0" colspan="6">
          <widget class="Line" name="line_7">
           <property name="orientation">
@@ -293,6 +216,84 @@
          <widget class="Line" name="line_4">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="10" column="1" colspan="2">
+         <widget class="Tuner" name="tilt2" native="true"/>
+        </item>
+        <item row="4" column="1" colspan="2">
+         <widget class="Tuner" name="tuneBragg" native="true"/>
+        </item>
+        <item row="7" column="1" colspan="2">
+         <widget class="Tuner" name="bend2front" native="true"/>
+        </item>
+        <item row="6" column="4" colspan="2">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>first</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="4" colspan="2">
+         <widget class="Tuner" name="bend1front" native="true"/>
+        </item>
+        <item row="8" column="4" colspan="2">
+         <widget class="Tuner" name="bend1back" native="true"/>
+        </item>
+        <item row="8" column="1" colspan="2">
+         <widget class="Tuner" name="bend2back" native="true"/>
+        </item>
+        <item row="4" column="4" colspan="2">
+         <widget class="Tuner" name="tuneX" native="true"/>
+        </item>
+        <item row="10" column="4" colspan="2">
+         <widget class="Tuner" name="tilt1" native="true"/>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>Diffraction</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <widget class="QRadioButton" name="si111">
+            <property name="toolTip">
+             <string>For 16-100 kEv</string>
+            </property>
+            <property name="text">
+             <string>&lt;111&gt;</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">diffractions</string>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="si311">
+            <property name="toolTip">
+             <string>For 31-195 kEv</string>
+            </property>
+            <property name="text">
+             <string>&lt;311&gt;</string>
+            </property>
+            <attribute name="buttonGroup">
+             <string notr="true">diffractions</string>
+            </attribute>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="0" colspan="6">
+         <widget class="QLabel" name="currentThetas">
+          <property name="text">
+           <string>disconnected</string>
           </property>
          </widget>
         </item>
@@ -331,14 +332,39 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout">
-         <property name="spacing">
-          <number>1</number>
-         </property>
+        <layout class="QGridLayout" name="gridLayout_2">
          <property name="margin">
           <number>0</number>
          </property>
-         <item>
+         <item row="1" column="2">
+          <widget class="QPushButton" name="moveOut">
+           <property name="text">
+            <string>out</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="3">
+          <widget class="QLabel" name="currentInOut">
+           <property name="text">
+            <string>disconnected</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Z separation</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="moveIn">
+           <property name="text">
+            <string>In</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
           <widget class="QLabel" name="label_14">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -351,36 +377,8 @@
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="QLabel" name="currentInOut">
-           <property name="text">
-            <string>disconnected</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="label_15">
-           <property name="text">
-            <string>Move:</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="moveIn">
-           <property name="text">
-            <string>In</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QPushButton" name="moveOut">
-           <property name="text">
-            <string>out</string>
-           </property>
-          </widget>
+         <item row="0" column="1" colspan="3">
+          <widget class="Tuner" name="z2tuner" native="true"/>
          </item>
         </layout>
        </widget>

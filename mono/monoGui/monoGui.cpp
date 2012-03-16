@@ -1,6 +1,7 @@
 #include "monoGui.h"
 #include "error.h"
 #include "ui_monoGui.h"
+#include "tuner.h"
 
 
 MonoGui::MonoGui(QWidget *parent) :
@@ -26,14 +27,14 @@ void MonoGui::init() {
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
 
   ui->motors->lock(true);
-  ui->motors->addMotor(component()->listMotors(),true,true);
+  ui->motors->addMotor(component()->motors.values(),true,true);
 
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), SLOT(updateMotion(bool)));
   connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
   connect(component(), SIGNAL(dBraggChanged(double)), ui->tuneBragg, SLOT(setValue(double)));
   connect(component(), SIGNAL(dXChanged(double)), ui->tuneX, SLOT(setValue(double)));
-  connect(component(), SIGNAL(dZChanged(double)), ui->z2tuner, SLOT(setValue(double)));
+  connect(component(), SIGNAL(zSeparationChanged(double)), ui->z2tuner, SLOT(setValue(double)));
   connect(component(), SIGNAL(tilt1Changed(double)), ui->tilt1, SLOT(setValue(double)));
   connect(component(), SIGNAL(tilt2Changed(double)), ui->tilt2, SLOT(setValue(double)));
   connect(component(), SIGNAL(bend1frontChanged(double)), ui->bend1front, SLOT(setValue(double)));
@@ -41,6 +42,8 @@ void MonoGui::init() {
   connect(component(), SIGNAL(bend1backChanged(double)), ui->bend1back, SLOT(setValue(double)));
   connect(component(), SIGNAL(bend2backChanged(double)), ui->bend2back, SLOT(setValue(double)));
   connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(updateInOut(Mono::InOutPosition)));
+
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedMoving(bool)), SLOT(updateEnergyChanging()));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->si111, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
@@ -55,7 +58,7 @@ void MonoGui::init() {
   connect(ui->bend2back, SIGNAL(valueChanged(double)), component(), SLOT(setBend2back(double)));
   connect(ui->tilt1, SIGNAL(valueChanged(double)), component(), SLOT(setTilt1(double)));
   connect(ui->tilt2, SIGNAL(valueChanged(double)), component(), SLOT(setTilt2(double)));
-  connect(ui->z2tuner, SIGNAL(valueChanged(double)), component(), SLOT(setDZ(double)));
+  connect(ui->z2tuner, SIGNAL(valueChanged(double)), component(), SLOT(setZseparation(double)));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
   connect(ui->stop, SIGNAL(clicked()), SLOT(onStopReset()));
@@ -75,17 +78,36 @@ void MonoGui::updateMotion(bool moving) {
   ui->mainWdg->setEnabled(!moving);
 }
 
+void MonoGui::updateEnergyChanging() {
+  if (component()->motors[Mono::Bragg2]->isMoving()) {
+    ui->currentThetas->setVisible(true);
+    ui->currentThetas->setText(
+          "Crystal 1: " +
+          QString::number(component()->motors[Mono::Bragg1]->getUserPosition()) + "->" +
+          QString::number(component()->motors[Mono::Bragg1]->getUserGoal()) + ", "
+          "Crystal 2: " +
+          QString::number(component()->motors[Mono::Bragg2]->getUserPosition()) + "->" +
+          QString::number(component()->motors[Mono::Bragg2]->getUserGoal()) + ", "
+          "X: " +
+          QString::number(component()->motors[Mono::Xdist]->getUserPosition()) + "->" +
+          QString::number(component()->motors[Mono::Xdist]->getUserGoal()) );
+  } else
+    ui->currentThetas->setVisible(false);
+}
+
+
 
 void MonoGui::updateConnection(bool con) {
   ui->mainWdg->setEnabled(con);
   ui->z2tuner->setEnabled(con);
   ui->inout->setEnabled(con);
   ui->stop->setEnabled(con);
-  ui->stop->setText("Disconnected");
-  if (con)
+  if (con) {
     updateMotion(component()->isMoving());
-  else
+  } else {
     ui->currentInOut->setText("disconnected");
+    ui->stop->setText("Disconnected");
+  }
 }
 
 
@@ -124,8 +146,8 @@ void MonoGui::updateInOut(Mono::InOutPosition iopos) {
   case Mono::BETWEEN : ui->currentInOut->setText("between"); break;
   case Mono::MOVING : ui->currentInOut->setText("moving"); break;
   }
-  ui->currentInOut->setStyleSheet( iopos == Mono::MOVING ?
-                                     "background-color: rgba(255, 0, 0,64);":
+  ui->currentInOut->setStyleSheet( iopos == Mono::BETWEEN ?
+                                     "background-color: rgba(255, 0, 0,64);" :
                                      "");
 }
 
@@ -142,7 +164,7 @@ void MonoGui::onStopReset() {
     ui->bend2front->setValue(component()->bend2front());
     ui->bend1back->setValue(component()->bend1back());
     ui->bend2back->setValue(component()->bend2back());
-    ui->z2tuner->setValue(component()->dZ());
+    ui->z2tuner->setValue(component()->zSeparation());
     ui->tuneBragg->setValue(component()->dBragg());
     ui->tuneX->setValue(component()->dX());
   }

@@ -26,8 +26,7 @@ Tuner::~Tuner() {
 bool Tuner::eventFilter(QObject *obj, QEvent *event) {
   if ( event->type() == QEvent::FocusIn ||
        event->type() == QEvent::FocusOut )
-    ui->control->setVisible( ui->value->hasFocus() ||
-                             ui->increment->hasFocus() );
+    ui->control->setVisible(ui->value->hasFocus() || ui->increment->hasFocus());
   return QObject::eventFilter(obj, event);
 }
 

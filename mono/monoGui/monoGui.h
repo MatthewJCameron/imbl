@@ -10,6 +10,8 @@ namespace Ui {
 class MonoGui;
 }
 
+class Tuner;
+
 class MonoGui : public ComponentGui {
   Q_OBJECT;
 
@@ -38,6 +40,7 @@ private slots:
 
   void updateConnection(bool con);
   void updateMotion(bool moving);
+  void updateEnergyChanging();
   void updateInOut(Mono::InOutPosition iopos);
   void updateEnergy();
 

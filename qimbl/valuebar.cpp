@@ -3,6 +3,7 @@
 #include "error.h"
 
 #include <QPainter>
+#include <QDebug>
 #include <math.h>
 
 #include <qwt_scale_map.h>
@@ -61,7 +62,8 @@ ValueBar::ValueBar(const QString &_pv, QWidget *parent):
   hi(NAN),
   hihi(NAN),
   min(NAN),
-  max(NAN)
+  max(NAN),
+  prec(0)
 {
   ui->setupUi(this);
   ui->title->setAlignment( Qt::AlignCenter );
@@ -129,7 +131,6 @@ void ValueBar::updateValue() {
     ui->value->setStyleSheet("");
     setHealth(OK);
   }
-
 
 }
 

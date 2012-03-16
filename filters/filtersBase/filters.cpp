@@ -129,7 +129,7 @@ void Paddle::updateLimitState() {
 
 
 
-const QString Filters::pvBaseName="SR08ID01FR"; // SR08ID01FR01:MTR01
+const QString Filters::pvBaseName="SR08ID01FR";
 const QList<Paddle*> Filters::paddles = Filters::init();
 
 

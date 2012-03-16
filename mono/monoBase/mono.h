@@ -17,20 +17,13 @@ public:
   static const double maxEnergy111 = 100.0; // keV
   static const double minEnergy311 = 31.0; // keV
 
-
-private:
-
-  static const double alpha = 14.75; // asymmetry angle (rad) "+" for 111 "-" for 311
-  static const double zDist = 2.0; // desired Z-separation of crystals;
-  static const double zOut = 40.0; // Z1 when the mono is out of the beam;
-
   enum Motors {
     Bragg1,
     Bragg2,
     Tilt1,
     Tilt2,
     Z1, // 0 when in beam
-    Z2, // 0 when in beam
+    Z2, // zDist when in beam
     Xdist,
     Bend1f,
     Bend2f,
@@ -39,6 +32,13 @@ private:
   };
 
   static const QHash<Motors,QCaMotor*> motors;
+
+private:
+
+  static const double zDist = 2.0; // standard Z-separation of crystals;
+  static const double zOut = 40.0; // Z1 when the mono is out of the beam;
+  static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+
   static QHash<Motors,QCaMotor*> init_motors();
   double motorAngle(double enrg, int crystal, Diffraction diff);
 
@@ -47,13 +47,7 @@ private:
   Diffraction _diff;
   double _dBragg; // murad , displacement of the second crystal
   double _dX; // mm , X displacement of the stage
-  double _dZ; // mm , Z displacement of the 2nd crystal
-  double _tilt1; // mum
-  double _tilt2; // mum
-  double _bend1f; // mum
-  double _bend2f; // mum
-  double _bend1b; // mum
-  double _bend2b; // mum
+  double _zSeparation; // mm , Z separation of the 2nd crystal
   InOutPosition _inBeam;
 
 public:
@@ -64,17 +58,16 @@ public:
   inline Diffraction diffraction() const { return _diff; }
   inline double dBragg() const {return _dBragg;}
   inline double dX() const {return _dX;}
-  inline double dZ() const {return _dZ;}
-  inline double tilt1() {return _tilt1;}
-  inline double tilt2() {return _tilt2;}
-  inline double bend1front() {return _bend1f;}
-  inline double bend2front() {return _bend2f;}
-  inline double bend1back() {return _bend1b;}
-  inline double bend2back() {return _bend2b;}
+  inline double zSeparation() const {return _zSeparation;}
+  inline double tilt1() {return motors[Tilt1]->getUserPosition();}
+  inline double tilt2() {return motors[Tilt2]->getUserPosition();}
+  inline double bend1front() {return motors[Bend1f]->getUserPosition();}
+  inline double bend2front() {return motors[Bend2f]->getUserPosition();}
+  inline double bend1back() {return motors[Bend1b]->getUserPosition();}
+  inline double bend2back() {return motors[Bend2b]->getUserPosition();}
   inline InOutPosition inBeam() {return _inBeam;}
 
   inline bool isMoving() const { return iAmMoving; }
-  inline QList<QCaMotor*> listMotors() const {return motors.values();}
   void wait_stop();
 
 public slots:
@@ -83,7 +76,7 @@ public slots:
   void setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg=true, bool keepDX=true);
   void setDBragg(double val);
   void setDX(double val);
-  void setDZ(double val);
+  void setZseparation(double val);
   void setTilt1(double val);
   void setTilt2(double val);
   void setBend1front(double val);
@@ -121,7 +114,7 @@ signals:
   void energyChanged(double);
   void dBraggChanged(double);
   void dXChanged(double);
-  void dZChanged(double);
+  void zSeparationChanged(double);
   void tilt1Changed(double);
   void tilt2Changed(double);
   void bend1frontChanged(double);
