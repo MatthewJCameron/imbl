@@ -98,10 +98,12 @@ void MonoGui::updateEnergyChanging() {
 
 
 void MonoGui::updateConnection(bool con) {
+  /*
   ui->mainWdg->setEnabled(con);
   ui->z2tuner->setEnabled(con);
   ui->inout->setEnabled(con);
   ui->stop->setEnabled(con);
+  */
   if (con) {
     updateMotion(component()->isMoving());
   } else {

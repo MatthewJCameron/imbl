@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>659</width>
-    <height>533</height>
+    <height>573</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -220,13 +220,13 @@
          </widget>
         </item>
         <item row="10" column="1" colspan="2">
-         <widget class="Tuner" name="tilt2" native="true"/>
+         <widget class="Tuner" name="tilt2"/>
         </item>
         <item row="4" column="1" colspan="2">
-         <widget class="Tuner" name="tuneBragg" native="true"/>
+         <widget class="Tuner" name="tuneBragg"/>
         </item>
         <item row="7" column="1" colspan="2">
-         <widget class="Tuner" name="bend2front" native="true"/>
+         <widget class="Tuner" name="bend2front"/>
         </item>
         <item row="6" column="4" colspan="2">
          <widget class="QLabel" name="label_9">
@@ -239,19 +239,19 @@
          </widget>
         </item>
         <item row="7" column="4" colspan="2">
-         <widget class="Tuner" name="bend1front" native="true"/>
+         <widget class="Tuner" name="bend1front"/>
         </item>
         <item row="8" column="4" colspan="2">
-         <widget class="Tuner" name="bend1back" native="true"/>
+         <widget class="Tuner" name="bend1back"/>
         </item>
         <item row="8" column="1" colspan="2">
-         <widget class="Tuner" name="bend2back" native="true"/>
+         <widget class="Tuner" name="bend2back"/>
         </item>
         <item row="4" column="4" colspan="2">
-         <widget class="Tuner" name="tuneX" native="true"/>
+         <widget class="Tuner" name="tuneX"/>
         </item>
         <item row="10" column="4" colspan="2">
-         <widget class="Tuner" name="tilt1" native="true"/>
+         <widget class="Tuner" name="tilt1"/>
         </item>
         <item row="0" column="4">
          <widget class="QLabel" name="label_5">
@@ -377,8 +377,8 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="1" colspan="3">
-          <widget class="Tuner" name="z2tuner" native="true"/>
+         <item row="0" column="1" colspan="2">
+          <widget class="Tuner" name="z2tuner"/>
          </item>
         </layout>
        </widget>
@@ -426,7 +426,7 @@
   </customwidget>
   <customwidget>
    <class>Tuner</class>
-   <extends>QWidget</extends>
+   <extends>QDoubleSpinBox</extends>
    <header>tuner.h</header>
    <container>1</container>
   </customwidget>
