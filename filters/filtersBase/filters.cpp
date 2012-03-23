@@ -3,7 +3,7 @@
 
 QString materialName(Absorber::Material material){
   switch (material) {
-  case Absorber::Empty: return "Empty";
+  case Absorber::Empty: return "None";
   case Absorber::Beryllium: return "Be";
   case Absorber::Graphite: return "C";
   case Absorber::Aluminium: return "Al";

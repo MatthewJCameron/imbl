@@ -373,7 +373,7 @@ void Qimbl::update_rfcurrent() {
     set_nolink_style(ui->rfcurrent);
   } else {
     ui->rfcurrent->setStyleSheet("");
-    ui->rfcurrent->setText( QString::number(rfcurrent->get().toDouble(), 'f', 3) + "mA" );
+    ui->rfcurrent->setText( QString::number(rfcurrent->get().toDouble(), 'f', 0) + "mA" );
   }
 }
 
