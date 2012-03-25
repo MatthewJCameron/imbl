@@ -65,6 +65,7 @@ void MonoGui::init() {
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
 
   updateConnection(component()->isConnected());
+  updateMotion(false);
   updateEnergy();
   updateEnergyChanging();
 
@@ -76,11 +77,8 @@ MonoGui::~MonoGui() {
 
 
 void MonoGui::updateMotion(bool moving) {
-  /*
-  ui->stop->setText(moving?"Stop":"Reset");
-  */
   ui->mainLayout->setEnabled(!moving);
-  ui->advanced_pb->setVisible(!moving);
+  //ui->advanced_pb->setEnabled(!moving);
   ui->stop->setVisible(moving);
 }
 
@@ -104,18 +102,11 @@ void MonoGui::updateEnergyChanging() {
 
 
 void MonoGui::updateConnection(bool con) {
-  /*
-  ui->mainWdg->setEnabled(con);
+  ui->mainLayout->setEnabled(con);
   ui->z2tuner->setEnabled(con);
   ui->inout->setEnabled(con);
-  ui->stop->setEnabled(con);
-  */
-  if (con) {
+  if (con)
     updateMotion(component()->isMoving());
-  } else {
-    ui->currentInOut->setText("disconnected");
-    ui->stop->setText("Disconnected");
-  }
 }
 
 void MonoGui::onEnergyTune() {
@@ -162,7 +153,7 @@ void MonoGui::updateInOut(Mono::InOutPosition iopos) {
   case Mono::MOVING : ui->currentInOut->setText("moving"); break;
   }
   ui->currentInOut->setStyleSheet( iopos == Mono::BETWEEN ?
-                                     "background-color: rgba(255, 0, 0,64);" :
+                                     "color: rgba(255, 0, 0,64);" :
                                      "");
 }
 

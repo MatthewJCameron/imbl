@@ -54,17 +54,17 @@ Mono::Mono(QObject *parent) :
 
 QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   QHash<Mono::Motors,QCaMotor*> motret;
-  motret[Bragg1] = new QCaMotor("");
-  motret[Bragg2] = new QCaMotor("");
-  motret[Tilt1]  = new QCaMotor("");
-  motret[Tilt2]  = new QCaMotor("");
-  motret[Z1]     = new QCaMotor("");
-  motret[Z2]     = new QCaMotor("");
-  motret[Xdist]  = new QCaMotor("");
-  motret[Bend1f]  = new QCaMotor("");
-  motret[Bend2f]  = new QCaMotor("");
-  motret[Bend1b]  = new QCaMotor("");
-  motret[Bend2b]  = new QCaMotor("");
+  motret[Bragg1] = new QCaMotor("SR08ID01MCS01:BRAGG1");
+  motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG1");
+  motret[Tilt1]  = new QCaMotor("SR08ID01MCS01:TILT1");
+  motret[Tilt2]  = new QCaMotor("SR08ID01MCS01:TILT2");
+  motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
+  motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
+  motret[Xdist]  = new QCaMotor("SR08ID01MCS01:X");
+  motret[Bend1f]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
+  motret[Bend2f]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
+  motret[Bend1b]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
+  motret[Bend2b]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
   return motret;
 }
 

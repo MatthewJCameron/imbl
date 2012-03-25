@@ -404,7 +404,7 @@
       <string>Stop any motion.</string>
      </property>
      <property name="text">
-      <string>Disconnected</string>
+      <string>Stop</string>
      </property>
     </widget>
    </item>
