@@ -14,7 +14,7 @@ MrtShutter::MrtShutter(QObject * parent) :
   _cycle(0),
   _repeats(0),
   _progress(0),
-  _state(BETWEEN),
+  _state(CLOSED),
   _canStart(false),
   _valuesOK(false),
   _minRelax(0)

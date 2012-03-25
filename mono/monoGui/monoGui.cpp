@@ -49,22 +49,24 @@ void MonoGui::init() {
   connect(ui->si111, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->si311, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->energy, SIGNAL(valueChanged(double)),  SLOT(onEnergyTune()));
-  connect(ui->energy, SIGNAL(valueEdited(double)),  SLOT(onEnergySet()));
-  connect(ui->tuneBragg, SIGNAL(valueChanged(double)), component(), SLOT(setDBragg(double)));
-  connect(ui->tuneX, SIGNAL(valueChanged(double)), component(), SLOT(setDX(double)));
-  connect(ui->bend1front, SIGNAL(valueChanged(double)), component(), SLOT(setBend1front(double)));
-  connect(ui->bend2front, SIGNAL(valueChanged(double)), component(), SLOT(setBend2front(double)));
-  connect(ui->bend1back, SIGNAL(valueChanged(double)), component(), SLOT(setBend1back(double)));
-  connect(ui->bend2back, SIGNAL(valueChanged(double)), component(), SLOT(setBend2back(double)));
-  connect(ui->tilt1, SIGNAL(valueChanged(double)), component(), SLOT(setTilt1(double)));
-  connect(ui->tilt2, SIGNAL(valueChanged(double)), component(), SLOT(setTilt2(double)));
-  connect(ui->z2tuner, SIGNAL(valueChanged(double)), component(), SLOT(setZseparation(double)));
+  connect(ui->enSet, SIGNAL(clicked()),  SLOT(onEnergySet()));
+  connect(ui->enRevert, SIGNAL(clicked()),  SLOT(updateEnergy()));
+  connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
+  connect(ui->tuneX, SIGNAL(valueEdited(double)), component(), SLOT(setDX(double)));
+  connect(ui->bend1front, SIGNAL(valueEdited(double)), component(), SLOT(setBend1front(double)));
+  connect(ui->bend2front, SIGNAL(valueEdited(double)), component(), SLOT(setBend2front(double)));
+  connect(ui->bend1back, SIGNAL(valueEdited(double)), component(), SLOT(setBend1back(double)));
+  connect(ui->bend2back, SIGNAL(valueEdited(double)), component(), SLOT(setBend2back(double)));
+  connect(ui->tilt1, SIGNAL(valueEdited(double)), component(), SLOT(setTilt1(double)));
+  connect(ui->tilt2, SIGNAL(valueEdited(double)), component(), SLOT(setTilt2(double)));
+  connect(ui->z2tuner, SIGNAL(valueEdited(double)), component(), SLOT(setZseparation(double)));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
-  connect(ui->stop, SIGNAL(clicked()), SLOT(onStopReset()));
+  connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
 
   updateConnection(component()->isConnected());
   updateEnergy();
+  updateEnergyChanging();
 
 }
 
@@ -74,8 +76,12 @@ MonoGui::~MonoGui() {
 
 
 void MonoGui::updateMotion(bool moving) {
+  /*
   ui->stop->setText(moving?"Stop":"Reset");
-  ui->mainWdg->setEnabled(!moving);
+  */
+  ui->mainLayout->setEnabled(!moving);
+  ui->advanced_pb->setVisible(!moving);
+  ui->stop->setVisible(moving);
 }
 
 void MonoGui::updateEnergyChanging() {
@@ -112,17 +118,19 @@ void MonoGui::updateConnection(bool con) {
   }
 }
 
-
 void MonoGui::onEnergyTune() {
   const double enrg = ui->energy->value();
-  //ui->wave->setValue( 12.398419 / enrg ); // 12.398419 = h*c (keV)
   ui->si311->setDisabled(enrg < Mono::minEnergy311);
   ui->si111->setDisabled(enrg > Mono::maxEnergy111);
   if ( enrg < Mono::minEnergy311 && ui->si311->isChecked() )
     ui->si111->setChecked(true);
   if ( enrg > Mono::maxEnergy111 && ui->si111->isChecked() )
     ui->si311->setChecked(true);
-  //ui->angle->setValue(energy2bragg(enrg, ui->si111->isChecked() ? Mono::Si111 : Mono::Si311) );
+  bool setrevert = enrg != component()->energy() ||
+      ( ui->si111->isChecked() && component()->diffraction() != Mono::Si111 ) ||
+      ( ui->si311->isChecked() && component()->diffraction() != Mono::Si311 );
+  ui->enRevert->setVisible(setrevert);
+  ui->enSet->setVisible(setrevert);
 }
 
 
@@ -130,7 +138,10 @@ void MonoGui::onEnergySet() {
   component()->setEnergy(ui->energy->value(),
                          ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
+  ui->enRevert->hide();
+  ui->enSet->hide();
 }
+
 
 void MonoGui::updateEnergy() {
   ui->energy->setValue(component()->energy());
@@ -138,6 +149,8 @@ void MonoGui::updateEnergy() {
     ui->si111->setChecked(true);
   else
     ui->si311->setChecked(true);
+  ui->enRevert->hide();
+  ui->enSet->hide();
 }
 
 
@@ -153,8 +166,8 @@ void MonoGui::updateInOut(Mono::InOutPosition iopos) {
                                      "");
 }
 
-
-void MonoGui::onStopReset() {
+/*
+void MonoGui::onStop() {
   if (component()->isMoving())
     component()->stop();
   else {
@@ -171,6 +184,7 @@ void MonoGui::onStopReset() {
     ui->tuneX->setValue(component()->dX());
   }
 }
+*/
 
 
 void MonoGui::onAdvancedControl() {

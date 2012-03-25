@@ -36,7 +36,6 @@ private slots:
   void onAdvancedControl();
   void onEnergySet();
   void onEnergyTune();
-  void onStopReset();
 
   void updateConnection(bool con);
   void updateMotion(bool moving);
