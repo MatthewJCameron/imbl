@@ -55,7 +55,7 @@ Mono::Mono(QObject *parent) :
 QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   QHash<Mono::Motors,QCaMotor*> motret;
   motret[Bragg1] = new QCaMotor("SR08ID01MCS01:BRAGG1");
-  motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG1");
+  motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG2");
   motret[Tilt1]  = new QCaMotor("SR08ID01MCS01:TILT1");
   motret[Tilt2]  = new QCaMotor("SR08ID01MCS01:TILT2");
   motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
@@ -121,7 +121,7 @@ void Mono::updateBragg1() {
   if ( ! isConnected() || motors[Bragg2]->isMoving() )
     return;
   const double delta = motors[Bragg1]->getUserPosition()
-      - motorAngle(energy(), 2, diffraction());
+      - motorAngle(energy(), 1, diffraction());
   _dBragg = 1.0e6*delta*M_PI/180.0; //murad
   emit dBraggChanged(_dBragg);
 }
@@ -160,7 +160,7 @@ void Mono::updateBragg2() {
 void Mono::updateX() {
   if ( ! isConnected() )
     return;
-  const double xDist = zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
+  const double xDist = zDist / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
   _dX = motors[Xdist]->getUserPosition() - xDist;
   emit dXChanged(_dX);
 }
@@ -174,9 +174,9 @@ void Mono::updateZ1() {
   double newZ1 = motors[Z1]->getUserPosition();
   if (motors[Z1]->isMoving())
     _inBeam = MOVING;
-  else if ( newZ1 == 0.0 )
+  else if ( qAbs(newZ1) <= 0.001 ) // 1 micron - unsertanty in Z
     _inBeam = INBEAM;
-  else if ( newZ1 >= zOut )
+  else if ( newZ1 <= zOut )
     _inBeam = OUTBEAM;
   else {
     _inBeam = BETWEEN;
@@ -193,7 +193,6 @@ void Mono::updateZ2() {
   if ( ! isConnected() )
     return;
   _zSeparation = motors[Z2]->getUserPosition();
-  updateX();
   emit zSeparationChanged(_zSeparation);
 }
 
@@ -288,11 +287,11 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
   }
 
   motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff)
-                                  + ( keepDBragg ? dBragg() : 0 ),
+                                  + ( keepDBragg ? dBragg() * 180 / (1.0e06 * M_PI) : 0 ),
                                   QCaMotor::STARTED);
   motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff),
                                   QCaMotor::STARTED);
-  motors[Xdist]->goUserPosition( zSeparation() / tan(2*braggA*M_PI/180) +
+  motors[Xdist]->goUserPosition( zDist / tan(2*braggA*M_PI/180) +
                                  + ( keepDX ? dX() : 0 ),
                                  QCaMotor::STARTED);
 
@@ -300,7 +299,6 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
 
 
 void Mono::setDBragg(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBragg1()));
   if ( ! isConnected() || isMoving() )
     return;
   motors[Bragg1]->goUserPosition( motorAngle(energy(), 1, diffraction())
@@ -310,17 +308,15 @@ void Mono::setDBragg(double val) {
 
 
 void Mono::setDX(double val) {
-  QTimer::singleShot(0, this, SLOT(updateX()));
   if ( ! isConnected() || isMoving() )
     return;
   motors[Xdist]->goUserPosition
-      ( zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
+      ( zDist / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
         QCaMotor::STARTED);
 }
 
 
 void Mono::setInBeam(bool val) {
-  QTimer::singleShot(0, this, SLOT(updateZ1()));
   if ( ! isConnected() || isMoving() )
     return;
   motors[Z1]->goUserPosition( val ? 0 : zOut);
@@ -328,16 +324,13 @@ void Mono::setInBeam(bool val) {
 
 
 void Mono::setZseparation(double val) {
-  QTimer::singleShot(0, this, SLOT(updateZ2()));
   if ( ! isConnected() || isMoving() )
     return;
   motors[Z2]->goUserPosition(val, QCaMotor::STOPPED);
-  setEnergy(energy(), diffraction());
 }
 
 
 void Mono::setTilt1(double val) {
-  QTimer::singleShot(0, this, SLOT(updateTilt1()));
   if ( ! isConnected() )
     return;
   motors[Tilt1]->goUserPosition(val, QCaMotor::STARTED);
@@ -345,7 +338,6 @@ void Mono::setTilt1(double val) {
 
 
 void Mono::setTilt2(double val) {
-  QTimer::singleShot(0, this, SLOT(updateTilt2()));
   if ( ! isConnected() )
     return;
   motors[Tilt2]->goUserPosition(val, QCaMotor::STARTED);
@@ -353,7 +345,6 @@ void Mono::setTilt2(double val) {
 
 
 void Mono::setBend1front(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend1f()));
   if ( ! isConnected() )
     return;
   motors[Bend1f]->goUserPosition(val, QCaMotor::STARTED);
@@ -361,7 +352,6 @@ void Mono::setBend1front(double val) {
 
 
 void Mono::setBend2front(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend2f()));
   if ( ! isConnected() )
     return;
   motors[Bend2f]->goUserPosition(val, QCaMotor::STARTED);

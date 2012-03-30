@@ -15,6 +15,7 @@ class Tuner : public QMDoubleSpinBox {
 public:
   explicit Tuner(QWidget *parent = 0);
   ~Tuner();
+  void setIncrement(double twk);
 
 private slots:
 

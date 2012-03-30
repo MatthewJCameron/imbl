@@ -5,6 +5,9 @@
 #include <qcamotor.h>
 #include <QHash>
 
+
+
+
 class Mono : public Component {
   Q_OBJECT;
 
@@ -35,8 +38,8 @@ public:
 
 private:
 
-  static const double zDist = 2.0; // standard Z-separation of crystals;
-  static const double zOut = 40.0; // Z1 when the mono is out of the beam;
+  static const double zDist = 25.0; // standard Z-separation of crystals;
+  static const double zOut = -45.0; // Z1 when the mono is out of the beam;
   static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
 
   static QHash<Motors,QCaMotor*> init_motors();

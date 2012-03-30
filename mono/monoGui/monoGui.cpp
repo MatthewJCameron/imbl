@@ -4,6 +4,43 @@
 #include "tuner.h"
 
 
+
+
+EnergySetRevert::EnergySetRevert(QWidget * master) :
+  QWidget(static_cast<QWidget*>(master->parent())),
+  setBut(new QPushButton("Set",this)),
+  revertBut(new QPushButton("Revert",this))
+{
+  hide();
+  setAutoFillBackground(true);
+  QHBoxLayout * lay = new QHBoxLayout;
+  lay->addWidget(setBut);
+  lay->addWidget(revertBut);
+  setLayout(lay);
+  connect(setBut, SIGNAL(clicked()), SIGNAL(set()));
+  connect(revertBut, SIGNAL(clicked()), SIGNAL(revert()));
+  master->installEventFilter(this);
+}
+
+
+bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
+  QWidget * objW = static_cast<QWidget*>(obj);
+  if (objW) {
+    if ( event->type() == QEvent::Resize ) {
+      setMinimumWidth(objW->width());
+      setMaximumWidth(objW->width());
+    } else if ( event->type() == QEvent::Move ||
+                event->type() == QEvent::Show ) {
+      QRect geom = geometry();
+      geom.moveTopLeft(objW->geometry().topLeft()+QPoint(0, objW->height()));
+      setGeometry(geom);
+    }
+  }
+  return QObject::eventFilter(obj, event);
+}
+
+
+
 MonoGui::MonoGui(QWidget *parent) :
   ComponentGui(new Mono(parent), true, parent),
   ui(new Ui::MonoGui)
@@ -22,6 +59,7 @@ MonoGui::MonoGui(Mono * mono, QWidget *parent) :
 void MonoGui::init() {
 
   ui->setupUi(this);
+  energySetter = new EnergySetRevert(ui->energy);
   ui->advanced->hide();
 
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
@@ -32,25 +70,27 @@ void MonoGui::init() {
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), SLOT(updateMotion(bool)));
   connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
-  connect(component(), SIGNAL(dBraggChanged(double)), ui->tuneBragg, SLOT(setValue(double)));
-  connect(component(), SIGNAL(dXChanged(double)), ui->tuneX, SLOT(setValue(double)));
-  connect(component(), SIGNAL(zSeparationChanged(double)), ui->z2tuner, SLOT(setValue(double)));
-  connect(component(), SIGNAL(tilt1Changed(double)), ui->tilt1, SLOT(setValue(double)));
-  connect(component(), SIGNAL(tilt2Changed(double)), ui->tilt2, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend1frontChanged(double)), ui->bend1front, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend2frontChanged(double)), ui->bend2front, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend1backChanged(double)), ui->bend1back, SLOT(setValue(double)));
-  connect(component(), SIGNAL(bend2backChanged(double)), ui->bend2back, SLOT(setValue(double)));
+  connect(component(), SIGNAL(dBraggChanged(double)), SLOT(updateDBragg()));
+  connect(component(), SIGNAL(dXChanged(double)), SLOT(updateDX()));
+  connect(component(), SIGNAL(zSeparationChanged(double)), SLOT(updateZseparation()));
+  connect(component(), SIGNAL(tilt1Changed(double)), SLOT(updateTilt1()));
+  connect(component(), SIGNAL(tilt2Changed(double)), SLOT(updateTilt2()));
+  connect(component(), SIGNAL(bend1frontChanged(double)), SLOT(updateBend1f()));
+  connect(component(), SIGNAL(bend2frontChanged(double)), SLOT(updateBend2f()));
+  connect(component(), SIGNAL(bend1backChanged(double)), SLOT(updateBend1b()));
+  connect(component(), SIGNAL(bend2backChanged(double)), SLOT(updateBend2b()));
   connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(updateInOut(Mono::InOutPosition)));
 
-  connect(component()->motors[Mono::Bragg2], SIGNAL(changedMoving(bool)), SLOT(updateEnergyChanging()));
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedUserPosition(double)), SLOT(updateMotorBragg2()));
+  connect(component()->motors[Mono::Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateMotorBragg1()));
+  connect(component()->motors[Mono::Xdist], SIGNAL(changedUserPosition(double)), SLOT(updateMotorX()));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->si111, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->si311, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->energy, SIGNAL(valueChanged(double)),  SLOT(onEnergyTune()));
-  connect(ui->enSet, SIGNAL(clicked()),  SLOT(onEnergySet()));
-  connect(ui->enRevert, SIGNAL(clicked()),  SLOT(updateEnergy()));
+  connect(energySetter, SIGNAL(set()),  SLOT(onEnergySet()));
+  connect(energySetter, SIGNAL(revert()),  SLOT(updateEnergy()));
   connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
   connect(ui->tuneX, SIGNAL(valueEdited(double)), component(), SLOT(setDX(double)));
   connect(ui->bend1front, SIGNAL(valueEdited(double)), component(), SLOT(setBend1front(double)));
@@ -67,7 +107,9 @@ void MonoGui::init() {
   updateConnection(component()->isConnected());
   updateMotion(false);
   updateEnergy();
-  updateEnergyChanging();
+  updateMotorBragg1();
+  updateMotorBragg2();
+  updateMotorX();
 
 }
 
@@ -77,36 +119,38 @@ MonoGui::~MonoGui() {
 
 
 void MonoGui::updateMotion(bool moving) {
-  ui->mainLayout->setEnabled(!moving);
-  //ui->advanced_pb->setEnabled(!moving);
-  ui->stop->setVisible(moving);
-}
-
-void MonoGui::updateEnergyChanging() {
-  if (component()->motors[Mono::Bragg2]->isMoving()) {
-    ui->currentThetas->setVisible(true);
-    ui->currentThetas->setText(
-          "Crystal 1: " +
-          QString::number(component()->motors[Mono::Bragg1]->getUserPosition()) + "->" +
-          QString::number(component()->motors[Mono::Bragg1]->getUserGoal()) + ", "
-          "Crystal 2: " +
-          QString::number(component()->motors[Mono::Bragg2]->getUserPosition()) + "->" +
-          QString::number(component()->motors[Mono::Bragg2]->getUserGoal()) + ", "
-          "X: " +
-          QString::number(component()->motors[Mono::Xdist]->getUserPosition()) + "->" +
-          QString::number(component()->motors[Mono::Xdist]->getUserGoal()) );
-  } else
-    ui->currentThetas->setVisible(false);
+  ui->stop->setEnabled( component()->isConnected() && moving);
+  if(!moving) {
+    updateDBragg();
+    updateDX();
+    updateZseparation();
+    updateTilt1();
+    updateTilt2();
+    updateBend1f();
+    updateBend1b();
+    updateBend2f();
+    updateBend2b();
+  }
 }
 
 
 
 void MonoGui::updateConnection(bool con) {
-  ui->mainLayout->setEnabled(con);
-  ui->z2tuner->setEnabled(con);
-  ui->inout->setEnabled(con);
-  if (con)
-    updateMotion(component()->isMoving());
+   ui->mainWidget->setEnabled(component()->isConnected());
+  ui->stop->setText( con ? "Stop all" : "No link");
+  ui->stop->setStyleSheet( con ? "" : "color: rgb(255, 0, 0); background-color: rgb(0, 0, 0);");
+  updateMotion(component()->isMoving());
+  if (con) {
+    ui->tuneBragg->setIncrement(component()->motors[Mono::Bragg1]->getStep());
+    ui->tuneX->setIncrement(component()->motors[Mono::Xdist]->getStep());
+    ui->tilt1->setIncrement(component()->motors[Mono::Tilt1]->getStep());
+    ui->tilt2->setIncrement(component()->motors[Mono::Tilt2]->getStep());
+    ui->bend1front->setIncrement(component()->motors[Mono::Bend1f]->getStep());
+    ui->bend1back->setIncrement(component()->motors[Mono::Bend1b]->getStep());
+    ui->bend2front->setIncrement(component()->motors[Mono::Bend2f]->getStep());
+    ui->bend2back->setIncrement(component()->motors[Mono::Bend2b]->getStep());
+    ui->z2tuner->setIncrement(component()->motors[Mono::Z2]->getStep());
+  }
 }
 
 void MonoGui::onEnergyTune() {
@@ -117,11 +161,14 @@ void MonoGui::onEnergyTune() {
     ui->si111->setChecked(true);
   if ( enrg > Mono::maxEnergy111 && ui->si111->isChecked() )
     ui->si311->setChecked(true);
-  bool setrevert = enrg != component()->energy() ||
+  bool setrevert =
+      ! component()->motors[Mono::Bragg1]->isMoving() &&
+      ! component()->motors[Mono::Bragg2]->isMoving() &&
+      ! component()->motors[Mono::Xdist]->isMoving() &&
+      ( enrg != component()->energy() ||
       ( ui->si111->isChecked() && component()->diffraction() != Mono::Si111 ) ||
-      ( ui->si311->isChecked() && component()->diffraction() != Mono::Si311 );
-  ui->enRevert->setVisible(setrevert);
-  ui->enSet->setVisible(setrevert);
+      ( ui->si311->isChecked() && component()->diffraction() != Mono::Si311 ) );
+  energySetter->setVisible(setrevert);
 }
 
 
@@ -129,53 +176,103 @@ void MonoGui::onEnergySet() {
   component()->setEnergy(ui->energy->value(),
                          ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
-  ui->enRevert->hide();
-  ui->enSet->hide();
+  energySetter->hide();
 }
 
 
 void MonoGui::updateEnergy() {
-  ui->energy->setValue(component()->energy());
+  if ( qAbs(ui->energy->value() - component()->energy()) >= 1.0e-03 )
+    ui->energy->setValue(component()->energy());
   if (component()->diffraction() == Mono::Si111)
     ui->si111->setChecked(true);
   else
     ui->si311->setChecked(true);
-  ui->enRevert->hide();
-  ui->enSet->hide();
+  energySetter->hide();
 }
 
 
 void MonoGui::updateInOut(Mono::InOutPosition iopos) {
+  ui->currentInOut->setStyleSheet("");
   switch (iopos) {
   case Mono::INBEAM : ui->currentInOut->setText("In"); break;
   case Mono::OUTBEAM : ui->currentInOut->setText("Out"); break;
-  case Mono::BETWEEN : ui->currentInOut->setText("between"); break;
-  case Mono::MOVING : ui->currentInOut->setText("moving"); break;
+  case Mono::BETWEEN :
+    ui->currentInOut->setText("between: " +
+                              QString::number(component()->motors[Mono::Z1]->getUserPosition()));
+    ui->currentInOut->setStyleSheet("color: rgba(255, 0, 0);");
+    break;
+  case Mono::MOVING :
+    ui->currentInOut->setText("moving: " +
+                              QString::number(component()->motors[Mono::Z1]->getUserPosition()));
+    break;
   }
-  ui->currentInOut->setStyleSheet( iopos == Mono::BETWEEN ?
-                                     "color: rgba(255, 0, 0,64);" :
-                                     "");
 }
 
-/*
-void MonoGui::onStop() {
-  if (component()->isMoving())
-    component()->stop();
-  else {
-    updateInOut(component()->inBeam());
-    updateEnergy();
-    ui->tilt1->setValue(component()->tilt1());
-    ui->tilt2->setValue(component()->tilt2());
-    ui->bend1front->setValue(component()->bend1front());
-    ui->bend2front->setValue(component()->bend2front());
-    ui->bend1back->setValue(component()->bend1back());
-    ui->bend2back->setValue(component()->bend2back());
-    ui->z2tuner->setValue(component()->zSeparation());
+
+void MonoGui::updateDBragg() {
+  //double dBraggMuRad = component()->dBragg() * 1.0e6 * M_PI / 180;
+  ui->readBragg->setText(QString::number(component()->dBragg()));
+  if ( ! component()->motors[Mono::Bragg1]->isMoving() &&
+       ! component()->motors[Mono::Bragg2]->isMoving() )
     ui->tuneBragg->setValue(component()->dBragg());
-    ui->tuneX->setValue(component()->dX());
-  }
 }
-*/
+
+
+void MonoGui::updateDX() {
+  ui->readDX->setText(QString::number(component()->dX()));
+  if ( ! component()->motors[Mono::Bragg2]->isMoving() &&
+       ! component()->motors[Mono::Xdist]->isMoving() )
+    ui->tuneX->setValue(component()->dX());
+}
+
+
+void MonoGui::updateZseparation() {
+  ui->readZ2->setText(QString::number(component()->zSeparation()));
+  if ( ! component()->motors[Mono::Z2]->isMoving() )
+    ui->z2tuner->setValue(component()->zSeparation());
+}
+
+
+void MonoGui::updateTilt1() {
+  ui->readTilt1->setText(QString::number(component()->tilt1()));
+  if ( ! component()->motors[Mono::Tilt1]->isMoving() )
+    ui->tilt1->setValue(component()->tilt1());
+}
+
+
+void MonoGui::updateTilt2() {
+  ui->readTilt2->setText(QString::number(component()->tilt2()));
+  if ( ! component()->motors[Mono::Tilt2]->isMoving() )
+    ui->tilt2->setValue(component()->tilt2());
+}
+
+
+void MonoGui::updateBend1f() {
+  ui->readB1F->setText(QString::number(component()->bend1front()));
+  if ( ! component()->motors[Mono::Bend1f]->isMoving() )
+    ui->bend1front->setValue(component()->bend1front());
+}
+
+
+void MonoGui::updateBend1b() {
+  ui->readB1B->setText(QString::number(component()->bend1back()));
+  if ( ! component()->motors[Mono::Bend1b]->isMoving() )
+    ui->bend1back->setValue(component()->bend1back());
+}
+
+void MonoGui::updateBend2f() {
+  ui->readB2F->setText(QString::number(component()->bend2front()));
+  if ( ! component()->motors[Mono::Bend2f]->isMoving() )
+    ui->bend2front->setValue(component()->bend2front());
+}
+
+
+void MonoGui::updateBend2b() {
+  ui->readB2B->setText(QString::number(component()->bend2back()));
+  if ( ! component()->motors[Mono::Bend2b]->isMoving() )
+    ui->bend2back->setValue(component()->bend2back());
+}
+
 
 
 void MonoGui::onAdvancedControl() {
@@ -191,3 +288,26 @@ void MonoGui::onAdvancedControl() {
 }
 
 
+void MonoGui::updateMotorBragg1() {
+  QString msg;
+  msg += QString().sprintf("Crystal 1: %f", component()->motors[Mono::Bragg1]->getUserPosition());
+  if ( component()->motors[Mono::Bragg1]->isMoving() )
+    msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg1]->getUserGoal());
+  ui->readBragg1->setText(msg);
+}
+
+void MonoGui::updateMotorBragg2() {
+  QString msg;
+  msg += QString().sprintf("Crystal 2: %f", component()->motors[Mono::Bragg2]->getUserPosition());
+  if ( component()->motors[Mono::Bragg2]->isMoving() )
+    msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg2]->getUserGoal());
+  ui->readBragg2->setText(msg);
+}
+
+void MonoGui::updateMotorX() {
+  QString msg;
+  msg += QString().sprintf("X: %f", component()->motors[Mono::Xdist]->getUserPosition());
+  if ( component()->motors[Mono::Xdist]->isMoving() )
+    msg += QString().sprintf( " -> %f", component()->motors[Mono::Xdist]->getUserGoal());
+  ui->readX->setText(msg);
+}

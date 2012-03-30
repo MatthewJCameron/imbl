@@ -12,6 +12,22 @@ class MonoGui;
 
 class Tuner;
 
+
+
+class EnergySetRevert : public QWidget {
+  Q_OBJECT;
+public:
+  EnergySetRevert(QWidget * master);
+signals:
+  void revert();
+  void set();
+private:
+  QPushButton * setBut;
+  QPushButton * revertBut;
+  bool eventFilter(QObject *obj, QEvent *event);
+};
+
+
 class MonoGui : public ComponentGui {
   Q_OBJECT;
 
@@ -39,11 +55,24 @@ private slots:
 
   void updateConnection(bool con);
   void updateMotion(bool moving);
-  void updateEnergyChanging();
   void updateInOut(Mono::InOutPosition iopos);
   void updateEnergy();
+  void updateDBragg();
+  void updateDX();
+  void updateZseparation();
+  void updateTilt1();
+  void updateTilt2();
+  void updateBend1f();
+  void updateBend1b();
+  void updateBend2f();
+  void updateBend2b();
+  void updateMotorBragg1();
+  void updateMotorBragg2();
+  void updateMotorX();
+
 
 private:
+  EnergySetRevert * energySetter;
 
 };
 

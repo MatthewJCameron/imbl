@@ -73,3 +73,7 @@ void Tuner::divide10() {
   ui->increment->setValue(0.1*ui->increment->value());
 }
 
+void Tuner::setIncrement(double twk) {
+  ui->increment->setValue(twk);
+}
+
