@@ -70,6 +70,8 @@ private slots:
   void updateMotorBragg2();
   void updateMotorX();
 
+  void updateLSs();
+
 
 private:
   EnergySetRevert * energySetter;

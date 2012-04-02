@@ -34,7 +34,6 @@ Mono::Mono(QObject *parent) :
     connect(mot, SIGNAL(changedMoving(bool)), SLOT(updateMotion()));
   }
   connect(motors[Z1],     SIGNAL(changedMoving(bool)), SLOT(updateZ1()));
-
   connect(motors[Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateBragg1()));
   connect(motors[Bragg2], SIGNAL(changedUserPosition(double)), SLOT(updateBragg2()));
   connect(motors[Tilt1],  SIGNAL(changedUserPosition(double)), SLOT(updateTilt1()));
@@ -54,13 +53,13 @@ Mono::Mono(QObject *parent) :
 
 QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   QHash<Mono::Motors,QCaMotor*> motret;
+  motret[Xdist]  = new QCaMotor("SR08ID01MCS01:X");
   motret[Bragg1] = new QCaMotor("SR08ID01MCS01:BRAGG1");
   motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG2");
   motret[Tilt1]  = new QCaMotor("SR08ID01MCS01:TILT1");
   motret[Tilt2]  = new QCaMotor("SR08ID01MCS01:TILT2");
   motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
   motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
-  motret[Xdist]  = new QCaMotor("SR08ID01MCS01:X");
   motret[Bend1f]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
   motret[Bend2f]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
   motret[Bend1b]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");

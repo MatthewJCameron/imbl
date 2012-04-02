@@ -85,6 +85,12 @@ void MonoGui::init() {
   connect(component()->motors[Mono::Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateMotorBragg1()));
   connect(component()->motors[Mono::Xdist], SIGNAL(changedUserPosition(double)), SLOT(updateMotorX()));
 
+  foreach(QCaMotor * mot, component()->motors.values()) {
+    connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateLSs()));
+    connect(mot, SIGNAL(changedLoLimitStatus(bool)), SLOT(updateLSs()));
+  }
+
+
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->si111, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->si311, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
@@ -311,3 +317,27 @@ void MonoGui::updateMotorX() {
     msg += QString().sprintf( " -> %f", component()->motors[Mono::Xdist]->getUserGoal());
   ui->readX->setText(msg);
 }
+
+
+void MonoGui::updateLSs() {
+  QCaMotor * mot = static_cast<QCaMotor*>(sender());
+  if (!mot)
+    return;
+  QLabel * lab=0;
+  if (mot == component()->motors[Mono::Xdist]) lab = ui->readX;
+  else if (mot == component()->motors[Mono::Bragg1]) lab = ui->readBragg1;
+  else if (mot == component()->motors[Mono::Bragg2]) lab = ui->readBragg2;
+  else if (mot == component()->motors[Mono::Tilt1]) lab = ui->readTilt1;
+  else if (mot == component()->motors[Mono::Tilt2]) lab = ui->readTilt2;
+  else if (mot == component()->motors[Mono::Z1]) lab = ui->currentInOut;
+  else if (mot == component()->motors[Mono::Z2]) lab = ui->readZ2;
+  else if (mot == component()->motors[Mono::Bend1f]) lab = ui->readB1F;
+  else if (mot == component()->motors[Mono::Bend1b]) lab = ui->readB1B;
+  else if (mot == component()->motors[Mono::Bend2f]) lab = ui->readB2F;
+  else if (mot == component()->motors[Mono::Bend2b]) lab = ui->readB2B;
+  else return;
+  lab->setStyleSheet(
+        (mot->getHiLimitStatus() || mot->getLoLimitStatus()) ?
+          "background-color: rgb(128, 0, 0); color: rgb(255, 255, 255);" :
+          "");
+  }
