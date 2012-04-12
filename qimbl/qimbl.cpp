@@ -85,6 +85,8 @@ Qimbl::Qimbl(QWidget *parent) :
   mono(new MonoGui(this))
 {
 
+  //QEpicsPv::setDebugLevel(1);
+
   ui->setupUi(this);
   connect(ui->chooseComponent, SIGNAL(buttonClicked(QAbstractButton*)),
           SLOT(chooseComponent(QAbstractButton*)));
@@ -342,28 +344,41 @@ void Qimbl::update_eps_status() {
 
 
 void Qimbl::update_rfstat() {
+
   if ( ! rfstat->isConnected() ) {
+
     set_nolink_style(ui->rfSt);
-  } else if ( ! rfstat->getEnum().size() ||
-              rfstat->get().toInt() >= rfstat->getEnum().size() ) { // should never happen
-    ui->rfSt->setStyleSheet("color: rgb(255, 0, 0);");
-    ui->rfSt->setText("Error");
-  } else {
-    ui->rfSt->setText( rfstat->getEnum()[rfstat->get().toInt()] );
+
+  } else if (rfstat->getEnum().size() &&
+             rfstat->get().toInt() < rfstat->getEnum().size()) { // should always be true
+
     switch (rfstat->get().toInt()) {
       case 0 : // unknown
         ui->rfSt->setStyleSheet(gray_style);
+        //ui->rfSt->setText("Unknown");
         break;
       case 1 : // no beam
         ui->rfSt->setStyleSheet(red_style);
+        //ui->rfSt->setText("No Beam");
         break;
       case 2 :
         ui->rfSt->setStyleSheet(green_style);
+        //ui->rfSt->setText("Beam available");
         break;
       default :
         ui->rfSt->setStyleSheet("");
+        //ui->rfSt->setText("Error");
         break;
     }
+
+    ui->rfSt->setText( rfstat->getEnum()[rfstat->get().toInt()] );
+
+  } else { // should never happen
+
+    qDebug() << "BUG" << rfstat->getEnum() << rfstat->get().toInt();
+    ui->rfSt->setStyleSheet("color: rgb(255, 0, 0);");
+    ui->rfSt->setText("Error");
+
   }
 }
 
