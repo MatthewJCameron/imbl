@@ -349,35 +349,27 @@ void Qimbl::update_rfstat() {
 
     set_nolink_style(ui->rfSt);
 
-  } else if (rfstat->getEnum().size() &&
-             rfstat->get().toInt() < rfstat->getEnum().size()) { // should always be true
+  } else {
 
     switch (rfstat->get().toInt()) {
-      case 0 : // unknown
-        ui->rfSt->setStyleSheet(gray_style);
-        //ui->rfSt->setText("Unknown");
-        break;
-      case 1 : // no beam
-        ui->rfSt->setStyleSheet(red_style);
-        //ui->rfSt->setText("No Beam");
-        break;
-      case 2 :
-        ui->rfSt->setStyleSheet(green_style);
-        //ui->rfSt->setText("Beam available");
-        break;
-      default :
-        ui->rfSt->setStyleSheet("");
-        //ui->rfSt->setText("Error");
-        break;
+    case 0 : ui->rfSt->setStyleSheet(gray_style); break;
+    case 1 : ui->rfSt->setStyleSheet(red_style); break;
+    case 2 : ui->rfSt->setStyleSheet(green_style); break;
+    default : ui->rfSt->setStyleSheet(""); break;
     }
 
-    ui->rfSt->setText( rfstat->getEnum()[rfstat->get().toInt()] );
-
-  } else { // should never happen
-
-    qDebug() << "BUG" << rfstat->getEnum() << rfstat->get().toInt();
-    ui->rfSt->setStyleSheet("color: rgb(255, 0, 0);");
-    ui->rfSt->setText("Error");
+    if (rfstat->getEnum().size() &&
+             rfstat->get().toInt() < rfstat->getEnum().size()) // should always be true but is NOT
+      ui->rfSt->setText( rfstat->getEnum()[rfstat->get().toInt()] );
+    else {
+      switch (rfstat->get().toInt()) {
+      case 0 : ui->rfSt->setText("Unknown"); break;
+      case 1 : ui->rfSt->setText("No Beam"); break;
+      case 2 : ui->rfSt->setText("Beam available"); break;
+      default : ui->rfSt->setText("Error"); break;
+      }
+      qDebug() << "BUG" << rfstat->getEnum() << rfstat->get().toInt();
+    }
 
   }
 }

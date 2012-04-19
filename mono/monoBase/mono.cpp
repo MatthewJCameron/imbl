@@ -26,6 +26,7 @@ Mono::Mono(QObject *parent) :
   _dBragg(0),
   _dX(0),
   _zSeparation(0),
+  _zTweak(0),
   _inBeam(BETWEEN)
 {
 
@@ -56,8 +57,8 @@ QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   motret[Xdist]  = new QCaMotor("SR08ID01MCS01:X");
   motret[Bragg1] = new QCaMotor("SR08ID01MCS01:BRAGG1");
   motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG2");
-  motret[Tilt1]  = new QCaMotor("SR08ID01MCS01:TILT1");
-  motret[Tilt2]  = new QCaMotor("SR08ID01MCS01:TILT2");
+  motret[Tilt1]  = new QCaMotor("SR08ID01MCS02:TILT1");
+  motret[Tilt2]  = new QCaMotor("SR08ID01MCS02:TILT2");
   motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
   motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
   motret[Bend1f]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
@@ -79,6 +80,8 @@ void Mono::updateConnection() {
   bool con = true;
   foreach(QCaMotor * mot, motors)
     con &= mot->isConnected();
+  if ( con && ! isConnected() ) // Just connected
+    emit zSeparationChanged( _zSeparation = motors[Z2]->getUserPosition() );
   setConnected(con);
   if ( isConnected() ) {
     updateBragg1();
@@ -159,7 +162,7 @@ void Mono::updateBragg2() {
 void Mono::updateX() {
   if ( ! isConnected() )
     return;
-  const double xDist = zDist / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
+  const double xDist = zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
   _dX = motors[Xdist]->getUserPosition() - xDist;
   emit dXChanged(_dX);
 }
@@ -191,8 +194,8 @@ void Mono::updateZ1() {
 void Mono::updateZ2() {
   if ( ! isConnected() )
     return;
-  _zSeparation = motors[Z2]->getUserPosition();
-  emit zSeparationChanged(_zSeparation);
+  _zTweak = motors[Z2]->getUserPosition() - zSeparation();
+  emit zTweakChanged( _zTweak = motors[Z2]->getUserPosition() - zSeparation() );
 }
 
 
@@ -290,7 +293,7 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
                                   QCaMotor::STARTED);
   motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff),
                                   QCaMotor::STARTED);
-  motors[Xdist]->goUserPosition( zDist / tan(2*braggA*M_PI/180) +
+  motors[Xdist]->goUserPosition( zSeparation() / tan(2*braggA*M_PI/180) +
                                  + ( keepDX ? dX() : 0 ),
                                  QCaMotor::STARTED);
 
@@ -310,7 +313,7 @@ void Mono::setDX(double val) {
   if ( ! isConnected() || isMoving() )
     return;
   motors[Xdist]->goUserPosition
-      ( zDist / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
+      ( zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
         QCaMotor::STARTED);
 }
 
@@ -323,6 +326,14 @@ void Mono::setInBeam(bool val) {
 
 
 void Mono::setZseparation(double val) {
+  if ( ! isConnected() || isMoving() )
+    return;
+  setEnergy(energy(), diffraction());
+  emit zSeparationChanged(_zSeparation=val);
+  emit zTweakChanged(_zTweak=0.0);
+}
+
+void Mono::setZtweak(double val) {
   if ( ! isConnected() || isMoving() )
     return;
   motors[Z2]->goUserPosition(val, QCaMotor::STOPPED);

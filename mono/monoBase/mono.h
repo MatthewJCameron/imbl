@@ -38,7 +38,7 @@ public:
 
 private:
 
-  static const double zDist = 25.0; // standard Z-separation of crystals;
+  //static const double zDist = 25.0; // standard Z-separation of crystals;
   static const double zOut = -45.0; // Z1 when the mono is out of the beam;
   static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
 
@@ -50,7 +50,8 @@ private:
   Diffraction _diff;
   double _dBragg; // murad , displacement of the second crystal
   double _dX; // mm , X displacement of the stage
-  double _zSeparation; // mm , Z separation of the 2nd crystal
+  double _zSeparation; // mm , Z nominal separation of the 2nd crystal
+  double _zTweak; // mm , The difference between Z nominal separation and actual Z.
   InOutPosition _inBeam;
 
 public:
@@ -62,6 +63,7 @@ public:
   inline double dBragg() const {return _dBragg;}
   inline double dX() const {return _dX;}
   inline double zSeparation() const {return _zSeparation;}
+  inline double zTweak() const {return _zTweak;}
   inline double tilt1() {return motors[Tilt1]->getUserPosition();}
   inline double tilt2() {return motors[Tilt2]->getUserPosition();}
   inline double bend1front() {return motors[Bend1f]->getUserPosition();}
@@ -80,6 +82,7 @@ public slots:
   void setDBragg(double val);
   void setDX(double val);
   void setZseparation(double val);
+  void setZtweak(double val);
   void setTilt1(double val);
   void setTilt2(double val);
   void setBend1front(double val);
@@ -118,6 +121,7 @@ signals:
   void dBraggChanged(double);
   void dXChanged(double);
   void zSeparationChanged(double);
+  void zTweakChanged(double);
   void tilt1Changed(double);
   void tilt2Changed(double);
   void bend1frontChanged(double);

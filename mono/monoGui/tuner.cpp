@@ -48,13 +48,17 @@ bool Tuner::eventFilter(QObject *obj, QEvent *event) {
 
 
 void Tuner::add() {
-  setValue( value() + ui->increment->value() );
-  emit valueEdited(value());
+  double newVal = value() + ui->increment->value();
+  setValue( newVal );
+  QDoubleSpinBox::setValue( newVal );
+  emit valueEdited(newVal);
 }
 
 void Tuner::subtract() {
-  setValue( value() - ui->increment->value() );
-  emit valueEdited(value());
+  double newVal = value() - ui->increment->value();
+  setValue( newVal );
+  QDoubleSpinBox::setValue( newVal );
+  emit valueEdited(newVal);
 }
 
 void Tuner::multiply2() {
