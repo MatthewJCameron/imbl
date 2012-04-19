@@ -25,8 +25,8 @@ Mono::Mono(QObject *parent) :
   _energy(0),
   _dBragg(0),
   _dX(0),
-  _zSeparation(0),
-  _zTweak(0),
+  _zSeparation(standardZseparation),
+  _dZ(0),
   _inBeam(BETWEEN)
 {
 
@@ -80,8 +80,6 @@ void Mono::updateConnection() {
   bool con = true;
   foreach(QCaMotor * mot, motors)
     con &= mot->isConnected();
-  if ( con && ! isConnected() ) // Just connected
-    emit zSeparationChanged( _zSeparation = motors[Z2]->getUserPosition() );
   setConnected(con);
   if ( isConnected() ) {
     updateBragg1();
@@ -95,11 +93,14 @@ void Mono::updateConnection() {
     updateBend2f();
     updateBend1b();
     updateBend2b();
+    emit zSeparationChanged(zSeparation());
   }
 }
 
 
 void Mono::updateMotion() {
+  if (!isConnected())
+    return;
   bool newMov = false;
   foreach(QCaMotor * mot, motors)
     newMov |= mot->isMoving();
@@ -120,7 +121,8 @@ double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
 
 
 void Mono::updateBragg1() {
-  if ( ! isConnected() || motors[Bragg2]->isMoving() )
+  if ( ! motors[Bragg1]->isConnected() || ! motors[Bragg2]->isConnected() ||
+       motors[Bragg2]->isMoving() )
     return;
   const double delta = motors[Bragg1]->getUserPosition()
       - motorAngle(energy(), 1, diffraction());
@@ -131,7 +133,7 @@ void Mono::updateBragg1() {
 
 void Mono::updateBragg2() {
 
-  if ( ! isConnected() )
+  if ( ! motors[Bragg2]->isConnected() )
     return;
 
   const double mAngle = motors[Bragg2]->getUserPosition();
@@ -160,7 +162,8 @@ void Mono::updateBragg2() {
 
 
 void Mono::updateX() {
-  if ( ! isConnected() )
+  if ( ! motors[Bragg1]->isConnected() ||
+       ! motors[Xdist]->isConnected() )
     return;
   const double xDist = zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
   _dX = motors[Xdist]->getUserPosition() - xDist;
@@ -170,7 +173,7 @@ void Mono::updateX() {
 
 void Mono::updateZ1() {
 
-  if ( ! isConnected() )
+  if ( ! motors[Z1]->isConnected() )
     return;
 
   double newZ1 = motors[Z1]->getUserPosition();
@@ -192,50 +195,49 @@ void Mono::updateZ1() {
 
 
 void Mono::updateZ2() {
-  if ( ! isConnected() )
+  if ( ! motors[Z2]->isConnected() )
     return;
-  _zTweak = motors[Z2]->getUserPosition() - zSeparation();
-  emit zTweakChanged( _zTweak = motors[Z2]->getUserPosition() - zSeparation() );
+  emit dZChanged( _dZ = motors[Z2]->getUserPosition() - zSeparation() );
 }
 
 
 void Mono::updateTilt1() {
-  if ( ! isConnected() )
+  if ( ! motors[Tilt1]->isConnected() )
     return;
   emit tilt1Changed(tilt1());
 }
 
 
 void Mono::updateTilt2() {
-  if ( ! isConnected() )
+  if ( ! motors[Tilt1]->isConnected() )
     return;
   emit tilt1Changed(tilt2());
 }
 
 
 void Mono::updateBend1f() {
-  if ( ! isConnected() )
+  if ( ! motors[Bend1f]->isConnected() )
     return;
   emit bend1frontChanged(bend1front());
 }
 
 
 void Mono::updateBend2f() {
-  if ( ! isConnected() )
+  if ( ! motors[Bend2f]->isConnected() )
     return;
   emit bend2frontChanged(bend2front());
 }
 
 
 void Mono::updateBend1b() {
-  if ( ! isConnected() )
+  if ( ! motors[Bend1b]->isConnected() )
     return;
   emit bend1backChanged(bend1back());
 }
 
 
 void Mono::updateBend2b() {
-  if ( ! isConnected() )
+  if ( ! motors[Bend2b]->isConnected() )
     return;
   emit bend2backChanged(bend2back());
 }
@@ -325,18 +327,18 @@ void Mono::setInBeam(bool val) {
 }
 
 
-void Mono::setZseparation(double val) {
+void Mono::setZseparation(double val, bool keepDZ) {
   if ( ! isConnected() || isMoving() )
     return;
-  setEnergy(energy(), diffraction());
   emit zSeparationChanged(_zSeparation=val);
-  emit zTweakChanged(_zTweak=0.0);
+  setEnergy(energy(), diffraction());
+  setDZ(keepDZ ? zTweak() : 0);
 }
 
-void Mono::setZtweak(double val) {
+void Mono::setDZ(double val) {
   if ( ! isConnected() || isMoving() )
     return;
-  motors[Z2]->goUserPosition(val, QCaMotor::STOPPED);
+  motors[Z2]->goUserPosition( zSeparation()+val, QCaMotor::STARTED);
 }
 
 

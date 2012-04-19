@@ -105,7 +105,6 @@ public:
 private:
 
   static const QString pvBaseName;
-  static const QList<Paddle*> init();
 
   bool iAmMoving;
   QList<Absorber::Foil> _train;

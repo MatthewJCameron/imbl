@@ -36,6 +36,8 @@ private:
   Ui::MonoGui *ui;
 
   explicit MonoGui(Mono * mono, QWidget *parent = 0);
+  QWidgetList advancedWidgets;
+
 
   void init();
 
@@ -52,6 +54,7 @@ private slots:
   void onAdvancedControl();
   void onEnergySet();
   void onEnergyTune();
+  void onZseparationSet();
 
   void updateConnection(bool con);
   void updateMotion(bool moving);
@@ -59,7 +62,7 @@ private slots:
   void updateEnergy();
   void updateDBragg();
   void updateDX();
-  void updateZseparation();
+  void updateDZ();
   void updateTilt1();
   void updateTilt2();
   void updateBend1f();

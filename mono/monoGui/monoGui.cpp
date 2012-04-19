@@ -59,8 +59,19 @@ MonoGui::MonoGui(Mono * mono, QWidget *parent) :
 void MonoGui::init() {
 
   ui->setupUi(this);
+
+  int apbrow, neverused;
+  ui->mainLayout->getItemPosition ( ui->mainLayout->indexOf(ui->advanced_pb),
+                                    &apbrow, &neverused, &neverused, &neverused);
+  for (int row = apbrow+1 ; row < ui->mainLayout->rowCount() - 1 ; row++ )
+    for ( int column = 0; column < ui->mainLayout->columnCount() ; column++ )
+      if ( ui->mainLayout->itemAtPosition(row,column) &&
+           ui->mainLayout->itemAtPosition(row,column)->widget() )
+        advancedWidgets << ui->mainLayout->itemAtPosition(row,column)->widget();
+
   energySetter = new EnergySetRevert(ui->energy);
-  ui->advanced->hide();
+  ui->bigDBrag->hide();
+  ui->bigDX->hide();
 
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
 
@@ -72,7 +83,8 @@ void MonoGui::init() {
   connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
   connect(component(), SIGNAL(dBraggChanged(double)), SLOT(updateDBragg()));
   connect(component(), SIGNAL(dXChanged(double)), SLOT(updateDX()));
-  connect(component(), SIGNAL(zSeparationChanged(double)), SLOT(updateZseparation()));
+  connect(component(), SIGNAL(zSeparationChanged(double)), ui->zSeparation, SLOT(setValue(double)));
+  connect(component(), SIGNAL(dZChanged(double)), SLOT(updateDZ()));
   connect(component(), SIGNAL(tilt1Changed(double)), SLOT(updateTilt1()));
   connect(component(), SIGNAL(tilt2Changed(double)), SLOT(updateTilt2()));
   connect(component(), SIGNAL(bend1frontChanged(double)), SLOT(updateBend1f()));
@@ -90,7 +102,6 @@ void MonoGui::init() {
     connect(mot, SIGNAL(changedLoLimitStatus(bool)), SLOT(updateLSs()));
   }
 
-
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->si111, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->si311, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
@@ -105,7 +116,7 @@ void MonoGui::init() {
   connect(ui->bend2back, SIGNAL(valueEdited(double)), component(), SLOT(setBend2back(double)));
   connect(ui->tilt1, SIGNAL(valueEdited(double)), component(), SLOT(setTilt1(double)));
   connect(ui->tilt2, SIGNAL(valueEdited(double)), component(), SLOT(setTilt2(double)));
-  connect(ui->z2tuner, SIGNAL(valueEdited(double)), component(), SLOT(setZseparation(double)));
+  connect(ui->zSeparation, SIGNAL(valueEdited(double)), SLOT(onZseparationSet()));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
@@ -116,6 +127,7 @@ void MonoGui::init() {
   updateMotorBragg1();
   updateMotorBragg2();
   updateMotorX();
+  onAdvancedControl();
 
 }
 
@@ -129,7 +141,7 @@ void MonoGui::updateMotion(bool moving) {
   if(!moving) {
     updateDBragg();
     updateDX();
-    updateZseparation();
+    updateDZ();
     updateTilt1();
     updateTilt2();
     updateBend1f();
@@ -155,7 +167,7 @@ void MonoGui::updateConnection(bool con) {
     ui->bend1back->setIncrement(component()->motors[Mono::Bend1b]->getStep());
     ui->bend2front->setIncrement(component()->motors[Mono::Bend2f]->getStep());
     ui->bend2back->setIncrement(component()->motors[Mono::Bend2b]->getStep());
-    ui->z2tuner->setIncrement(component()->motors[Mono::Z2]->getStep());
+    ui->tuneZ->setIncrement(component()->motors[Mono::Z2]->getStep());
   }
 }
 
@@ -183,6 +195,11 @@ void MonoGui::onEnergySet() {
                          ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
   energySetter->hide();
+}
+
+
+void MonoGui::onZseparationSet() {
+  component()->setZseparation(ui->zSeparation->value(), ui->lockDZ->isChecked());
 }
 
 
@@ -216,11 +233,12 @@ void MonoGui::updateInOut(Mono::InOutPosition iopos) {
 
 
 void MonoGui::updateDBragg() {
-  //double dBraggMuRad = component()->dBragg() * 1.0e6 * M_PI / 180;
   ui->readBragg->setText(QString::number(component()->dBragg()));
   if ( ! component()->motors[Mono::Bragg1]->isMoving() &&
        ! component()->motors[Mono::Bragg2]->isMoving() )
     ui->tuneBragg->setValue(component()->dBragg());
+  ui->bigDBrag->setVisible( component()->dBragg() < ui->tuneBragg->minimum() ||
+                            component()->dBragg() > ui->tuneBragg->maximum() );
 }
 
 
@@ -229,15 +247,15 @@ void MonoGui::updateDX() {
   if ( ! component()->motors[Mono::Bragg2]->isMoving() &&
        ! component()->motors[Mono::Xdist]->isMoving() )
     ui->tuneX->setValue(component()->dX());
+  ui->bigDX->setVisible( component()->dX() < ui->tuneX->minimum() ||
+                         component()->dX() > ui->tuneX->maximum() );
 }
 
 
-void MonoGui::updateZseparation() {
-  ui->readZ2->setText(QString::number(component()->zSeparation()));
+void MonoGui::updateDZ() {
   if ( ! component()->motors[Mono::Z2]->isMoving() )
-    ui->z2tuner->setValue(component()->zSeparation());
+    ui->tuneZ->setValue(component()->zTweak());
 }
-
 
 void MonoGui::updateTilt1() {
   ui->readTilt1->setText(QString::number(component()->tilt1()));
@@ -282,12 +300,14 @@ void MonoGui::updateBend2b() {
 
 
 void MonoGui::onAdvancedControl() {
-  if (ui->advanced->isVisible()) {
-    ui->advanced->hide();
+  if (ui->motors->isVisibleTo(this)) {
+    foreach (QWidget * wdg, advancedWidgets)
+      wdg->setVisible(false);
     ui->advanced_pb->setText("Show advanced control");
     ui->advanced_pb->setStyleSheet("");
   } else if ( PsswDial::ask(this) ) {
-    ui->advanced->show();
+    foreach (QWidget * wdg, advancedWidgets)
+      wdg->setVisible(true);
     ui->advanced_pb->setText("Please don't forget to close");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
   }
@@ -330,7 +350,7 @@ void MonoGui::updateLSs() {
   else if (mot == component()->motors[Mono::Tilt1]) lab = ui->readTilt1;
   else if (mot == component()->motors[Mono::Tilt2]) lab = ui->readTilt2;
   else if (mot == component()->motors[Mono::Z1]) lab = ui->currentInOut;
-  else if (mot == component()->motors[Mono::Z2]) lab = ui->readZ2;
+  else if (mot == component()->motors[Mono::Z2]) lab = ui->readDZ;
   else if (mot == component()->motors[Mono::Bend1f]) lab = ui->readB1F;
   else if (mot == component()->motors[Mono::Bend1b]) lab = ui->readB1B;
   else if (mot == component()->motors[Mono::Bend2f]) lab = ui->readB2F;
