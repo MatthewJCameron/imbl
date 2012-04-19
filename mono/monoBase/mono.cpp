@@ -254,10 +254,6 @@ void Mono::setEnergy(double val, bool keepDBragg, bool keepDX) {
 
 void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool keepDX) {
 
-  QTimer::singleShot(0, this, SLOT(updateBragg1()));
-  QTimer::singleShot(0, this, SLOT(updateBragg2()));
-  QTimer::singleShot(0, this, SLOT(updateX()));
-
   if ( ! isConnected() || isMoving() )
     return;
 
@@ -299,6 +295,10 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
                                  + ( keepDX ? dX() : 0 ),
                                  QCaMotor::STARTED);
 
+  QTimer::singleShot(0, this, SLOT(updateBragg1()));
+  QTimer::singleShot(0, this, SLOT(updateBragg2()));
+  QTimer::singleShot(0, this, SLOT(updateX()));
+
 }
 
 
@@ -328,7 +328,7 @@ void Mono::setInBeam(bool val) {
 
 
 void Mono::setZseparation(double val, bool keepDZ) {
-  if ( ! isConnected() || isMoving() )
+  if ( ! isConnected() )
     return;
   emit zSeparationChanged(_zSeparation=val);
   setEnergy(energy(), diffraction());
@@ -336,7 +336,7 @@ void Mono::setZseparation(double val, bool keepDZ) {
 }
 
 void Mono::setDZ(double val) {
-  if ( ! isConnected() || isMoving() )
+  if ( ! isConnected() )
     return;
   motors[Z2]->goUserPosition( zSeparation()+val, QCaMotor::STARTED);
 }

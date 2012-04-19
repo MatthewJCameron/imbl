@@ -117,6 +117,7 @@ void MonoGui::init() {
   connect(ui->tilt1, SIGNAL(valueEdited(double)), component(), SLOT(setTilt1(double)));
   connect(ui->tilt2, SIGNAL(valueEdited(double)), component(), SLOT(setTilt2(double)));
   connect(ui->zSeparation, SIGNAL(valueEdited(double)), SLOT(onZseparationSet()));
+  connect(ui->tuneZ, SIGNAL(valueEdited(double)), component(), SLOT(setDZ(double)));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
@@ -253,6 +254,7 @@ void MonoGui::updateDX() {
 
 
 void MonoGui::updateDZ() {
+  ui->readDZ->setText(QString::number(component()->zTweak()));
   if ( ! component()->motors[Mono::Z2]->isMoving() )
     ui->tuneZ->setValue(component()->zTweak());
 }
