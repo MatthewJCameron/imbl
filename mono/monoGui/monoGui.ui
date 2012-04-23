@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>670</width>
-    <height>881</height>
+    <height>399</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -90,20 +90,6 @@
             </widget>
            </item>
           </layout>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="bigDBrag">
-          <property name="toolTip">
-           <string>The tune value is meaninglessly big</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(128, 0, 2);
-color: rgb(255, 255, 255);</string>
-          </property>
-          <property name="text">
-           <string>reset to 0</string>
-          </property>
          </widget>
         </item>
         <item row="13" column="4">
@@ -403,7 +389,7 @@ color: rgb(255, 255, 255);</string>
              <string>&lt;111&gt;</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">diffractions</string>
+             <string>diffractions</string>
             </attribute>
            </widget>
           </item>
@@ -416,7 +402,7 @@ color: rgb(255, 255, 255);</string>
              <string>&lt;311&gt;</string>
             </property>
             <attribute name="buttonGroup">
-             <string notr="true">diffractions</string>
+             <string>diffractions</string>
             </attribute>
            </widget>
           </item>
@@ -549,20 +535,6 @@ color: rgb(255, 255, 255);</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="5">
-         <widget class="QPushButton" name="bigDX">
-          <property name="toolTip">
-           <string>The tune value is meaninglessly big</string>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: rgb(128, 0, 2);
-color: rgb(255, 255, 255);</string>
-          </property>
-          <property name="text">
-           <string>reset to 0</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0" colspan="6">
          <widget class="QWidget" name="scheme" native="true">
           <property name="sizePolicy">
@@ -606,6 +578,28 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
          </layout>
+        </item>
+        <item row="3" column="2">
+         <widget class="QLabel" name="bigDBragg">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(128, 0, 2);
+color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>meaninglessly large value</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5">
+         <widget class="QLabel" name="bigDX">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(128, 0, 2);
+color: rgb(255, 255, 255);</string>
+          </property>
+          <property name="text">
+           <string>meaninglessly large value</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

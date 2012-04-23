@@ -70,7 +70,7 @@ void MonoGui::init() {
         advancedWidgets << ui->mainLayout->itemAtPosition(row,column)->widget();
 
   energySetter = new EnergySetRevert(ui->energy);
-  ui->bigDBrag->hide();
+  ui->bigDBragg->hide();
   ui->bigDX->hide();
 
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
@@ -205,6 +205,8 @@ void MonoGui::onZseparationSet() {
 
 
 void MonoGui::updateEnergy() {
+  if ( ui->energy->hasFocus() || ui->si111->hasFocus() || ui->si311->hasFocus() )
+    return;
   if ( qAbs(ui->energy->value() - component()->energy()) >= 1.0e-03 )
     ui->energy->setValue(component()->energy());
   if (component()->diffraction() == Mono::Si111)
@@ -238,8 +240,8 @@ void MonoGui::updateDBragg() {
   if ( ! component()->motors[Mono::Bragg1]->isMoving() &&
        ! component()->motors[Mono::Bragg2]->isMoving() )
     ui->tuneBragg->setValue(component()->dBragg());
-  ui->bigDBrag->setVisible( component()->dBragg() < ui->tuneBragg->minimum() ||
-                            component()->dBragg() > ui->tuneBragg->maximum() );
+  ui->bigDBragg->setVisible( component()->dBragg() < ui->tuneBragg->minimum() ||
+                             component()->dBragg() > ui->tuneBragg->maximum() );
 }
 
 
