@@ -94,25 +94,27 @@ void Shutter1A::updateConnection() {
 }
 
 Shutter1A::State Shutter1A::state() const {
+  State ret=BETWEEN;
   switch (mode()) {
     case MONO:
-      return ssState();
+      ret = ssState();
       break;
     case WHITE:
       if ( ssState() == OPENED && psState() == OPENED )
-        return OPENED;
+        ret = OPENED;
       if ( ssState() == CLOSED && psState() == CLOSED )
-        return CLOSED;
+        ret = CLOSED;
       else
-        return BETWEEN;
+        ret = BETWEEN;
       break;
     case MRT:
-      return psState();
+      ret = psState();
       break;
     case INVALID:
-      return BETWEEN;
+      ret = BETWEEN;
       break;
   }
+  return ret;
 }
 
 
@@ -254,3 +256,9 @@ bool Shutter1A::setOpened(bool opn, bool wait) {
   if (opn) return open(wait);
   else     return close(wait);
 }
+
+bool Shutter1A::toggle(bool wait) {
+  if (state()==OPENED) return close(wait);
+  else                 return open(wait);
+}
+

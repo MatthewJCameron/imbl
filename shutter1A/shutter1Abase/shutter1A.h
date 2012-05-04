@@ -71,6 +71,7 @@ public slots:
   bool open(bool wait=false);
   bool close(bool wait=false);
   bool setOpened(bool opn, bool wait=false);
+  bool toggle(bool wait=false);
 
 signals:
 

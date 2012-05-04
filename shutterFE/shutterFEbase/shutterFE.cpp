@@ -132,3 +132,8 @@ bool ShutterFE::setOpened(bool opn, bool wait) {
   if (opn) return open(wait);
   else     return close(wait);
 }
+
+bool ShutterFE::toggle(bool wait) {
+  if (state()==OPENED) return close(wait);
+  else                 return open(wait);
+}

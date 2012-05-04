@@ -28,10 +28,10 @@ public:
     Z1, // 0 when in beam
     Z2, // zDist when in beam
     Xdist,
-    Bend1f,
-    Bend2f,
-    Bend1b,
-    Bend2b
+    Bend1ob,
+    Bend2ob,
+    Bend1ib,
+    Bend2ib
   };
 
   static const QHash<Motors,QCaMotor*> motors;
@@ -41,6 +41,12 @@ private:
   static const double standardZseparation = 25.0; // standard Z-separation of crystals;
   static const double zOut = -45.0; // Z1 when the mono is out of the beam;
   static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+  static const double benderGap = 0.6;
+  static const double bender1ibZero = 0.38;
+  static const double bender1obZero = -0.30;
+  static const double bender2ibZero = 0.0;
+  static const double bender2obZero = 0.13;
+
 
   static QHash<Motors,QCaMotor*> init_motors();
   double motorAngle(double enrg, int crystal, Diffraction diff);
@@ -52,6 +58,10 @@ private:
   double _dX; // mm , X displacement of the stage
   double _zSeparation; // mm , Z nominal separation of the 2nd crystal
   double _dZ; // mm , The difference between Z nominal separation and actual Z.
+  double b1ob;
+  double b1ib;
+  double b2ob;
+  double b2ib;
   InOutPosition _inBeam;
 
 public:
@@ -66,10 +76,10 @@ public:
   inline double zTweak() const {return _dZ;}
   inline double tilt1() const {return motors[Tilt1]->getUserPosition();}
   inline double tilt2() const {return motors[Tilt2]->getUserPosition();}
-  inline double bend1front() const {return motors[Bend1f]->getUserPosition();}
-  inline double bend2front() const {return motors[Bend2f]->getUserPosition();}
-  inline double bend1back() const {return motors[Bend1b]->getUserPosition();}
-  inline double bend2back() const {return motors[Bend2b]->getUserPosition();}
+  inline double bend1ob() const {return motors[Bend1ob]->getUserPosition();}
+  inline double bend2ob() const {return motors[Bend2ob]->getUserPosition();}
+  inline double bend1ib() const {return motors[Bend1ib]->getUserPosition();}
+  inline double bend2ib() const {return motors[Bend2ib]->getUserPosition();}
   inline InOutPosition inBeam() const {return _inBeam;}
 
   inline bool isMoving() const { return iAmMoving; }
@@ -85,10 +95,10 @@ public slots:
   void setDZ(double val);
   void setTilt1(double val);
   void setTilt2(double val);
-  void setBend1front(double val);
-  void setBend2front(double val);
-  void setBend1back(double val);
-  void setBend2back(double val);
+  void setBend1ob(double val);
+  void setBend2ob(double val);
+  void setBend1ib(double val);
+  void setBend2ib(double val);
   void setInBeam(bool val);
   inline void makeConsistent() { setEnergy(energy(), diffraction()); }
   inline void moveIn() { setInBeam(true); }
@@ -107,10 +117,10 @@ private slots:
   void updateZ1();
   void updateZ2();
   void updateX();
-  void updateBend1f();
-  void updateBend2f();
-  void updateBend1b();
-  void updateBend2b();
+  void updateBend1ob();
+  void updateBend2ob();
+  void updateBend1ib();
+  void updateBend2ib();
 
 
 signals:
@@ -124,10 +134,10 @@ signals:
   void dZChanged(double);
   void tilt1Changed(double);
   void tilt2Changed(double);
-  void bend1frontChanged(double);
-  void bend2frontChanged(double);
-  void bend1backChanged(double);
-  void bend2backChanged(double);
+  void bend1obChanged(double);
+  void bend2obChanged(double);
+  void bend1ibChanged(double);
+  void bend2ibChanged(double);
   void inBeamChanged(Mono::InOutPosition);
 
 };

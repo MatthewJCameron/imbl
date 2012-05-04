@@ -27,6 +27,10 @@ Mono::Mono(QObject *parent) :
   _dX(0),
   _zSeparation(standardZseparation),
   _dZ(0),
+  b1ob(0),
+  b1ib(0),
+  b2ob(0),
+  b2ib(0),
   _inBeam(BETWEEN)
 {
 
@@ -42,10 +46,10 @@ Mono::Mono(QObject *parent) :
   connect(motors[Z1],     SIGNAL(changedUserPosition(double)), SLOT(updateZ1()));
   connect(motors[Z2],     SIGNAL(changedUserPosition(double)), SLOT(updateZ2()));
   connect(motors[Xdist],  SIGNAL(changedUserPosition(double)), SLOT(updateX()));
-  connect(motors[Bend1f],  SIGNAL(changedUserPosition(double)), SLOT(updateBend1f()));
-  connect(motors[Bend2f],  SIGNAL(changedUserPosition(double)), SLOT(updateBend2f()));
-  connect(motors[Bend1b],  SIGNAL(changedUserPosition(double)), SLOT(updateBend1b()));
-  connect(motors[Bend2b],  SIGNAL(changedUserPosition(double)), SLOT(updateBend2b()));
+  connect(motors[Bend1ob],  SIGNAL(changedUserPosition(double)), SLOT(updateBend1ob()));
+  connect(motors[Bend2ob],  SIGNAL(changedUserPosition(double)), SLOT(updateBend2ob()));
+  connect(motors[Bend1ib],  SIGNAL(changedUserPosition(double)), SLOT(updateBend1ib()));
+  connect(motors[Bend2ib],  SIGNAL(changedUserPosition(double)), SLOT(updateBend2ib()));
 
 
   updateConnection();
@@ -61,10 +65,10 @@ QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   motret[Tilt2]  = new QCaMotor("SR08ID01MCS02:TILT2");
   motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
   motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
-  motret[Bend1f]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
-  motret[Bend2f]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
-  motret[Bend1b]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
-  motret[Bend2b]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
+  motret[Bend1ob]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
+  motret[Bend2ob]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
+  motret[Bend1ib]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
+  motret[Bend2ib]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
   return motret;
 }
 
@@ -89,10 +93,10 @@ void Mono::updateConnection() {
     updateZ1();
     updateZ2();
     updateX();
-    updateBend1f();
-    updateBend2f();
-    updateBend1b();
-    updateBend2b();
+    updateBend1ob();
+    updateBend2ob();
+    updateBend1ib();
+    updateBend2ib();
     emit zSeparationChanged(zSeparation());
   }
 }
@@ -214,31 +218,31 @@ void Mono::updateTilt2() {
 }
 
 
-void Mono::updateBend1f() {
-  if ( ! motors[Bend1f]->isConnected() )
+void Mono::updateBend1ob() {
+  if ( ! motors[Bend1ob]->isConnected() )
     return;
-  emit bend1frontChanged(bend1front());
+  emit bend1obChanged(bend1ob());
 }
 
 
-void Mono::updateBend2f() {
-  if ( ! motors[Bend2f]->isConnected() )
+void Mono::updateBend2ob() {
+  if ( ! motors[Bend2ob]->isConnected() )
     return;
-  emit bend2frontChanged(bend2front());
+  emit bend2obChanged(bend2ob());
 }
 
 
-void Mono::updateBend1b() {
-  if ( ! motors[Bend1b]->isConnected() )
+void Mono::updateBend1ib() {
+  if ( ! motors[Bend1ib]->isConnected() )
     return;
-  emit bend1backChanged(bend1back());
+  emit bend1ibChanged(bend1ib());
 }
 
 
-void Mono::updateBend2b() {
-  if ( ! motors[Bend2b]->isConnected() )
+void Mono::updateBend2ib() {
+  if ( ! motors[Bend2ib]->isConnected() )
     return;
-  emit bend2backChanged(bend2back());
+  emit bend2ibChanged(bend2ib());
 }
 
 
@@ -354,33 +358,33 @@ void Mono::setTilt2(double val) {
 }
 
 
-void Mono::setBend1front(double val) {
+void Mono::setBend1ob(double val) {
   if ( ! isConnected() )
     return;
-  motors[Bend1f]->goUserPosition(val, QCaMotor::STARTED);
+  motors[Bend1ob]->goUserPosition(val, QCaMotor::STARTED);
 }
 
 
-void Mono::setBend2front(double val) {
+void Mono::setBend2ob(double val) {
   if ( ! isConnected() )
     return;
-  motors[Bend2f]->goUserPosition(val, QCaMotor::STARTED);
+  motors[Bend2ob]->goUserPosition(val, QCaMotor::STARTED);
 }
 
 
-void Mono::setBend1back(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend1b()));
+void Mono::setBend1ib(double val) {
+  QTimer::singleShot(0, this, SLOT(updateBend1ib()));
   if ( ! isConnected() )
     return;
-  motors[Bend1b]->goUserPosition(val, QCaMotor::STARTED);
+  motors[Bend1ib]->goUserPosition(val, QCaMotor::STARTED);
 }
 
 
-void Mono::setBend2back(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend2b()));
+void Mono::setBend2ib(double val) {
+  QTimer::singleShot(0, this, SLOT(updateBend2ib()));
   if ( ! isConnected() )
     return;
-  motors[Bend2b]->goUserPosition(val, QCaMotor::STARTED);
+  motors[Bend2ib]->goUserPosition(val, QCaMotor::STARTED);
 }
 
 

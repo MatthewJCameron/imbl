@@ -35,11 +35,6 @@ private:
   QEpicsPv * bl_disabled;
   QEpicsPv * eps_enabled;
   QEpicsPv * eps_disabled;
-  /*
-  QEpicsPv * blmode1;
-  QEpicsPv * blmode2;
-  QEpicsPv * blmode3;
-  */
 
   QHash < Hutch*, QLabel* > hutches;
 
@@ -114,6 +109,27 @@ protected:
   virtual void paintEvent( QPaintEvent * event );
 };
 
+
+class LinkedLeft : public QWidget {
+public:
+  inline explicit LinkedLeft (QWidget * parent = 0) : QWidget(parent) {};
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
+
+class LinkedRight : public QWidget {
+public:
+  inline explicit LinkedRight (QWidget * parent = 0) : QWidget(parent) {};
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
+
+class LinkedMiddle : public QWidget {
+public:
+  inline explicit LinkedMiddle (QWidget * parent = 0) : QWidget(parent) {};
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
 
 
 

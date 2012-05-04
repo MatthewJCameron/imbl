@@ -48,6 +48,7 @@ static void set_nolink_style(QLabel* lab) {
 
 
 
+
 const QStringList Qimbl::vacMonitors =
     ( QStringList()
       << "SR08ID01CCG01:PRESSURE_MONITOR"
@@ -60,8 +61,12 @@ const QStringList Qimbl::tempMonitors =
       << "SR08FE01TES02:TEMPERATURE_MONITOR") ;
 const QStringList Qimbl::flowMonitors =
     ( QStringList()
-      << "FLOW_MONITOR_1"
-      << "FLOW_MONITOR_2") ;
+      << "SR08ID01EPS01:FLM01_FlowMonitor"
+      << "SR08ID01EPS01:FLM02_FlowMonitor"
+      << "SR08ID01EPS01:FLM03_FlowMonitor"
+      << "SR08ID01EPS01:FLM04_FlowMonitor"
+      << "SR08ID01EPS01:FLM05_FlowMonitor"
+      << "SR08ID01EPS01:FLM06_FlowMonitor" );
 
 
 Qimbl::Qimbl(QWidget *parent) :
@@ -126,12 +131,16 @@ Qimbl::Qimbl(QWidget *parent) :
 
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
+  connect(ui->shfeControl, SIGNAL(clicked()), shfe, SLOT(toggle()));
 
   connect(sh1A, SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(stateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(update_bl_mode()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_bl_mode()));
+  connect(ui->sh1AControl1, SIGNAL(clicked()), sh1A, SLOT(toggle()));
+  connect(ui->sh1AControl2, SIGNAL(clicked()), sh1A, SLOT(toggle()));
 
   connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
@@ -155,10 +164,10 @@ Qimbl::Qimbl(QWidget *parent) :
   ui->control->addWidget(mono);
   connect(mono->component(), SIGNAL(motionChanged(bool)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(energyChanged(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend1frontChanged(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend2frontChanged(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend1backChanged(double)), SLOT(update_mono()));
-  connect(mono->component(), SIGNAL(bend2backChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend1obChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend2obChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend1ibChanged(double)), SLOT(update_mono()));
+  connect(mono->component(), SIGNAL(bend2ibChanged(double)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
 
@@ -187,6 +196,10 @@ Qimbl::Qimbl(QWidget *parent) :
   row=1;
   foreach(QString str, flowMonitors) {
     ValueBar * vb = new ValueBar(str);
+    vb->setLo(5);
+    vb->setLoLo(5);
+    vb->setHi(45);
+    vb->setHiHi(45);
     ui->monitorsLayout->addWidget(vb, row++,2);
     flowBars << vb;
     connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_flow()));
@@ -423,18 +436,38 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::INVALID :
         ui->blMode->setStyleSheet(red_style);
         ui->blMode->setText("Invalid");
+        ui->psControl->setVisible(true);
+        ui->ssControl->setVisible(true);
+        ui->linked->setVisible(true);
+        ui->linkedLeft->setVisible(true);
+        ui->linkedRight->setVisible(true);
         break;
       case Shutter1A::MONO :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("Mono");
+        ui->psControl->setVisible(false);
+        ui->ssControl->setVisible(true);
+        ui->linked->setVisible(false);
+        ui->linkedLeft->setVisible(false);
+        ui->linkedRight->setVisible(false);
         break;
       case Shutter1A::WHITE :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("White");
+        ui->psControl->setVisible(true);
+        ui->ssControl->setVisible(true);
+        ui->linked->setVisible(true);
+        ui->linkedLeft->setVisible(true);
+        ui->linkedRight->setVisible(true);
         break;
       case Shutter1A::MRT :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("MRT");
+        ui->psControl->setVisible(true);
+        ui->ssControl->setVisible(false);
+        ui->linked->setVisible(false);
+        ui->linkedLeft->setVisible(false);
+        ui->linkedRight->setVisible(false);
         break;
     }
   update_sh1A();
@@ -461,7 +494,6 @@ void Qimbl::update_sh1A() {
         ui->shIndPS_c->setText(shutter_closed_string);
         ui->shIndPS_o->setStyleSheet("");
         ui->shIndPS_o->setText("");
-        ui->sh1AControl->setText("Open");
         break;
       case Shutter1A::OPENED :
         ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
@@ -471,7 +503,6 @@ void Qimbl::update_sh1A() {
         ui->shIndPS_c->setText("");
         ui->shIndPS_o->setStyleSheet(shInd_o_style);
         ui->shIndPS_o->setText(shutter_open_string);
-        ui->sh1AControl->setText("Close");
         break;
       case Shutter1A::BETWEEN :
         ui->shpsSt->setText(inprogress_string);
@@ -485,7 +516,6 @@ void Qimbl::update_sh1A() {
         ui->shIndSS_c->setText(shutter_closed_string);
         ui->shIndSS_o->setStyleSheet("");
         ui->shIndSS_o->setText("");
-        ui->sh1AControl->setText("Open");
         break;
       case Shutter1A::OPENED :
         ui->shssSt->setStyleSheet(green_style);
@@ -494,12 +524,24 @@ void Qimbl::update_sh1A() {
         ui->shIndSS_c->setText("");
         ui->shIndSS_o->setStyleSheet(shInd_o_style);
         ui->shIndSS_o->setText(shutter_open_string);
-        ui->sh1AControl->setText("Close");
         break;
       case Shutter1A::BETWEEN :
         ui->shssSt->setText(inprogress_string);
         break;
     }
+    switch (sh1A->state()) {
+      case Shutter1A::CLOSED :
+        ui->sh1AControl1->setText("Open");
+        ui->sh1AControl2->setText("Open");
+        break;
+      case Shutter1A::OPENED :
+        ui->sh1AControl1->setText("Close");
+        ui->sh1AControl2->setText("Close");
+        break;
+      case Shutter1A::BETWEEN :
+        break;
+    }
+
 
   }
 }
@@ -638,7 +680,7 @@ void Qimbl::update_mono() {
   } else if ( mono->component()->inBeam() == Mono::BETWEEN ) {
     ui->monoStW->show();
     ui->monoSt->setStyleSheet(red_style);
-    ui->monoSt->setText("Stopped in between");
+    ui->monoSt->setText("Between");
   } else {
     ui->monoStW->hide();
     ui->monoSt->setStyleSheet("");
@@ -662,7 +704,7 @@ void Qimbl::update_mono() {
       ui->monoPos->setText("Moving");
       break;
   }
-  ui->energy->setText(QString::number(mono->component()->energy()));
+  ui->energy->setText(QString::number(mono->component()->energy(),'f',3));
   switch (mono->component()->diffraction()) {
     case Mono::Si111 :
       ui->hkl->setText("1,1,1");
@@ -671,10 +713,10 @@ void Qimbl::update_mono() {
       ui->hkl->setText("3,1,1");
       break;
   }
-  ui->bend1->setText(QString::number(mono->component()->bend1front(),'g',2) + "/" +
-                     QString::number(mono->component()->bend1back(),'g',2));
-  ui->bend2->setText(QString::number(mono->component()->bend2front(),'g',2) + "/" +
-                     QString::number(mono->component()->bend2back(),'g',2));
+  ui->bend1->setText(QString::number(mono->component()->bend1ob(),'f',2) + "/" +
+                     QString::number(mono->component()->bend1ib(),'f',2));
+  ui->bend2->setText(QString::number(mono->component()->bend2ob(),'f',2) + "/" +
+                     QString::number(mono->component()->bend2ib(),'f',2));
 }
 
 
@@ -790,5 +832,35 @@ void QLabelLineTwo::paintEvent( QPaintEvent * event ) {
 }
 
 
+void LinkedLeft::paintEvent( QPaintEvent * event ) {
+  QWidget::paintEvent(event);
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(1);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  painter.drawLine(width()/2, 0, width()/2, height()/2);
+  painter.drawLine(width()/2, height()/2, width(), height()/2);
+}
 
+void LinkedRight::paintEvent( QPaintEvent * event ) {
+  QWidget::paintEvent(event);
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(1);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  painter.drawLine(width()/2, 0, width()/2, height()/2);
+  painter.drawLine(width()/2, height()/2, 0, height()/2);
+}
 
+void LinkedMiddle::paintEvent( QPaintEvent * event ) {
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(1);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  //painter.drawLine(0, height()/2, width(), height()/2);
+  painter.drawLine(0, height()/2, width(), height()/2);
+  QWidget::paintEvent(event);
+}

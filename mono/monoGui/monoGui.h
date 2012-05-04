@@ -68,10 +68,10 @@ private slots:
   void updateDZ();
   void updateTilt1();
   void updateTilt2();
-  void updateBend1f();
-  void updateBend1b();
-  void updateBend2f();
-  void updateBend2b();
+  void updateBend1ob();
+  void updateBend1ib();
+  void updateBend2ob();
+  void updateBend2ib();
   void updateMotorBragg1();
   void updateMotorBragg2();
   void updateMotorX();

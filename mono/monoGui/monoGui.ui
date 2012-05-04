@@ -101,7 +101,7 @@
        </widget>
       </item>
       <item row="10" column="6">
-       <widget class="QLabel" name="readB1B">
+       <widget class="QLabel" name="readB1ib">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -161,7 +161,7 @@
        </layout>
       </item>
       <item row="9" column="5">
-       <widget class="Tuner" name="bend1front">
+       <widget class="Tuner" name="bend1ob">
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -181,7 +181,7 @@
        </widget>
       </item>
       <item row="10" column="2">
-       <widget class="QLabel" name="readB2B">
+       <widget class="QLabel" name="readB2ib">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -269,7 +269,7 @@
        </widget>
       </item>
       <item row="9" column="2">
-       <widget class="QLabel" name="readB2F">
+       <widget class="QLabel" name="readB2ob">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -343,7 +343,7 @@
        </widget>
       </item>
       <item row="10" column="5">
-       <widget class="Tuner" name="bend1back">
+       <widget class="Tuner" name="bend1ib">
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -383,7 +383,7 @@
        </widget>
       </item>
       <item row="9" column="6">
-       <widget class="QLabel" name="readB1F">
+       <widget class="QLabel" name="readB1ob">
         <property name="text">
          <string>TextLabel</string>
         </property>
@@ -420,7 +420,7 @@
        </widget>
       </item>
       <item row="10" column="1">
-       <widget class="Tuner" name="bend2back">
+       <widget class="Tuner" name="bend2ib">
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -473,7 +473,7 @@
        </widget>
       </item>
       <item row="9" column="1">
-       <widget class="Tuner" name="bend2front">
+       <widget class="Tuner" name="bend2ob">
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>

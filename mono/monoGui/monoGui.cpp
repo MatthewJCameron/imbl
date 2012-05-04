@@ -91,14 +91,14 @@ void MonoGui::init() {
   ui->motors_1->addMotor(component()->motors[Mono::Bragg1], true,true);
   ui->motors_1->addMotor(component()->motors[Mono::Z1], true,true);
   ui->motors_1->addMotor(component()->motors[Mono::Tilt1], true,true);
-  ui->motors_1->addMotor(component()->motors[Mono::Bend1f], true,true);
-  ui->motors_1->addMotor(component()->motors[Mono::Bend1b], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Bend1ob], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Bend1ib], true,true);
   ui->motors_1->addMotor(component()->motors[Mono::Xdist], true,true);
   ui->motors_2->addMotor(component()->motors[Mono::Bragg2], true,true);
   ui->motors_2->addMotor(component()->motors[Mono::Z2], true,true);
   ui->motors_2->addMotor(component()->motors[Mono::Tilt2], true,true);
-  ui->motors_2->addMotor(component()->motors[Mono::Bend2f], true,true);
-  ui->motors_2->addMotor(component()->motors[Mono::Bend2b], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Bend2ob], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Bend2ib], true,true);
 
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
@@ -110,10 +110,10 @@ void MonoGui::init() {
   connect(component(), SIGNAL(dZChanged(double)), SLOT(updateDZ()));
   connect(component(), SIGNAL(tilt1Changed(double)), SLOT(updateTilt1()));
   connect(component(), SIGNAL(tilt2Changed(double)), SLOT(updateTilt2()));
-  connect(component(), SIGNAL(bend1frontChanged(double)), SLOT(updateBend1f()));
-  connect(component(), SIGNAL(bend2frontChanged(double)), SLOT(updateBend2f()));
-  connect(component(), SIGNAL(bend1backChanged(double)), SLOT(updateBend1b()));
-  connect(component(), SIGNAL(bend2backChanged(double)), SLOT(updateBend2b()));
+  connect(component(), SIGNAL(bend1obChanged(double)), SLOT(updateBend1ob()));
+  connect(component(), SIGNAL(bend2obChanged(double)), SLOT(updateBend2ob()));
+  connect(component(), SIGNAL(bend1ibChanged(double)), SLOT(updateBend1ib()));
+  connect(component(), SIGNAL(bend2ibChanged(double)), SLOT(updateBend2ib()));
   connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)),
           SLOT(updateInOut(Mono::InOutPosition)));
 
@@ -146,14 +146,14 @@ void MonoGui::init() {
           ui->tilt1, SLOT(setDisabled(bool)));
   connect(component()->motors[Mono::Tilt2],  SIGNAL(changedMoving(bool)),
           ui->tilt2, SLOT(setDisabled(bool)));
-  connect(component()->motors[Mono::Bend1b],  SIGNAL(changedMoving(bool)),
-          ui->bend1back, SLOT(setDisabled(bool)));
-  connect(component()->motors[Mono::Bend1f],  SIGNAL(changedMoving(bool)),
-          ui->bend1front, SLOT(setDisabled(bool)));
-  connect(component()->motors[Mono::Bend2b],  SIGNAL(changedMoving(bool)),
-          ui->bend2back, SLOT(setDisabled(bool)));
-  connect(component()->motors[Mono::Bend2f],  SIGNAL(changedMoving(bool)),
-          ui->bend2front, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend1ib],  SIGNAL(changedMoving(bool)),
+          ui->bend1ib, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend1ob],  SIGNAL(changedMoving(bool)),
+          ui->bend1ob, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend2ib],  SIGNAL(changedMoving(bool)),
+          ui->bend2ib, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend2ob],  SIGNAL(changedMoving(bool)),
+          ui->bend2ob, SLOT(setDisabled(bool)));
 
   foreach(QCaMotor * mot, component()->motors.values()) {
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateLSs()));
@@ -168,10 +168,10 @@ void MonoGui::init() {
   connect(energySetter, SIGNAL(revert()),  SLOT(updateEnergy()));
   connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
   connect(ui->tuneX, SIGNAL(valueEdited(double)), component(), SLOT(setDX(double)));
-  connect(ui->bend1front, SIGNAL(valueEdited(double)), component(), SLOT(setBend1front(double)));
-  connect(ui->bend2front, SIGNAL(valueEdited(double)), component(), SLOT(setBend2front(double)));
-  connect(ui->bend1back, SIGNAL(valueEdited(double)), component(), SLOT(setBend1back(double)));
-  connect(ui->bend2back, SIGNAL(valueEdited(double)), component(), SLOT(setBend2back(double)));
+  connect(ui->bend1ob, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ob(double)));
+  connect(ui->bend2ob, SIGNAL(valueEdited(double)), component(), SLOT(setBend2ob(double)));
+  connect(ui->bend1ib, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ib(double)));
+  connect(ui->bend2ib, SIGNAL(valueEdited(double)), component(), SLOT(setBend2ib(double)));
   connect(ui->tilt1, SIGNAL(valueEdited(double)), component(), SLOT(setTilt1(double)));
   connect(ui->tilt2, SIGNAL(valueEdited(double)), component(), SLOT(setTilt2(double)));
   connect(ui->zSeparation, SIGNAL(valueEdited(double)), SLOT(onZseparationSet()));
@@ -219,10 +219,10 @@ void MonoGui::updateConnection(bool con) {
     ui->tuneX->setIncrement(component()->motors[Mono::Xdist]->getStep());
     ui->tilt1->setIncrement(component()->motors[Mono::Tilt1]->getStep());
     ui->tilt2->setIncrement(component()->motors[Mono::Tilt2]->getStep());
-    ui->bend1front->setIncrement(component()->motors[Mono::Bend1f]->getStep());
-    ui->bend1back->setIncrement(component()->motors[Mono::Bend1b]->getStep());
-    ui->bend2front->setIncrement(component()->motors[Mono::Bend2f]->getStep());
-    ui->bend2back->setIncrement(component()->motors[Mono::Bend2b]->getStep());
+    ui->bend1ob->setIncrement(component()->motors[Mono::Bend1ob]->getStep());
+    ui->bend1ib->setIncrement(component()->motors[Mono::Bend1ib]->getStep());
+    ui->bend2ob->setIncrement(component()->motors[Mono::Bend2ob]->getStep());
+    ui->bend2ib->setIncrement(component()->motors[Mono::Bend2ib]->getStep());
     ui->tuneZ->setIncrement(component()->motors[Mono::Z2]->getStep());
   }
 }
@@ -399,30 +399,30 @@ void MonoGui::updateTilt2() {
 }
 
 
-void MonoGui::updateBend1f() {
-  ui->readB1F->setText(QString::number(component()->bend1front(), 'f', ui->bend1front->decimals()));
-  if ( ! component()->motors[Mono::Bend1f]->isMoving() )
-    ui->bend1front->setValue(component()->bend1front());
+void MonoGui::updateBend1ob() {
+  ui->readB1ob->setText(QString::number(component()->bend1ob(), 'f', ui->bend1ob->decimals()));
+  if ( ! component()->motors[Mono::Bend1ob]->isMoving() )
+    ui->bend1ob->setValue(component()->bend1ob());
 }
 
 
-void MonoGui::updateBend1b() {
-  ui->readB1B->setText(QString::number(component()->bend1back(), 'f', ui->bend1back->decimals()));
-  if ( ! component()->motors[Mono::Bend1b]->isMoving() )
-    ui->bend1back->setValue(component()->bend1back());
+void MonoGui::updateBend1ib() {
+  ui->readB1ib->setText(QString::number(component()->bend1ib(), 'f', ui->bend1ib->decimals()));
+  if ( ! component()->motors[Mono::Bend1ib]->isMoving() )
+    ui->bend1ib->setValue(component()->bend1ib());
 }
 
-void MonoGui::updateBend2f() {
-  ui->readB2F->setText(QString::number(component()->bend2front(), 'f', ui->bend2front->decimals()));
-  if ( ! component()->motors[Mono::Bend2f]->isMoving() )
-    ui->bend2front->setValue(component()->bend2front());
+void MonoGui::updateBend2ob() {
+  ui->readB2ob->setText(QString::number(component()->bend2ob(), 'f', ui->bend2ob->decimals()));
+  if ( ! component()->motors[Mono::Bend2ob]->isMoving() )
+    ui->bend2ob->setValue(component()->bend2ob());
 }
 
 
-void MonoGui::updateBend2b() {
-  ui->readB2B->setText(QString::number(component()->bend2back(), 'f', ui->bend2back->decimals()));
-  if ( ! component()->motors[Mono::Bend2b]->isMoving() )
-    ui->bend2back->setValue(component()->bend2back());
+void MonoGui::updateBend2ib() {
+  ui->readB2ib->setText(QString::number(component()->bend2ib(), 'f', ui->bend2ib->decimals()));
+  if ( ! component()->motors[Mono::Bend2ib]->isMoving() )
+    ui->bend2ib->setValue(component()->bend2ib());
 }
 
 
@@ -481,10 +481,10 @@ void MonoGui::updateLSs() {
   else if (mot == component()->motors[Mono::Tilt2]) lab = ui->readTilt2;
   else if (mot == component()->motors[Mono::Z1]) lab = ui->currentInOut;
   else if (mot == component()->motors[Mono::Z2]) lab = ui->readDZ;
-  else if (mot == component()->motors[Mono::Bend1f]) lab = ui->readB1F;
-  else if (mot == component()->motors[Mono::Bend1b]) lab = ui->readB1B;
-  else if (mot == component()->motors[Mono::Bend2f]) lab = ui->readB2F;
-  else if (mot == component()->motors[Mono::Bend2b]) lab = ui->readB2B;
+  else if (mot == component()->motors[Mono::Bend1ob]) lab = ui->readB1ob;
+  else if (mot == component()->motors[Mono::Bend1ib]) lab = ui->readB1ib;
+  else if (mot == component()->motors[Mono::Bend2ob]) lab = ui->readB2ob;
+  else if (mot == component()->motors[Mono::Bend2ib]) lab = ui->readB2ib;
   else return;
   lab->setStyleSheet(
         (mot->getHiLimitStatus() || mot->getLoLimitStatus()) ?

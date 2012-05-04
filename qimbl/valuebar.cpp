@@ -104,7 +104,7 @@ void ValueBar::updateValue() {
   bool ok;
   double value = pv->get().toDouble(&ok);
   ui->thermo->setValue(value);
-  if ( isLogarithmic() )
+  if ( isLogarithmic() || qAbs(value) > 1.0e05 || ( qAbs(value) < 1.0e-05 && value != 0.0 ) )
     ui->value->setText( QString::number(value,'e',prec)+units );
   else
     ui->value->setText( QString::number(value,'f',prec)+units );
