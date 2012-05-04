@@ -124,9 +124,8 @@ void Mono::updateBragg1() {
   if ( ! motors[Bragg1]->isConnected() || ! motors[Bragg2]->isConnected() ||
        motors[Bragg2]->isMoving() )
     return;
-  const double delta = motors[Bragg1]->getUserPosition()
-      - motorAngle(energy(), 1, diffraction());
-  _dBragg = 1.0e6*delta*M_PI/180.0; //murad
+  _dBragg = motors[Bragg1]->getUserPosition()- motorAngle(energy(), 1, diffraction());
+  //_dBragg = 1.0e6*delta*M_PI/180.0; //murad
   emit dBraggChanged(_dBragg);
 }
 
@@ -209,9 +208,9 @@ void Mono::updateTilt1() {
 
 
 void Mono::updateTilt2() {
-  if ( ! motors[Tilt1]->isConnected() )
+  if ( ! motors[Tilt2]->isConnected() )
     return;
-  emit tilt1Changed(tilt2());
+  emit tilt2Changed(tilt2());
 }
 
 
@@ -305,8 +304,7 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
 void Mono::setDBragg(double val) {
   if ( ! isConnected() || isMoving() )
     return;
-  motors[Bragg1]->goUserPosition( motorAngle(energy(), 1, diffraction())
-                                  + val * 180 / (1.0e06 * M_PI),
+  motors[Bragg1]->goUserPosition( motorAngle(energy(), 1, diffraction()) + val,
                                   QCaMotor::STARTED);
 }
 

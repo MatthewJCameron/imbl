@@ -48,7 +48,7 @@ private:
   bool iAmMoving;
   double _energy; // kev
   Diffraction _diff;
-  double _dBragg; // murad , displacement of the second crystal
+  double _dBragg; // displacement of the second crystal
   double _dX; // mm , X displacement of the stage
   double _zSeparation; // mm , Z nominal separation of the 2nd crystal
   double _dZ; // mm , The difference between Z nominal separation and actual Z.

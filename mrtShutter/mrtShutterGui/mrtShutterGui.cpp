@@ -64,9 +64,9 @@ void MrtShutterGui::updateConnection(bool con) {
     ui->repititions->setValue(component()->repeats());
     ui->trig->setText("Trig");
   } else {
-    ui->start->setText("Disconnected");
-    ui->open->setText("Disconnected");
-    ui->trig->setText("Disconnected");
+    ui->start->setText("No link");
+    ui->open->setText("No link");
+    ui->trig->setText("No link");
   }
 }
 

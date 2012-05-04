@@ -8,11 +8,15 @@ QEpicsPv * ShutterFE::opnSts = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_STS")
 QEpicsPv * ShutterFE::clsSts = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSED_STS");
 QEpicsPv * ShutterFE::opnCmd = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_CMD");
 QEpicsPv * ShutterFE::clsCmd = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSE_CMD");
+QEpicsPv * ShutterFE::enabledSts  = new QEpicsPv("SR08ID01PSS01:FES_EPS_ENABLE_STS");
+QEpicsPv * ShutterFE::disabledSts = new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_STS");
+
 
 
 ShutterFE::ShutterFE(QObject *parent) :
   Component("Fron-end shutter", parent),
-  st(BETWEEN)
+  st(BETWEEN),
+  enabled(false)
 {
 
   timer.setSingleShot(true);
@@ -22,10 +26,14 @@ ShutterFE::ShutterFE(QObject *parent) :
   connect(clsSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(opnCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(clsCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(enabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(disabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(&timer, SIGNAL(timeout()), SIGNAL(relaxChanged()));
 
   connect(opnSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
   connect(clsSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
+  connect(enabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+  connect(disabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
 
   updateConnection();
 
@@ -37,10 +45,12 @@ ShutterFE::~ShutterFE() {
 void ShutterFE::updateConnection() {
   bool connection =
       opnSts->isConnected() && clsSts->isConnected() &&
-      opnCmd->isConnected() && clsCmd->isConnected();
+      opnCmd->isConnected() && clsCmd->isConnected() &&
+      enabledSts->isConnected() && disabledSts->isConnected();
   setConnected(connection);
   if (isConnected()) {
     updateState();
+    updateEnabled();
     emit relaxChanged();
   }
 }
@@ -67,6 +77,14 @@ void ShutterFE::updateState() {
   }
   emit stateChanged(st);
 
+}
+
+void ShutterFE::updateEnabled() {
+  if ( ! isConnected() )
+    return;
+  bool newEnabled = enabledSts->get().toBool() && ! disabledSts->get().toBool();
+  if (newEnabled != enabled)
+    emit enabledChanged(enabled = newEnabled);
 }
 
 

@@ -5,7 +5,6 @@
 
 
 
-
 EnergySetRevert::EnergySetRevert(QWidget * master) :
   QWidget(static_cast<QWidget*>(master->parent())),
   setBut(new QPushButton("Set",this)),
@@ -14,6 +13,7 @@ EnergySetRevert::EnergySetRevert(QWidget * master) :
   hide();
   setAutoFillBackground(true);
   QHBoxLayout * lay = new QHBoxLayout;
+  lay->setContentsMargins(0, 0, 0, 0);
   lay->addWidget(setBut);
   lay->addWidget(revertBut);
   setLayout(lay);
@@ -32,12 +32,28 @@ bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
     } else if ( event->type() == QEvent::Move ||
                 event->type() == QEvent::Show ) {
       QRect geom = geometry();
-      geom.moveTopLeft(objW->geometry().topLeft()+QPoint(0, objW->height()));
+      geom.moveTopLeft(objW->geometry().topLeft()-QPoint(0, height()));
       setGeometry(geom);
+    } else if ( event->type() == QEvent::KeyPress ) {
+      int key = static_cast<QKeyEvent*>(event)->key();
+      if ( key == Qt::Key_Enter || key == Qt::Key_Return ) {
+        setBut->setFocus();
+        setBut->click();
+      } else if ( key == Qt::Key_Escape ) {
+        revertBut->setFocus();
+        revertBut->click();
+      }
     }
   }
   return QObject::eventFilter(obj, event);
 }
+
+
+
+
+
+
+
 
 
 
@@ -58,32 +74,39 @@ MonoGui::MonoGui(Mono * mono, QWidget *parent) :
 
 void MonoGui::init() {
 
-  ui->setupUi(this);
+  dBraggHealth=true;
+  dXhealth=true;
+  dZhealth=true;
 
-  int apbrow, neverused;
-  ui->mainLayout->getItemPosition ( ui->mainLayout->indexOf(ui->advanced_pb),
-                                    &apbrow, &neverused, &neverused, &neverused);
-  for (int row = apbrow+1 ; row < ui->mainLayout->rowCount() - 1 ; row++ )
-    for ( int column = 0; column < ui->mainLayout->columnCount() ; column++ )
-      if ( ui->mainLayout->itemAtPosition(row,column) &&
-           ui->mainLayout->itemAtPosition(row,column)->widget() )
-        advancedWidgets << ui->mainLayout->itemAtPosition(row,column)->widget();
+  ui->setupUi(this);
+  ui->motors_2->installEventFilter(this);
 
   energySetter = new EnergySetRevert(ui->energy);
-  ui->bigDBragg->hide();
-  ui->bigDX->hide();
-
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
 
-  ui->motors->lock(true);
-  ui->motors->addMotor(component()->motors.values(),true,true);
+  ui->motors_1->lock(true);
+  ui->motors_2->lock(true);
+  ui->motors_1->showGeneral(false);
+  ui->motors_2->showGeneral(false);
+  ui->motors_1->addMotor(component()->motors[Mono::Bragg1], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Z1], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Tilt1], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Bend1f], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Bend1b], true,true);
+  ui->motors_1->addMotor(component()->motors[Mono::Xdist], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Bragg2], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Z2], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Tilt2], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Bend2f], true,true);
+  ui->motors_2->addMotor(component()->motors[Mono::Bend2b], true,true);
 
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
-  connect(component(), SIGNAL(motionChanged(bool)), SLOT(updateMotion(bool)));
+  connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
   connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
   connect(component(), SIGNAL(dBraggChanged(double)), SLOT(updateDBragg()));
   connect(component(), SIGNAL(dXChanged(double)), SLOT(updateDX()));
-  connect(component(), SIGNAL(zSeparationChanged(double)), ui->zSeparation, SLOT(setValue(double)));
+  connect(component(), SIGNAL(zSeparationChanged(double)),
+          ui->zSeparation, SLOT(setValue(double)));
   connect(component(), SIGNAL(dZChanged(double)), SLOT(updateDZ()));
   connect(component(), SIGNAL(tilt1Changed(double)), SLOT(updateTilt1()));
   connect(component(), SIGNAL(tilt2Changed(double)), SLOT(updateTilt2()));
@@ -91,11 +114,46 @@ void MonoGui::init() {
   connect(component(), SIGNAL(bend2frontChanged(double)), SLOT(updateBend2f()));
   connect(component(), SIGNAL(bend1backChanged(double)), SLOT(updateBend1b()));
   connect(component(), SIGNAL(bend2backChanged(double)), SLOT(updateBend2b()));
-  connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(updateInOut(Mono::InOutPosition)));
+  connect(component(), SIGNAL(inBeamChanged(Mono::InOutPosition)),
+          SLOT(updateInOut(Mono::InOutPosition)));
 
-  connect(component()->motors[Mono::Bragg2], SIGNAL(changedUserPosition(double)), SLOT(updateMotorBragg2()));
-  connect(component()->motors[Mono::Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateMotorBragg1()));
-  connect(component()->motors[Mono::Xdist], SIGNAL(changedUserPosition(double)), SLOT(updateMotorX()));
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedUserPosition(double)),
+          SLOT(updateMotorBragg2()));
+  connect(component()->motors[Mono::Bragg1], SIGNAL(changedUserPosition(double)),
+          SLOT(updateMotorBragg1()));
+  connect(component()->motors[Mono::Xdist], SIGNAL(changedUserPosition(double)),
+          SLOT(updateMotorX()));
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedMoving(bool)),
+          SLOT(updateDBragg()));
+  connect(component()->motors[Mono::Bragg1], SIGNAL(changedMoving(bool)),
+          SLOT(updateDBragg()));
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedMoving(bool)),
+          SLOT(updateDX()));
+  connect(component()->motors[Mono::Xdist], SIGNAL(changedMoving(bool)),
+          SLOT(updateDX()));
+
+  connect(component()->motors[Mono::Bragg1], SIGNAL(changedMoving(bool)),
+          SLOT(updateEnergyMotion()));
+  connect(component()->motors[Mono::Z2], SIGNAL(changedMoving(bool)),
+          SLOT(updateEnergyMotion()));
+  connect(component()->motors[Mono::Bragg2], SIGNAL(changedMoving(bool)),
+          SLOT(updateEnergyMotion()));
+  connect(component()->motors[Mono::Xdist], SIGNAL(changedMoving(bool)),
+          SLOT(updateEnergyMotion()));
+  connect(component()->motors[Mono::Z1], SIGNAL(changedMoving(bool)),
+          ui->modeSetEnable, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Tilt1],  SIGNAL(changedMoving(bool)),
+          ui->tilt1, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Tilt2],  SIGNAL(changedMoving(bool)),
+          ui->tilt2, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend1b],  SIGNAL(changedMoving(bool)),
+          ui->bend1back, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend1f],  SIGNAL(changedMoving(bool)),
+          ui->bend1front, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend2b],  SIGNAL(changedMoving(bool)),
+          ui->bend2back, SLOT(setDisabled(bool)));
+  connect(component()->motors[Mono::Bend2f],  SIGNAL(changedMoving(bool)),
+          ui->bend2front, SLOT(setDisabled(bool)));
 
   foreach(QCaMotor * mot, component()->motors.values()) {
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateLSs()));
@@ -123,7 +181,6 @@ void MonoGui::init() {
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
 
   updateConnection(component()->isConnected());
-  updateMotion(false);
   updateEnergy();
   updateMotorBragg1();
   updateMotorBragg2();
@@ -137,29 +194,27 @@ MonoGui::~MonoGui() {
 }
 
 
-void MonoGui::updateMotion(bool moving) {
-  ui->stop->setEnabled( component()->isConnected() && moving);
-  if(!moving) {
-    updateDBragg();
-    updateDX();
-    updateDZ();
-    updateTilt1();
-    updateTilt2();
-    updateBend1f();
-    updateBend1b();
-    updateBend2f();
-    updateBend2b();
+bool MonoGui::eventFilter(QObject *obj, QEvent *event) {
+  if ( event->type() == QEvent::Resize) {
+    if (ui->advancedWidget->isVisible()) {
+      ui->label1->setMinimumWidth(ui->motors_1->width());
+      ui->label2->setMinimumWidth(ui->motors_2->width());
+    } else {
+      ui->label1->setMinimumWidth(0);
+      ui->label2->setMinimumWidth(0);
+    }
   }
+  return QObject::eventFilter(obj, event);
 }
 
 
 
 void MonoGui::updateConnection(bool con) {
-   ui->mainWidget->setEnabled(component()->isConnected());
+  ui->mainWidget->setEnabled(component()->isConnected());
   ui->stop->setText( con ? "Stop all" : "No link");
   ui->stop->setStyleSheet( con ? "" : "color: rgb(255, 0, 0); background-color: rgb(0, 0, 0);");
-  updateMotion(component()->isMoving());
   if (con) {
+    ui->stop->setEnabled(component()->isMoving());
     ui->tuneBragg->setIncrement(component()->motors[Mono::Bragg1]->getStep());
     ui->tuneX->setIncrement(component()->motors[Mono::Xdist]->getStep());
     ui->tilt1->setIncrement(component()->motors[Mono::Tilt1]->getStep());
@@ -171,6 +226,25 @@ void MonoGui::updateConnection(bool con) {
     ui->tuneZ->setIncrement(component()->motors[Mono::Z2]->getStep());
   }
 }
+
+
+void MonoGui::updateEnergyMotion() {
+  bool mov =
+      component()->motors[Mono::Bragg1]->isMoving() ||
+      component()->motors[Mono::Z2]->isMoving() ||
+      component()->motors[Mono::Bragg2]->isMoving() ||
+      component()->motors[Mono::Xdist]->isMoving();
+  ui->energy->setDisabled(mov);
+  ui->diffractions->setDisabled(mov);
+  ui->lockBragg->setDisabled(mov);
+  ui->lockDZ->setDisabled(mov);
+  ui->lockX->setDisabled(mov);
+  ui->tuneBragg->setDisabled(mov);
+  ui->tuneX->setDisabled(mov);
+  ui->tuneZ->setDisabled(mov);
+  ui->zSeparationEnable->setDisabled(mov);
+}
+
 
 void MonoGui::onEnergyTune() {
   const double enrg = ui->energy->value();
@@ -205,98 +279,148 @@ void MonoGui::onZseparationSet() {
 
 
 void MonoGui::updateEnergy() {
+
+  if (component()->diffraction() == Mono::Si111) {
+    ui->si111->setStyleSheet("font: bold;");
+    ui->si311->setStyleSheet("");
+  } else {
+    ui->si111->setStyleSheet("");
+    ui->si311->setStyleSheet("font: bold;");
+  }
+
   if ( ui->energy->hasFocus() || ui->si111->hasFocus() || ui->si311->hasFocus() )
     return;
+
   if ( qAbs(ui->energy->value() - component()->energy()) >= 1.0e-03 )
     ui->energy->setValue(component()->energy());
+
   if (component()->diffraction() == Mono::Si111)
     ui->si111->setChecked(true);
   else
     ui->si311->setChecked(true);
+
   energySetter->hide();
+
 }
 
 
 void MonoGui::updateInOut(Mono::InOutPosition iopos) {
   ui->currentInOut->setStyleSheet("");
   switch (iopos) {
-  case Mono::INBEAM : ui->currentInOut->setText("In"); break;
-  case Mono::OUTBEAM : ui->currentInOut->setText("Out"); break;
+  case Mono::INBEAM :
+      ui->currentInOut->setText("IN beam");
+      ui->moveIn->setChecked(true);
+      ui->moveIn->setStyleSheet("font: bold;");
+      break;
+  case Mono::OUTBEAM :
+      ui->currentInOut->setText("OUT of the beam");
+      ui->moveOut->setChecked(true);
+      ui->moveOut->setStyleSheet("font: bold;");
+      break;
   case Mono::BETWEEN :
-    ui->currentInOut->setText("between: " +
-                              QString::number(component()->motors[Mono::Z1]->getUserPosition()));
-    ui->currentInOut->setStyleSheet("color: rgba(255, 0, 0);");
+    ui->currentInOut->setText(
+          "between: " +
+          QString::number(component()->motors[Mono::Z1]->getUserPosition(),'f', 2));
+    ui->currentInOut->setStyleSheet(ui->status->styleSheet());
+    ui->moveIn->setChecked(false);
+    ui->moveOut->setChecked(false);
     break;
   case Mono::MOVING :
-    ui->currentInOut->setText("moving: " +
-                              QString::number(component()->motors[Mono::Z1]->getUserPosition()));
+    ui->currentInOut->setText(
+          "moving: " +
+          QString::number(component()->motors[Mono::Z1]->getUserPosition(),'f', 2));
+    ui->moveIn->setChecked(false);
+    ui->moveOut->setChecked(false);
     break;
   }
+  updateStatus();
 }
 
 
 void MonoGui::updateDBragg() {
-  ui->readBragg->setText(QString::number(component()->dBragg()));
+  static const double expectedMaxDBragg = 1.0;
+  ui->readDBragg->setText(QString::number(component()->dBragg(), 'f', ui->tuneBragg->decimals()));
   if ( ! component()->motors[Mono::Bragg1]->isMoving() &&
        ! component()->motors[Mono::Bragg2]->isMoving() )
     ui->tuneBragg->setValue(component()->dBragg());
-  ui->bigDBragg->setVisible( component()->dBragg() < ui->tuneBragg->minimum() ||
-                             component()->dBragg() > ui->tuneBragg->maximum() );
+  dBraggHealth =
+      component()->motors[Mono::Bragg1]->isMoving() ||
+      component()->motors[Mono::Bragg2]->isMoving() ||
+      qAbs(component()->dBragg()) < expectedMaxDBragg;
+  //ui->bigDBragg->setVisible( ! dBraggHealth );
+  updateStatus();
 }
 
 
 void MonoGui::updateDX() {
-  ui->readDX->setText(QString::number(component()->dX()));
+  static const double expectedMaxDX = 0.01;
+  ui->readDX->setText(QString::number(component()->dX(), 'f', ui->tuneX->decimals()));
   if ( ! component()->motors[Mono::Bragg2]->isMoving() &&
        ! component()->motors[Mono::Xdist]->isMoving() )
     ui->tuneX->setValue(component()->dX());
-  ui->bigDX->setVisible( component()->dX() < ui->tuneX->minimum() ||
-                         component()->dX() > ui->tuneX->maximum() );
+  dXhealth =
+      component()->motors[Mono::Bragg2]->isMoving() ||
+      component()->motors[Mono::Xdist]->isMoving()  ||
+      qAbs(component()->dX()) < expectedMaxDX;
+  //ui->bigDX->setVisible( ! dXhealth );
+  updateStatus();
 }
 
 
 void MonoGui::updateDZ() {
-  ui->readDZ->setText(QString::number(component()->zTweak()));
+  static const double expectedMaxDZ = 0.001;
+  ui->readDZ->setText(QString::number(component()->zTweak(), 'f', ui->tuneZ->decimals()));
   if ( ! component()->motors[Mono::Z2]->isMoving() )
     ui->tuneZ->setValue(component()->zTweak());
+  dZhealth =
+      component()->motors[Mono::Z2]->isMoving() ||
+      qAbs(component()->zTweak()) < expectedMaxDZ;
+  //ui->bigDZ->setVisible( ! dZhealth );
+  updateStatus();
+}
+
+
+void MonoGui::updateStatus() {
+  ui->status->setVisible( component()->inBeam() == Mono::BETWEEN ||
+                          ! dBraggHealth || ! dXhealth || ! dZhealth );
 }
 
 void MonoGui::updateTilt1() {
-  ui->readTilt1->setText(QString::number(component()->tilt1()));
+  ui->readTilt1->setText(QString::number(component()->tilt1(), 'f', ui->tilt1->decimals()));
   if ( ! component()->motors[Mono::Tilt1]->isMoving() )
     ui->tilt1->setValue(component()->tilt1());
 }
 
 
 void MonoGui::updateTilt2() {
-  ui->readTilt2->setText(QString::number(component()->tilt2()));
+  ui->readTilt2->setText(QString::number(component()->tilt2(), 'f', ui->tilt2->decimals()));
   if ( ! component()->motors[Mono::Tilt2]->isMoving() )
     ui->tilt2->setValue(component()->tilt2());
 }
 
 
 void MonoGui::updateBend1f() {
-  ui->readB1F->setText(QString::number(component()->bend1front()));
+  ui->readB1F->setText(QString::number(component()->bend1front(), 'f', ui->bend1front->decimals()));
   if ( ! component()->motors[Mono::Bend1f]->isMoving() )
     ui->bend1front->setValue(component()->bend1front());
 }
 
 
 void MonoGui::updateBend1b() {
-  ui->readB1B->setText(QString::number(component()->bend1back()));
+  ui->readB1B->setText(QString::number(component()->bend1back(), 'f', ui->bend1back->decimals()));
   if ( ! component()->motors[Mono::Bend1b]->isMoving() )
     ui->bend1back->setValue(component()->bend1back());
 }
 
 void MonoGui::updateBend2f() {
-  ui->readB2F->setText(QString::number(component()->bend2front()));
+  ui->readB2F->setText(QString::number(component()->bend2front(), 'f', ui->bend2front->decimals()));
   if ( ! component()->motors[Mono::Bend2f]->isMoving() )
     ui->bend2front->setValue(component()->bend2front());
 }
 
 
 void MonoGui::updateBend2b() {
-  ui->readB2B->setText(QString::number(component()->bend2back()));
+  ui->readB2B->setText(QString::number(component()->bend2back(), 'f', ui->bend2back->decimals()));
   if ( ! component()->motors[Mono::Bend2b]->isMoving() )
     ui->bend2back->setValue(component()->bend2back());
 }
@@ -304,16 +428,18 @@ void MonoGui::updateBend2b() {
 
 
 void MonoGui::onAdvancedControl() {
-  if (ui->motors->isVisibleTo(this)) {
-    foreach (QWidget * wdg, advancedWidgets)
-      wdg->setVisible(false);
+  if (ui->advancedWidget->isVisibleTo(this)) {
+    ui->advancedWidget->setVisible(false);
     ui->advanced_pb->setText("Show advanced control");
     ui->advanced_pb->setStyleSheet("");
+    ui->zSeparation->setEnabled(false);
+    ui->modeSet->setEnabled(false);
   } else if ( PsswDial::ask(this) ) {
-    foreach (QWidget * wdg, advancedWidgets)
-      wdg->setVisible(true);
-    ui->advanced_pb->setText("Please don't forget to close");
+    ui->advancedWidget->setVisible(true);
+    ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
+    ui->zSeparation->setEnabled(true);
+    ui->modeSet->setEnabled(true);
   }
 }
 
@@ -348,7 +474,7 @@ void MonoGui::updateLSs() {
   if (!mot)
     return;
   QLabel * lab=0;
-  if (mot == component()->motors[Mono::Xdist]) lab = ui->readX;
+  if (mot == component()->motors[Mono::Xdist]) lab = ui->readDX;
   else if (mot == component()->motors[Mono::Bragg1]) lab = ui->readBragg1;
   else if (mot == component()->motors[Mono::Bragg2]) lab = ui->readBragg2;
   else if (mot == component()->motors[Mono::Tilt1]) lab = ui->readTilt1;
@@ -365,3 +491,9 @@ void MonoGui::updateLSs() {
           "background-color: rgb(128, 0, 0); color: rgb(255, 255, 255);" :
           "");
   }
+
+
+
+
+
+

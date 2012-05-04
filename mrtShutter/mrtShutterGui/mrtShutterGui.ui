@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>318</width>
     <height>300</height>
    </rect>
   </property>
@@ -120,6 +120,12 @@
    </item>
    <item>
     <widget class="QProgressBar" name="progressBar">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="format">
       <string>%v of %m (%p%)</string>
      </property>
@@ -168,6 +174,15 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
+   <class>QMDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">qtpvwidgets.h</header>
+   <slots>
+    <signal>valueEdited(double)</signal>
+    <signal>escaped()</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>QMSpinBox</class>
    <extends>QSpinBox</extends>
    <header location="global">qtpvwidgets.h</header>
@@ -175,11 +190,6 @@
   <customwidget>
    <class>QMComboBox</class>
    <extends>QComboBox</extends>
-   <header location="global">qtpvwidgets.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QMDoubleSpinBox</class>
-   <extends>QDoubleSpinBox</extends>
    <header location="global">qtpvwidgets.h</header>
   </customwidget>
  </customwidgets>

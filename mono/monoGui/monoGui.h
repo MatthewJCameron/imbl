@@ -28,6 +28,8 @@ private:
 };
 
 
+
+
 class MonoGui : public ComponentGui {
   Q_OBJECT;
 
@@ -36,7 +38,9 @@ private:
   Ui::MonoGui *ui;
 
   explicit MonoGui(Mono * mono, QWidget *parent = 0);
-  QWidgetList advancedWidgets;
+  bool dBraggHealth;
+  bool dXhealth;
+  bool dZhealth;
 
 
   void init();
@@ -57,7 +61,6 @@ private slots:
   void onZseparationSet();
 
   void updateConnection(bool con);
-  void updateMotion(bool moving);
   void updateInOut(Mono::InOutPosition iopos);
   void updateEnergy();
   void updateDBragg();
@@ -72,14 +75,19 @@ private slots:
   void updateMotorBragg1();
   void updateMotorBragg2();
   void updateMotorX();
+  void updateStatus();
+  void updateEnergyMotion();
 
   void updateLSs();
 
 
 private:
   EnergySetRevert * energySetter;
+  bool eventFilter(QObject *obj, QEvent *event);
 
 };
+
+
 
 #endif // MONOGUI_H
 

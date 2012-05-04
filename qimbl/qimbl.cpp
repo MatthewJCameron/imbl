@@ -75,9 +75,6 @@ Qimbl::Qimbl(QWidget *parent) :
   bl_disabled(new QEpicsPv("SR08ID01PSS01:BL_DISABLE_STS")),
   eps_enabled(new QEpicsPv("SR08ID01PSS01:FES_EPS_ENABLE_STS")),
   eps_disabled(new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_STS")),
-  blmode1(new QEpicsPv("SR08ID01PSS01:BL_OPMODE1_STS")),
-  blmode2(new QEpicsPv("SR08ID01PSS01:BL_OPMODE2_STS")),
-  blmode3(new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS")),
   shfe(new ShutterFE(this)),
   sh1A(new Shutter1A(this)),
   slits(new HhlSlitsGui(this)),
@@ -130,8 +127,11 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
 
-  connect(sh1A, SIGNAL(stateChanged(Shutter1A::State)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(update_bl_mode()));
+  connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_bl_mode()));
 
   connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
@@ -282,29 +282,6 @@ void Qimbl::update_hutches() {
 }
 
 
-void Qimbl::update_bl_mode() {
-  if ( ! blmode1->isConnected() ||
-       ! blmode2->isConnected() ||
-       ! blmode3->isConnected() ) {
-    set_nolink_style(ui->blMode);
-  } else if ( 1 !=
-              blmode1->get().toInt() +
-              blmode2->get().toInt() +
-              blmode3->get().toInt() ) {
-    ui->blMode->setStyleSheet("color: rgb(255, 0, 0);");
-    ui->blMode->setText("Inconsistent data");
-  } else {
-    ui->blMode->setStyleSheet("");
-    if ( blmode1->get().toBool() )
-      ui->blMode->setText("1");
-    else if ( blmode2->get().toBool() )
-      ui->blMode->setText("2");
-    else
-      ui->blMode->setText("3");
-  }
-}
-
-
 void Qimbl::update_bl_status() {
   if ( ! bl_enabled->isConnected() ||
        ! bl_disabled->isConnected()) {
@@ -417,7 +394,7 @@ void Qimbl::update_shfe() {
         ui->shfeSt->setText(shutter_closed_string);
         ui->shIndFE_c->setStyleSheet(shInd_c_style);
         ui->shIndFE_c->setText(shutter_closed_string);
-        ui->shIndFE_o->setStyleSheet(shInd_c_style);
+        ui->shIndFE_o->setStyleSheet("");
         ui->shIndFE_o->setText("");
         ui->shfeControl->setText("Open");
         break;
@@ -438,6 +415,34 @@ void Qimbl::update_shfe() {
 }
 
 
+void Qimbl::update_bl_mode() {
+  if ( ! sh1A->isConnected() )
+    set_nolink_style(ui->blMode);
+  else
+    switch (sh1A->mode()) {
+      case Shutter1A::INVALID :
+        ui->blMode->setStyleSheet(red_style);
+        ui->blMode->setText("Invalid");
+        break;
+      case Shutter1A::MONO :
+        ui->blMode->setStyleSheet("");
+        ui->blMode->setText("Mono");
+        break;
+      case Shutter1A::WHITE :
+        ui->blMode->setStyleSheet("");
+        ui->blMode->setText("White");
+        break;
+      case Shutter1A::MRT :
+        ui->blMode->setStyleSheet("");
+        ui->blMode->setText("MRT");
+        break;
+    }
+  update_sh1A();
+}
+
+
+
+
 void Qimbl::update_sh1A() {
   if ( ! sh1A->isConnected() ) {
     set_nolink_style(ui->shpsSt);
@@ -447,42 +452,55 @@ void Qimbl::update_sh1A() {
     set_nolink_style(ui->shIndSS_c);
     set_nolink_style(ui->shIndSS_o);
   } else {
-    switch (sh1A->state()) {
-      case ShutterFE::CLOSED :
-        ui->shpsSt->setStyleSheet(red_style);
+    switch (sh1A->psState()) {
+      case Shutter1A::CLOSED :
+        ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
+                                     green_style : red_style);
         ui->shpsSt->setText(shutter_closed_string);
-        ui->shssSt->setStyleSheet(red_style);
-        ui->shssSt->setText(shutter_closed_string);
         ui->shIndPS_c->setStyleSheet(shInd_c_style);
         ui->shIndPS_c->setText(shutter_closed_string);
-        ui->shIndPS_o->setStyleSheet(shInd_c_style);
+        ui->shIndPS_o->setStyleSheet("");
         ui->shIndPS_o->setText("");
-        ui->shIndSS_c->setStyleSheet(shInd_c_style);
-        ui->shIndSS_c->setText(shutter_closed_string);
-        ui->shIndSS_o->setStyleSheet(shInd_c_style);
-        ui->shIndSS_o->setText("");
         ui->sh1AControl->setText("Open");
         break;
-      case ShutterFE::OPENED :
-        ui->shpsSt->setStyleSheet(green_style);
+      case Shutter1A::OPENED :
+        ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
+                                     red_style : green_style );
         ui->shpsSt->setText(shutter_open_string);
-        ui->shssSt->setStyleSheet(green_style);
-        ui->shssSt->setText(shutter_open_string);
         ui->shIndPS_c->setStyleSheet("");
         ui->shIndPS_c->setText("");
         ui->shIndPS_o->setStyleSheet(shInd_o_style);
         ui->shIndPS_o->setText(shutter_open_string);
+        ui->sh1AControl->setText("Close");
+        break;
+      case Shutter1A::BETWEEN :
+        ui->shpsSt->setText(inprogress_string);
+        break;
+    }
+    switch (sh1A->ssState()) {
+      case Shutter1A::CLOSED :
+        ui->shssSt->setStyleSheet(red_style);
+        ui->shssSt->setText(shutter_closed_string);
+        ui->shIndSS_c->setStyleSheet(shInd_c_style);
+        ui->shIndSS_c->setText(shutter_closed_string);
+        ui->shIndSS_o->setStyleSheet("");
+        ui->shIndSS_o->setText("");
+        ui->sh1AControl->setText("Open");
+        break;
+      case Shutter1A::OPENED :
+        ui->shssSt->setStyleSheet(green_style);
+        ui->shssSt->setText(shutter_open_string);
         ui->shIndSS_c->setStyleSheet("");
         ui->shIndSS_c->setText("");
         ui->shIndSS_o->setStyleSheet(shInd_o_style);
         ui->shIndSS_o->setText(shutter_open_string);
         ui->sh1AControl->setText("Close");
         break;
-      case ShutterFE::BETWEEN :
-        ui->shpsSt->setText(inprogress_string);
+      case Shutter1A::BETWEEN :
         ui->shssSt->setText(inprogress_string);
         break;
     }
+
   }
 }
 
@@ -653,10 +671,10 @@ void Qimbl::update_mono() {
       ui->hkl->setText("3,1,1");
       break;
   }
-  ui->bend1->setText(QString::number(mono->component()->bend1front()) + "/" +
-                     QString::number(mono->component()->bend1back()));
-  ui->bend2->setText(QString::number(mono->component()->bend2front()) + "/" +
-                     QString::number(mono->component()->bend2back()));
+  ui->bend1->setText(QString::number(mono->component()->bend1front(),'g',2) + "/" +
+                     QString::number(mono->component()->bend1back(),'g',2));
+  ui->bend2->setText(QString::number(mono->component()->bend2front(),'g',2) + "/" +
+                     QString::number(mono->component()->bend2back(),'g',2));
 }
 
 
@@ -737,9 +755,40 @@ void QLabelLine::paintEvent( QPaintEvent * event ) {
   pen.setWidth(3);
   //pen.setColor(Qt::yellow);
   painter.setPen(pen);
-  painter.drawLine(rect().left(), rect().height()/2,
-                   rect().right(), rect().height()/2);
+  painter.drawLine(0, height()/2, width(), height()/2);
 }
+
+
+void QLabelLineMono::paintEvent( QPaintEvent * event ) {
+  QLabel::paintEvent(event);
+  if ( ! text().isEmpty() )
+    return;
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(3);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  painter.drawLine(0, height()*3/4, width(), height()*3/4);
+  painter.drawLine(0, height()/4, width()/3, height()/4);
+  painter.drawLine(width()/3, height()/4, width()*2/3, height()*3/4);
+}
+
+
+
+void QLabelLineTwo::paintEvent( QPaintEvent * event ) {
+  QLabel::paintEvent(event);
+  if ( ! text().isEmpty() )
+    return;
+  QPainter painter(this);
+  QPen pen;
+  pen.setWidth(3);
+  //pen.setColor(Qt::yellow);
+  painter.setPen(pen);
+  painter.drawLine(0, rect().height()/4, width(), rect().height()/4);
+  painter.drawLine(0, rect().height()*3/4, width(), rect().height()*3/4);
+
+}
+
 
 
 

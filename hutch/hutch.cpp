@@ -12,10 +12,6 @@ Hutch::Hutch(Hutch::Hutches hu, QObject *parent) :
   stackG(new QEpicsPv(this)),
   stackA(new QEpicsPv(this)),
   stackR(new QEpicsPv(this)),
-  lDoorLocked(new QEpicsPv(this)),
-  lDoorClosed(new QEpicsPv(this)),
-  rDoorLocked(new QEpicsPv(this)),
-  rDoorClosed(new QEpicsPv(this)),
   _stack(OFF),
   _enabled(false),
   _state(OPEN)
@@ -59,10 +55,25 @@ Hutch::Hutch(Hutch::Hutches hu, QObject *parent) :
   stackG->setPV(baseName+"_STK_GREEN_STS");
   stackA->setPV(baseName+"_STK_AMBER_STS");
   stackR->setPV(baseName+"_STK_RED_STS");
-  lDoorLocked->setPV(baseName+"_L_DOOR_LOCK_STS");
-  lDoorClosed->setPV(baseName+"_L_DOOR_SW_STS");
-  rDoorLocked->setPV(baseName+"_R_DOOR_LOCK_STS");
-  rDoorClosed->setPV(baseName+"_R_DOOR_SW_STS");
+  if ( hu == H3B ) {
+    doorsLocked
+        << new QEpicsPv(baseName+"_EST_L_DOOR_LOCK_STS", this)
+        << new QEpicsPv(baseName+"_EST_R_DOOR_LOCK_STS", this)
+        << new QEpicsPv(baseName+"_WST_L_DOOR_LOCK_STS", this)
+        << new QEpicsPv(baseName+"_WST_R_DOOR_LOCK_STS", this);
+    doorsClosed
+        << new QEpicsPv(baseName+"_EST_L_DOOR_SW_STS", this)
+        << new QEpicsPv(baseName+"_EST_R_DOOR_SW_STS", this)
+        << new QEpicsPv(baseName+"_WST_L_DOOR_SW_STS", this)
+        << new QEpicsPv(baseName+"_WST_R_DOOR_SW_STS", this);
+  } else {
+    doorsLocked
+        << new QEpicsPv(baseName+"_L_DOOR_LOCK_STS", this)
+        << new QEpicsPv(baseName+"_R_DOOR_LOCK_STS", this);
+    doorsClosed
+        << new QEpicsPv(baseName+"_L_DOOR_SW_STS", this)
+        << new QEpicsPv(baseName+"_R_DOOR_SW_STS", this);
+  }
 
   foreach(QEpicsPv * pv, findChildren<QEpicsPv*>() )
     connect(pv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
@@ -70,13 +81,13 @@ Hutch::Hutch(Hutch::Hutches hu, QObject *parent) :
   connect(enabledPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateEnabled()));
   connect(disabledPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateEnabled()));
   connect(searchedPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  connect(lDoorLocked, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  connect(lDoorClosed, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  connect(rDoorLocked, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  connect(rDoorClosed, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
   connect(stackG, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
   connect(stackR, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
   connect(stackA, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
+  foreach(QEpicsPv * pv, doorsLocked)
+    connect(pv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
+  foreach(QEpicsPv * pv, doorsClosed)
+    connect(pv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
 
   emit stackChanged(_stack);
   emit stateChanged(_state);
@@ -91,6 +102,7 @@ Hutch::~Hutch() {
 }
 
 void Hutch::updateConnection() {
+
   bool connection = true;
   foreach(QEpicsPv * pv, findChildren<QEpicsPv*>())
     connection &= pv->isConnected();
@@ -126,12 +138,19 @@ void Hutch::updateState() {
   if ( ! isConnected() )
     return;
 
+  bool locked = true;
+  foreach(QEpicsPv * pv, doorsLocked)
+    locked &= pv->get().toBool();
+  bool closed = true;
+  foreach(QEpicsPv * pv, doorsClosed)
+    closed &= pv->get().toBool();
+
   State newState;
   if ( searchedPv->get().toBool() )
     newState = SEARCHED;
-  else if ( lDoorLocked->get().toBool() && rDoorLocked->get().toBool() )
+  else if ( locked )
     newState = LOCKED;
-  else if ( lDoorClosed->get().toBool() && rDoorClosed->get().toBool() )
+  else if ( closed )
     newState = CLOSED;
   else
     newState = OPEN;

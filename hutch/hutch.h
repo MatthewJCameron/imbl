@@ -44,10 +44,8 @@ protected:
   QEpicsPv * stackG;
   QEpicsPv * stackA;
   QEpicsPv * stackR;
-  QEpicsPv * lDoorLocked;
-  QEpicsPv * lDoorClosed;
-  QEpicsPv * rDoorLocked;
-  QEpicsPv * rDoorClosed;
+  QList<QEpicsPv*> doorsLocked;
+  QList<QEpicsPv*> doorsClosed;
 
   StackColor _stack;
   bool _enabled;

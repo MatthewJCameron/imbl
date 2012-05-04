@@ -16,7 +16,10 @@ Shutter1Agui::Shutter1Agui(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
+  connect(component(), SIGNAL(psStateChanged(Shutter1A::State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(updateStatuses()));
   connect(component(), SIGNAL(stateChanged(Shutter1A::State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(updateStatuses()));
   connect(component(), SIGNAL(relaxChanged()), SLOT(updateStatuses()));
   updateConnection(false);
 }
@@ -39,36 +42,73 @@ Shutter1Agui::~Shutter1Agui() {
 }
 
 void Shutter1Agui::updateConnection(bool con) {
-  if ( !con )
-    ui->label->setText("Disconnected");
-  else
+  if ( !con ) {
+    ui->psLabel->setText("Disconnected");
+    ui->ssLabel->setText("Disconnected");
+  } else
     updateStatuses();
 }
 
 void Shutter1Agui::updateStatuses() {
+
   switch ( component()->state() ) {
-  case Shutter1A::OPENED:
-    ui->open->setStyleSheet( styleTemplate.arg("0.0", "1.0", "128, 0, 0, 200") );
-    ui->close->setStyleSheet( styleTemplate.arg("0.0", "0.5", "0, 128, 0, 255") );
-    setStyleSheet( "background-color: rgba(128, 0, 0, 200);" );
-    break;
-  case Shutter1A::CLOSED:
-    ui->open->setStyleSheet( styleTemplate.arg("0.0", "0.5", "128, 0, 0, 255") );
-    ui->close->setStyleSheet( styleTemplate.arg("0.0", "1.0", "0, 128, 0, 200") );
-    setStyleSheet( "background-color: rgba(0, 128, 0, 200);" );
-    break;
-  case Shutter1A::BETWEEN:
-    ui->open->setStyleSheet( styleTemplate.arg("0.0", "0.5", "128, 0, 0, 200") );
-    ui->close->setStyleSheet( styleTemplate.arg("0.0", "0.5", "0, 128, 0, 200") );
-    setStyleSheet( "background-color: rgba(128, 128, 0, 200);" );
-    break;
+    case Shutter1A::OPENED:
+      ui->open->setStyleSheet( styleTemplate.arg("0.0", "1.0", "128, 0, 0, 200") );
+      ui->close->setStyleSheet( styleTemplate.arg("0.0", "0.5", "0, 128, 0, 255") );
+      setStyleSheet( "background-color: rgba(128, 0, 0, 200);" );
+      break;
+    case Shutter1A::CLOSED:
+      ui->open->setStyleSheet( styleTemplate.arg("0.0", "0.5", "128, 0, 0, 255") );
+      ui->close->setStyleSheet( styleTemplate.arg("0.0", "1.0", "0, 128, 0, 200") );
+      setStyleSheet( "background-color: rgba(0, 128, 0, 200);" );
+      break;
+    case Shutter1A::BETWEEN:
+      ui->open->setStyleSheet( styleTemplate.arg("0.0", "0.5", "128, 0, 0, 200") );
+      ui->close->setStyleSheet( styleTemplate.arg("0.0", "0.5", "0, 128, 0, 200") );
+      setStyleSheet( "background-color: rgba(128, 128, 0, 200);" );
+      break;
   }
   ui->open->setEnabled( ! component()->isRelaxing() && component()->isEnabled() );
   ui->close->setEnabled( ! component()->isRelaxing() && component()->isEnabled() );
-  ui->label->setText( component()->objectName() + ":\n"
-                      + component()->description() + "\n"
-                      + (component()->isEnabled() ? "En" : "Dis") + "abled\n"
-                      + (component()->isRelaxing() ? "Relaxing" : "") );
+
+  QString addToStatus = QString() +
+      (component()->isEnabled() ? "En" : "Dis") + "abled\n" +
+      (component()->isRelaxing() ? "Relaxing" : "");
+
+  QString ssStatus="Safety Shutter\n";
+  switch ( component()->ssState() ) {
+    case Shutter1A::OPENED:
+      ssStatus += "OPENED\n";
+      ui->ssLabel->setStyleSheet( "background-color: rgba(128, 0, 0, 200);" );
+      break;
+    case Shutter1A::CLOSED:
+      ssStatus += "CLOSED\n";
+      ui->ssLabel->setStyleSheet( "background-color: rgba(0, 128, 0, 200);" );
+    break;
+  case Shutter1A::BETWEEN:
+      ssStatus += "BETWEEN\n";
+      ui->ssLabel->setStyleSheet( "background-color: rgba(128, 128, 0, 200);" );
+    break;
+  }
+  ui->ssLabel->setText(ssStatus+addToStatus);
+
+  QString psStatus="Photon Stop\n";
+  switch ( component()->psState() ) {
+    case Shutter1A::OPENED:
+      psStatus += "OPENED\n";
+      ui->psLabel->setStyleSheet( "background-color: rgba(128, 0, 0, 200);" );
+      break;
+    case Shutter1A::CLOSED:
+      psStatus += "CLOSED\n";
+      ui->psLabel->setStyleSheet( "background-color: rgba(0, 128, 0, 200);" );
+    break;
+  case Shutter1A::BETWEEN:
+      psStatus += "BETWEEN\n";
+      ui->psLabel->setStyleSheet( "background-color: rgba(128, 128, 0, 200);" );
+    break;
+  }
+  ui->psLabel->setText(ssStatus+addToStatus);
+
 }
 
 

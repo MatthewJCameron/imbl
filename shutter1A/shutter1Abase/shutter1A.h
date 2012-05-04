@@ -10,6 +10,13 @@ class Shutter1A : public Component {
 
 public:
 
+  enum Mode {
+    INVALID=0,
+    WHITE,
+    MONO,
+    MRT
+  };
+
   enum State {
     OPENED = 1,
     CLOSED = 0,
@@ -24,27 +31,40 @@ protected:
   static const int relaxTime;
   QTimer timer;
 
-  State st;
+  State psst;
+  State ssst;
+  Mode md;
   bool enabled;
 
-  static QEpicsPv * opnSts;
-  static QEpicsPv * clsSts;
-  static QEpicsPv * opnCmd;
-  static QEpicsPv * clsCmd;
-  static QEpicsPv * enabledSts;
-  static QEpicsPv * disabledSts;
+  static QEpicsPv * mode1;
+  static QEpicsPv * mode2;
+  static QEpicsPv * mode3;
+
+  static QEpicsPv * psOpenStatus;
+  static QEpicsPv * psCloseStatus;
+  static QEpicsPv * ssOpenStatus;
+  static QEpicsPv * ssCloseStatus;
+
+  static QEpicsPv * openCommand;
+  static QEpicsPv * closeCommand;
+
+  static QEpicsPv * enabledStatus;
+  static QEpicsPv * disabledStatus;
 
 public:
 
   explicit Shutter1A(QObject *parent = 0);
   ~Shutter1A();
 
-  inline State state() const {return st;}
+  inline State psState() const {return psst;}
+  inline State ssState() const {return ssst;}
+  State state() const;
+  inline Mode mode() const {return md;}
   inline bool isRelaxing() const {return timer.isActive();}
   inline bool isEnabled() const {return enabled;}
 
-  static State stateS();
-  static bool setOpenedS(bool opn, bool wait=false);
+  //static State stateS();
+  //static bool setOpenedS(bool opn, bool wait=false);
 
 public slots:
 
@@ -54,15 +74,21 @@ public slots:
 
 signals:
 
-  void stateChanged(Shutter1A::State st);
+  void psStateChanged(Shutter1A::State);
+  void ssStateChanged(Shutter1A::State);
+  void stateChanged(Shutter1A::State);
+  void modeChanged(Shutter1A::Mode);
   void relaxChanged();
-  void opened();
-  void closed();
-  void enabledChanged(bool isenabled);
+  //void opened();
+  //void closed();
+  void enabledChanged(bool);
 
 protected slots:
 
+  void updatePsState();
+  void updateSsState();
   void updateState();
+  void updateMode();
   void updateConnection();
   void updateEnabled();
 

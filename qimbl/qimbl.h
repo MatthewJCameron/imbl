@@ -35,9 +35,11 @@ private:
   QEpicsPv * bl_disabled;
   QEpicsPv * eps_enabled;
   QEpicsPv * eps_disabled;
+  /*
   QEpicsPv * blmode1;
   QEpicsPv * blmode2;
   QEpicsPv * blmode3;
+  */
 
   QHash < Hutch*, QLabel* > hutches;
 
@@ -90,6 +92,28 @@ public:
 protected:
   virtual void paintEvent( QPaintEvent * event );
 };
+
+class QLabelLineMono : public QLabel {
+public:
+  inline explicit QLabelLineMono(QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(parent,f) {}
+  inline explicit QLabelLineMono (const QString & text, QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(text,parent,f) {}
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
+
+
+class QLabelLineTwo : public QLabel {
+public:
+  inline explicit QLabelLineTwo(QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(parent,f) {}
+  inline explicit QLabelLineTwo (const QString & text, QWidget * parent = 0, Qt::WindowFlags f = 0 ) :
+    QLabel(text,parent,f) {}
+protected:
+  virtual void paintEvent( QPaintEvent * event );
+};
+
 
 
 

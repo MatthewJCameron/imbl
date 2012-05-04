@@ -16,6 +16,7 @@ public:
   explicit Tuner(QWidget *parent = 0);
   ~Tuner();
   void setIncrement(double twk);
+  void setDecimals(int prec);
 
 private slots:
 

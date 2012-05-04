@@ -81,3 +81,8 @@ void Tuner::setIncrement(double twk) {
   ui->increment->setValue(twk);
 }
 
+void Tuner::setDecimals(int prec) {
+  QDoubleSpinBox::setDecimals(prec);
+  ui->increment->setDecimals(prec);
+}
+

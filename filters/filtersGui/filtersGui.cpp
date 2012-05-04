@@ -385,7 +385,7 @@ void FiltersGui::onAdvancedControl() {
     ui->advanced_pb->setStyleSheet("");
   } else if ( PsswDial::ask(this) ) {
     ui->advanced->show();
-    ui->advanced_pb->setText("Please don't forget to close");
+    ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
   }
 }

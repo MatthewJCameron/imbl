@@ -3,38 +3,71 @@
 #include <QDebug>
 
 const int Shutter1A::relaxTime = 2500; // msec
-const QString Shutter1A::pvBaseName = "SR08ID01PSS01:HU01A_BL_SHUTTER";
-QEpicsPv * Shutter1A::opnSts = new QEpicsPv(Shutter1A::pvBaseName + "_OPEN_STS");
-QEpicsPv * Shutter1A::clsSts = new QEpicsPv(Shutter1A::pvBaseName + "_CLOSE_STS");
-QEpicsPv * Shutter1A::opnCmd = new QEpicsPv(Shutter1A::pvBaseName + "_OPEN_CMD");
-QEpicsPv * Shutter1A::clsCmd = new QEpicsPv(Shutter1A::pvBaseName + "_CLOSE_CMD");
-QEpicsPv * Shutter1A::enabledSts  = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
-QEpicsPv * Shutter1A::disabledSts = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
+
+QEpicsPv * Shutter1A::psOpenStatus =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
+QEpicsPv * Shutter1A::psCloseStatus =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
+
+QEpicsPv * Shutter1A::ssOpenStatus =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_OPEN_IND_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
+QEpicsPv * Shutter1A::ssCloseStatus =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_CLOSE_IND_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
+
+QEpicsPv * Shutter1A::openCommand =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_CMD");
+QEpicsPv * Shutter1A::closeCommand =
+    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_CMD");
+
+QEpicsPv * Shutter1A::enabledStatus  =
+    new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
+QEpicsPv * Shutter1A::disabledStatus =
+    new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
 
 
+QEpicsPv * Shutter1A::mode1 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE1_STS");
+QEpicsPv * Shutter1A::mode2 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE2_STS");
+QEpicsPv * Shutter1A::mode3 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS");
 
 Shutter1A::Shutter1A(QObject *parent) :
   Component("1A shutter", parent),
-  st(BETWEEN),
-  enabled(true)
+  psst(BETWEEN),
+  ssst(BETWEEN),
+  md(INVALID),
+  enabled(false)
 {
 
 
   timer.setSingleShot(true);
   timer.setInterval(relaxTime);
 
-  connect(opnSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(clsSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(opnCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(clsCmd, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(enabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(disabledSts, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(mode1, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(mode2, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(mode3, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(psOpenStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(psCloseStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(ssOpenStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(ssCloseStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(openCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(closeCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(enabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(disabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(&timer, SIGNAL(timeout()), SIGNAL(relaxChanged()));
 
-  connect(opnSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
-  connect(clsSts, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
-  connect(enabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
-  connect(disabledSts, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+  connect(psOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
+  connect(psCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
+  connect(ssOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
+  connect(ssCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
+  connect(enabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+  connect(disabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+
+  connect(this, SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(updateState()));
+  connect(this, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(updateState()));
+  connect(this, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(updateState()));
 
   updateConnection();
 
@@ -45,56 +78,135 @@ Shutter1A::~Shutter1A() {
 
 void Shutter1A::updateConnection() {
   bool connection =
-      opnSts->isConnected() && clsSts->isConnected() &&
-      opnCmd->isConnected() && clsCmd->isConnected() /* &&
-      enabledSts->isConnected() && disabledSts->isConnected() */; // NEW PSSDB
+      mode1->isConnected() && mode2->isConnected() && mode3->isConnected() &&
+      psOpenStatus->isConnected() && psCloseStatus->isConnected() &&
+      ssOpenStatus->isConnected() && ssCloseStatus->isConnected() &&
+      openCommand->isConnected() && closeCommand->isConnected() &&
+      enabledStatus->isConnected() && disabledStatus->isConnected();
   setConnected(connection);
   if (isConnected()) {
-    updateState();
+    updatePsState();
+    updateSsState();
+    updateMode();
     updateEnabled();
     emit relaxChanged();
   }
 }
 
+Shutter1A::State Shutter1A::state() const {
+  switch (mode()) {
+    case MONO:
+      return ssState();
+      break;
+    case WHITE:
+      if ( ssState() == OPENED && psState() == OPENED )
+        return OPENED;
+      if ( ssState() == CLOSED && psState() == CLOSED )
+        return CLOSED;
+      else
+        return BETWEEN;
+      break;
+    case MRT:
+      return psState();
+      break;
+    case INVALID:
+      return BETWEEN;
+      break;
+  }
+}
 
-void Shutter1A::updateState() {
+
+void Shutter1A::updatePsState() {
 
   if ( ! isConnected() )
     return;
 
-  if ( sender() == opnSts || sender() == clsSts ) {
+  if ( sender() == psOpenStatus || sender() == psCloseStatus ) {
     timer.start();
     emit relaxChanged();
   }
 
-  if ( clsSts->get().toBool() == opnSts->get().toBool() )  {
-    st = BETWEEN;
-    setDescription("Operation in proggress.");
-  } else if ( opnSts->get().toBool() ) {
-    st = OPENED;
-    setDescription("Opened.");
-    emit opened();
-  } else {
-    st = CLOSED;
-    setDescription("Closed.");
-    emit closed();
+  if ( psCloseStatus->get().toBool() == psOpenStatus->get().toBool() )
+    psst = BETWEEN;
+  else if ( psOpenStatus->get().toBool() )
+    psst = OPENED;
+  else
+    psst = CLOSED;
+  emit psStateChanged(psst);
+
+}
+
+void Shutter1A::updateSsState() {
+
+  if ( ! isConnected() )
+    return;
+
+  if ( sender() == ssOpenStatus || sender() == ssCloseStatus ) {
+    timer.start();
+    emit relaxChanged();
   }
-  emit stateChanged(st);
+
+  if ( ssCloseStatus->get().toBool() == ssOpenStatus->get().toBool() )
+    ssst = BETWEEN;
+  else if ( ssOpenStatus->get().toBool() )
+    ssst = OPENED;
+  else
+    ssst = CLOSED;
+  emit ssStateChanged(ssst);
 
 }
 
 
-void Shutter1A::updateEnabled() {
-  if ( ! isConnected() ||
-       ! enabledSts->isConnected() || // remove with the new PSSDB
-       ! disabledSts->isConnected() ) // remove with the new PSSDB
+void Shutter1A::updateState() {
+  QString desc;
+  desc+="PS: ";
+  switch (psState()){
+    case OPENED: desc+="opened"; break;
+    case CLOSED: desc+="closed"; break;
+    case BETWEEN: desc+="between"; break;
+  }
+  desc+="SS: ";
+  switch (ssState()){
+    case OPENED: desc+="opened"; break;
+    case CLOSED: desc+="closed"; break;
+    case BETWEEN: desc+="between"; break;
+  }
+  setDescription(desc);
+  emit stateChanged(state());
+}
+
+
+
+void Shutter1A::updateMode() {
+
+  if ( ! isConnected() )
     return;
-  bool newEnabled = enabledSts->get().toBool() && ! disabledSts->get().toBool();
+
+  if ( 1 !=
+       mode1->get().toInt() +
+       mode2->get().toInt() +
+       mode3->get().toInt() )
+    md = INVALID;
+  else if ( mode1->get().toBool() )
+    md = WHITE;
+  else if ( mode2->get().toBool() )
+    md = MRT;
+  else if ( mode3->get().toBool() )
+    md = MONO;
+
+  emit modeChanged(md);
+
+}
+
+void Shutter1A::updateEnabled() {
+  if ( ! isConnected() )
+    return;
+  bool newEnabled = enabledStatus->get().toBool() && ! disabledStatus->get().toBool();
   if (newEnabled != enabled)
     emit enabledChanged(enabled = newEnabled);
 }
 
-
+/*
 Shutter1A::State Shutter1A::stateS() {
   Shutter1A sht;
   if ( ! sht.getReady(2000) ) {
@@ -103,29 +215,31 @@ Shutter1A::State Shutter1A::stateS() {
   }
   return sht.state();
 }
+*/
 
 bool Shutter1A::open(bool wait) {
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
-  clsCmd->set(0);
-  opnCmd->set(1);
-  if ( st != OPENED && wait )
+  closeCommand->set(0);
+  openCommand->set(1);
+  if ( psst != OPENED && wait )
     return qtWait(this, SIGNAL(opened()), transitionTime);
   else
-    return st == OPENED ;
+    return psst == OPENED ;
 }
 
 bool Shutter1A::close(bool wait) {
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
-  opnCmd->set(0);
-  clsCmd->set(1);
-  if ( st != CLOSED && wait )
+  openCommand->set(0);
+  closeCommand->set(1);
+  if ( psst != CLOSED && wait )
     return qtWait(this, SIGNAL(closed()), transitionTime);
   else
-    return st == CLOSED;
+    return psst == CLOSED;
 }
 
+/*
 bool Shutter1A::setOpenedS(bool opn, bool wait) {
   Shutter1A sht;
   if ( ! sht.getReady(2000) ) {
@@ -134,6 +248,7 @@ bool Shutter1A::setOpenedS(bool opn, bool wait) {
   }
   return sht.setOpened(opn,wait);
 }
+*/
 
 bool Shutter1A::setOpened(bool opn, bool wait) {
   if (opn) return open(wait);
