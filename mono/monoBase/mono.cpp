@@ -218,7 +218,7 @@ void Mono::updateTilt2() {
 }
 
 
-double Mono::bendR2X(double radius, Mono::Motors mot) {
+double Mono::bendR2X(double curvature, Mono::Motors mot) {
 
   double zero;
   double rt;
@@ -243,10 +243,10 @@ double Mono::bendR2X(double radius, Mono::Motors mot) {
     return 0;
   }
 
-  if (radius==0.0)
+  if (curvature==0.0)
     return zero;
 
-  double dt = rt / radius;
+  double dt = curvature / ( rt * source2monoDistance );
 
   if (dt<0)
     return -dt + zero + benderGap/2.0;
@@ -282,14 +282,14 @@ double Mono::bendX2R(double pos, Mono::Motors mot) {
   }
 
   double dt = -pos + zero;
-  double radius;
+  double curvature;
   if ( dt < -benderGap/2.0 )
-    radius = rt / (dt + benderGap/2.0);
+    curvature = (dt + benderGap/2.0) / rt;
   else if ( dt > benderGap/2.0 )
-    radius = rt / (dt - benderGap/2.0);
+    curvature = (dt - benderGap/2.0) / rt;
   else
-    radius = 0;
-  return radius;
+    curvature = 0;
+  return source2monoDistance * curvature;
 
 }
 

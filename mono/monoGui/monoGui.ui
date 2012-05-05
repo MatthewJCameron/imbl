@@ -162,9 +162,6 @@
       </item>
       <item row="9" column="5">
        <widget class="Tuner" name="bend1ob">
-        <property name="suffix">
-         <string>m</string>
-        </property>
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -347,9 +344,6 @@
       </item>
       <item row="10" column="5">
        <widget class="Tuner" name="bend1ib">
-        <property name="suffix">
-         <string>m</string>
-        </property>
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -427,9 +421,6 @@
       </item>
       <item row="10" column="1">
        <widget class="Tuner" name="bend2ib">
-        <property name="suffix">
-         <string>m</string>
-        </property>
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -483,9 +474,6 @@
       </item>
       <item row="9" column="1">
        <widget class="Tuner" name="bend2ob">
-        <property name="suffix">
-         <string>m</string>
-        </property>
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
