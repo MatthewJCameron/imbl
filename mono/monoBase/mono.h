@@ -41,12 +41,19 @@ private:
   static const double standardZseparation = 25.0; // standard Z-separation of crystals;
   static const double zOut = -45.0; // Z1 when the mono is out of the beam;
   static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+
   static const double benderGap = 0.6;
+  static const double bend1rt = 58.112;
+  static const double bend2rt = 62.2;
+  static const double bend1BraggCorrection = 0.00373;
+  static const double bend2BraggCorrection = 0.00326;
   static const double bender1ibZero = 0.38;
   static const double bender1obZero = -0.30;
   static const double bender2ibZero = 0.0;
   static const double bender2obZero = 0.13;
 
+  double bendR2X(double radius, Motors mot);
+  double bendX2R(double pos, Motors mot);
 
   static QHash<Motors,QCaMotor*> init_motors();
   double motorAngle(double enrg, int crystal, Diffraction diff);
@@ -76,10 +83,10 @@ public:
   inline double zTweak() const {return _dZ;}
   inline double tilt1() const {return motors[Tilt1]->getUserPosition();}
   inline double tilt2() const {return motors[Tilt2]->getUserPosition();}
-  inline double bend1ob() const {return motors[Bend1ob]->getUserPosition();}
-  inline double bend2ob() const {return motors[Bend2ob]->getUserPosition();}
-  inline double bend1ib() const {return motors[Bend1ib]->getUserPosition();}
-  inline double bend2ib() const {return motors[Bend2ib]->getUserPosition();}
+  inline double bend1ob() const {return b1ob;}
+  inline double bend2ob() const {return b2ob;}
+  inline double bend1ib() const {return b1ib;}
+  inline double bend2ib() const {return b2ib;}
   inline InOutPosition inBeam() const {return _inBeam;}
 
   inline bool isMoving() const { return iAmMoving; }

@@ -60,8 +60,8 @@ Shutter1A::Shutter1A(QObject *parent) :
 
   connect(psOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
   connect(psCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
-  connect(ssOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
-  connect(ssCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updatePsState()));
+  connect(ssOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateSsState()));
+  connect(ssCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateSsState()));
   connect(enabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
   connect(disabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
 

@@ -218,9 +218,85 @@ void Mono::updateTilt2() {
 }
 
 
+double Mono::bendR2X(double radius, Mono::Motors mot) {
+
+  double zero;
+  double rt;
+  switch (mot) {
+  case Bend1ob:
+    zero = bender1obZero;
+    rt = bend1rt;
+    break;
+  case Bend1ib:
+    zero = bender1ibZero;
+    rt = bend1rt;
+    break;
+  case Bend2ob:
+    zero = bender2obZero;
+    rt = bend2rt;
+    break;
+  case Bend2ib:
+    zero = bender2ibZero;
+    rt = bend2rt;
+    break;
+  default:
+    return 0;
+  }
+
+  if (radius==0.0)
+    return zero;
+
+  double dt = rt / radius;
+
+  if (dt<0)
+    return -dt + zero + benderGap/2.0;
+  else
+    return -dt + zero - benderGap/2.0;
+
+}
+
+
+double Mono::bendX2R(double pos, Mono::Motors mot) {
+
+  double zero;
+  double rt;
+  switch (mot) {
+  case Bend1ob:
+    zero = bender1obZero;
+    rt = bend1rt;
+    break;
+  case Bend1ib:
+    zero = bender1ibZero;
+    rt = bend1rt;
+    break;
+  case Bend2ob:
+    zero = bender2obZero;
+    rt = bend2rt;
+    break;
+  case Bend2ib:
+    zero = bender2ibZero;
+    rt = bend2rt;
+    break;
+  default:
+    return 0;
+  }
+
+  double dt = -pos + zero;
+  double radius;
+  if ( dt < -benderGap/2.0 )
+    radius = rt / (dt + benderGap/2.0);
+  else if ( dt > benderGap/2.0 )
+    radius = rt / (dt - benderGap/2.0);
+  else
+    radius = 0;
+  return radius;
+
+}
+
 void Mono::updateBend1ob() {
   if ( ! motors[Bend1ob]->isConnected() )
     return;
+  b1ob = bendX2R(motors[Bend1ob]->getUserPosition(), Bend1ob);
   emit bend1obChanged(bend1ob());
 }
 
@@ -228,6 +304,7 @@ void Mono::updateBend1ob() {
 void Mono::updateBend2ob() {
   if ( ! motors[Bend2ob]->isConnected() )
     return;
+  b2ob = bendX2R(motors[Bend2ob]->getUserPosition(), Bend2ob);
   emit bend2obChanged(bend2ob());
 }
 
@@ -235,6 +312,7 @@ void Mono::updateBend2ob() {
 void Mono::updateBend1ib() {
   if ( ! motors[Bend1ib]->isConnected() )
     return;
+  b1ib = bendX2R(motors[Bend1ib]->getUserPosition(), Bend1ib);
   emit bend1ibChanged(bend1ib());
 }
 
@@ -242,6 +320,7 @@ void Mono::updateBend1ib() {
 void Mono::updateBend2ib() {
   if ( ! motors[Bend2ib]->isConnected() )
     return;
+  b2ib = bendX2R(motors[Bend2ib]->getUserPosition(), Bend2ib);
   emit bend2ibChanged(bend2ib());
 }
 
@@ -361,30 +440,32 @@ void Mono::setTilt2(double val) {
 void Mono::setBend1ob(double val) {
   if ( ! isConnected() )
     return;
-  motors[Bend1ob]->goUserPosition(val, QCaMotor::STARTED);
+  double target = bendR2X(val, Bend1ob);
+  motors[Bend1ob]->goUserPosition(target, QCaMotor::STARTED);
 }
 
 
 void Mono::setBend2ob(double val) {
   if ( ! isConnected() )
     return;
-  motors[Bend2ob]->goUserPosition(val, QCaMotor::STARTED);
+  double target = bendR2X(val, Bend2ob);
+  motors[Bend2ob]->goUserPosition(target, QCaMotor::STARTED);
 }
 
 
 void Mono::setBend1ib(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend1ib()));
   if ( ! isConnected() )
     return;
-  motors[Bend1ib]->goUserPosition(val, QCaMotor::STARTED);
+  double target = bendR2X(val, Bend1ib);
+  motors[Bend1ib]->goUserPosition(target, QCaMotor::STARTED);
 }
 
 
 void Mono::setBend2ib(double val) {
-  QTimer::singleShot(0, this, SLOT(updateBend2ib()));
   if ( ! isConnected() )
     return;
-  motors[Bend2ib]->goUserPosition(val, QCaMotor::STARTED);
+  double target = bendR2X(val, Bend2ib);
+  motors[Bend2ib]->goUserPosition(target, QCaMotor::STARTED);
 }
 
 
