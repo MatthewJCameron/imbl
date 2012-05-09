@@ -40,13 +40,12 @@ Mono::Mono(QObject *parent) :
   b1ib(0),
   b2ob(0),
   b2ib(0),
-  _inBeam(BETWEEN)
+  _inBeam(BETWEEN),
+  incalibration(false)
 {
 
-  foreach (Motors motk, motors.keys()) {
+  foreach (Motors motk, motors.keys())
     calibratedMotors[motk]  = true;
-    incalibration[motk] = false;
-  }
 
   foreach(QCaMotor * mot, motors) {
     connect(mot, SIGNAL(changedConnected(bool)), SLOT(updateConnection()));
@@ -218,11 +217,9 @@ void Mono::updateCalibration() {
 }
 
 bool Mono::isCalibrated() {
-  bool allCalibrated = true;
+  bool allCalibrated = ! incalibration;
   foreach(bool cal, calibratedMotors)
     allCalibrated &= cal;
-  foreach(bool incal, incalibration)
-    allCalibrated &= incal;
   return allCalibrated;
 }
 
@@ -590,84 +587,81 @@ void Mono::stop() {
 }
 
 void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
+
+  incalibration = true;
+  updateCalibration();
+
+  QHash<Mono::Motors, double> initialPositions;
   foreach(Motors motk, motors2calibrate)
-    switch (motk) {
-      case Bragg1 : QTimer::singleShot(0, this, SLOT(startCalBragg1()));
-      case Bragg2 : QTimer::singleShot(0, this, SLOT(startCalBragg2()));
-      case Xdist : QTimer::singleShot(0, this, SLOT(startCalXdist()));
-      case Tilt1 : QTimer::singleShot(0, this, SLOT(startCalTilt1()));
-      case Tilt2 : QTimer::singleShot(0, this, SLOT(startCalTilt2()));
-      case Z1 : QTimer::singleShot(0, this, SLOT(startCalZ1()));
-      case Z2 : QTimer::singleShot(0, this, SLOT(startCalZ2()));
-      case Bend1ob : QTimer::singleShot(0, this, SLOT(startCalBend1ob()));
-      case Bend1ib : QTimer::singleShot(0, this, SLOT(startCalBend1ib()));
-      case Bend2ob : QTimer::singleShot(0, this, SLOT(startCalBend2ob()));
-      case Bend2ib : QTimer::singleShot(0, this, SLOT(startCalBend2ib()));
-    }
-}
+    initialPositions[motk] = motors[motk]->getUserPosition();
 
 
-void Mono::calibrate(Mono::Motors motor) {
-
-  incalibration[motor] = true;
-  updateCalibration();
-  QCaMotor * mot = motors[motor];
-  const double currentPos = mot->getUserPosition();
-
-  if (motor == Bragg1 && Bragg1EncLoss->get().toBool() ) {
-    QList<ObjSig> os;
-    os << ObjSig(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)))
-       << ObjSig(mot, SIGNAL(stopped()));
-    mot->goLimit(1, QCaMotor::STARTED);
-    qtWait(os);
+  if ( motors2calibrate.contains(Bragg1) && Bragg1EncLoss->get().toBool() ) {
+    connect(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg1], SLOT(stop()));
+    motors[Bragg1]->goLimit(1, QCaMotor::STARTED);
   }
-  if (motor == Bragg2 && Bragg2EncLoss->get().toBool() ) {
-    QList<ObjSig> os;
-    os << ObjSig(Bragg2EncLoss, SIGNAL(valueChanged(QVariant)))
-       << ObjSig(mot, SIGNAL(stopped()));
-    mot->goLimit(1, QCaMotor::STARTED);
-    qtWait(os);
+  if ( motors2calibrate.contains(Bragg2) && Bragg2EncLoss->get().toBool() ) {
+    connect(Bragg2EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg2], SLOT(stop()));
+    motors[Bragg2]->goLimit(1, QCaMotor::STARTED);
   }
-  if (motor == Xdist && XdistEncLoss->get().toBool() ) {
-    QList<ObjSig> os;
-    os << ObjSig(XdistEncLoss, SIGNAL(valueChanged(QVariant)))
-       << ObjSig(mot, SIGNAL(stopped()));
-    mot->goLimit(1, QCaMotor::STARTED);
-    qtWait(os);
+  if ( motors2calibrate.contains(Xdist) && XdistEncLoss->get().toBool() ) {
+    connect(XdistEncLoss, SIGNAL(valueChanged(QVariant)), motors[Xdist], SLOT(stop()));
+    motors[Xdist]->goLimit(1, QCaMotor::STARTED);
+  }
+  qtWait(200);
+  if ( motors2calibrate.contains(Bragg1) ) {
+    motors[Bragg1]->wait_stop();
+    disconnect(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg1], SLOT(stop()));
+  }
+  if ( motors2calibrate.contains(Bragg2) ) {
+    motors[Bragg2]->wait_stop();
+    disconnect(Bragg2EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg2], SLOT(stop()));
+  }
+  if ( motors2calibrate.contains(Xdist) ) {
+    motors[Xdist]->wait_stop();
+    disconnect(XdistEncLoss, SIGNAL(valueChanged(QVariant)), motors[Xdist], SLOT(stop()));
   }
 
-  mot->goLimit(-1, QCaMotor::STARTED);
-  mot->wait_stop();
+  foreach(Motors motk, motors2calibrate)
+    motors[motk]->goLimit(-1, QCaMotor::STARTED);
+  qtWait(200);
+  foreach(Motors motk, motors2calibrate)
+    motors[motk]->wait_stop();
 
-  if ( ( motor == Bragg1 && Bragg1EncLoss->get().toBool() ) ||
-       ( motor == Bragg2 && Bragg2EncLoss->get().toBool() ) ||
-       ( motor == Xdist && XdistEncLoss->get().toBool() ) ) {
-       warn("Could not recover the encoder loss on motor \"" + mot->getPv() + "\".");
-       incalibration[motor] = false;
-       updateCalibration();
-       return;
+  if ( ( motors2calibrate.contains(Bragg1) && Bragg1EncLoss->get().toBool() ) ||
+       ( motors2calibrate.contains(Bragg2) && Bragg2EncLoss->get().toBool() ) ||
+       ( motors2calibrate.contains(Xdist) && XdistEncLoss->get().toBool() ) ) {
+    warn("Could not recover the encoder loss.");
+    incalibration = false;
+    updateCalibration();
+    return;
   }
 
-  if (motor == Xdist)
-    mot->goHome(-1, QCaMotor::STARTED); // BUG in EPICS on inverted axis
-  else
-    mot->goHome(1, QCaMotor::STARTED);
-  mot->wait_stop();
+  foreach(Motors motk, motors2calibrate)
+    if (motk == Xdist)
+      motors[motk]->goLimit(-1, QCaMotor::STARTED); // BUG in EPICS on inverted axis
+    else
+      motors[motk]->goLimit(1, QCaMotor::STARTED);
+  qtWait(200);
+  foreach(Motors motk, motors2calibrate)
+    motors[motk]->wait_stop();
 
-  if ( motor == Bragg1 ||
-       motor == Bragg2 ||
-       motor == Xdist )
-    QEpicsPv::set(mot->getPv()+":ENCODER_HMZ.PROC", 1, -1);
+  foreach(Motors motk, motors2calibrate)
+    if ( motk == Bragg1 ||
+         motk == Bragg2 ||
+         motk == Xdist )
+      QEpicsPv::set(motors[motk]->getPv()+":ENCODER_HMZ.PROC", 1, -1);
 
-  mot->goUserPosition(currentPos, QCaMotor::STOPPED);
-  mot->wait_stop();
+  foreach(Motors motk, motors2calibrate)
+    motors[motk]->goUserPosition(initialPositions[motk], QCaMotor::STOPPED);
+  qtWait(200);
+  foreach(Motors motk, motors2calibrate)
+    motors[motk]->wait_stop();
 
-  incalibration[motor] = false;
+  incalibration = false;
   updateCalibration();
 
 }
-
-
 
 
 

@@ -83,8 +83,7 @@ private:
   static QEpicsPv * Bragg2EncLoss;
   static QEpicsPv * XdistEncLoss;
   QHash<Motors,bool> calibratedMotors;
-  QHash<Motors,bool> incalibration;
-  void calibrate(Mono::Motors motor);
+  bool incalibration;
 
 public:
 
@@ -147,18 +146,6 @@ private slots:
   void updateBend1ib();
   void updateBend2ib();
   void updateCalibration();
-
-  inline void startCalBragg1() {calibrate(Bragg1);}
-  inline void startCalBragg2() {calibrate(Bragg2);}
-  inline void startCalXdist() {calibrate(Xdist);}
-  inline void startCalTilt1() {calibrate(Tilt1);}
-  inline void startCalTilt2() {calibrate(Tilt2);}
-  inline void startCalZ1() {calibrate(Z1);}
-  inline void startCalZ2() {calibrate(Z2);}
-  inline void startCalBend1ob() {calibrate(Bend1ob);}
-  inline void startCalBend1ib() {calibrate(Bend1ib);}
-  inline void startCalBend2ob() {calibrate(Bend2ob);}
-  inline void startCalBend2ib() {calibrate(Bend2ib);}
 
 signals:
 
