@@ -36,9 +36,9 @@ protected:
   Mode md;
   bool enabled;
 
-  static QEpicsPv * mode1;
-  static QEpicsPv * mode2;
-  static QEpicsPv * mode3;
+  static QEpicsPv * whiteMode;
+  static QEpicsPv * monoMode;
+  static QEpicsPv * mrtMode;
 
   static QEpicsPv * psOpenStatus;
   static QEpicsPv * psCloseStatus;

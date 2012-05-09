@@ -704,14 +704,19 @@ void Qimbl::update_mono() {
       ui->monoPos->setText("Moving");
       break;
   }
-  ui->energy->setText(QString::number(mono->component()->energy(),'f',3));
-  switch (mono->component()->diffraction()) {
-    case Mono::Si111 :
-      ui->hkl->setText("1,1,1");
-      break;
-    case Mono::Si311 :
-      ui->hkl->setText("3,1,1");
-      break;
+  if (mono->component()->motors[Mono::Bragg2]->isMoving()) {
+    ui->energy->setText("Moving");
+    ui->hkl->setText("Moving");
+  } else {
+    ui->energy->setText(QString::number(mono->component()->energy(),'f',3));
+    switch (mono->component()->diffraction()) {
+      case Mono::Si111 :
+        ui->hkl->setText("1,1,1");
+        break;
+      case Mono::Si311 :
+        ui->hkl->setText("3,1,1");
+        break;
+    }
   }
   ui->bend1->setText(QString::number(mono->component()->bend1ob(),'f',2) + "/" +
                      QString::number(mono->component()->bend1ib(),'f',2));

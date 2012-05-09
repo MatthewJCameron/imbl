@@ -1,6 +1,7 @@
 #include "mono.h"
 #include "error.h"
 #include <qtpv.h>
+#include "shutterFE.h"
 
 
 static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
@@ -595,6 +596,7 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
   foreach(Motors motk, motors2calibrate)
     initialPositions[motk] = motors[motk]->getUserPosition();
 
+  ShutterFE::setOpenedS(false, true);
 
   if ( motors2calibrate.contains(Bragg1) && Bragg1EncLoss->get().toBool() ) {
     connect(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg1], SLOT(stop()));

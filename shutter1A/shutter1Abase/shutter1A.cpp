@@ -5,18 +5,18 @@
 const int Shutter1A::relaxTime = 2500; // msec
 
 QEpicsPv * Shutter1A::psOpenStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_STS");
-    //new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_STS");
+    new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
 QEpicsPv * Shutter1A::psCloseStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_STS");
-    //new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_STS");
+    new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
 
 QEpicsPv * Shutter1A::ssOpenStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_OPEN_IND_STS");
-    //new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_OPEN_IND_STS");
+    new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
 QEpicsPv * Shutter1A::ssCloseStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_CLOSE_IND_STS");
-    //new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
+    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_CLOSE_IND_STS");
+    new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
 
 QEpicsPv * Shutter1A::openCommand =
     new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_CMD");
@@ -29,9 +29,9 @@ QEpicsPv * Shutter1A::disabledStatus =
     new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
 
 
-QEpicsPv * Shutter1A::mode1 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE1_STS");
-QEpicsPv * Shutter1A::mode2 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE2_STS");
-QEpicsPv * Shutter1A::mode3 = new QEpicsPv("SR08ID01PSS01:BL_OPMODE3_STS");
+QEpicsPv * Shutter1A::whiteMode = new QEpicsPv("SR08ID01PSS01:HU01A_NOM_SHT_MOD_PERM_STS");
+QEpicsPv * Shutter1A::monoMode = new QEpicsPv("SR08ID01PSS01:HU01A_MON_SHT_MOD_PERM_STS");
+QEpicsPv * Shutter1A::mrtMode = new QEpicsPv("SR08ID01PSS01:HU01A_FST_SHT_MOD_PERM_STS");
 
 Shutter1A::Shutter1A(QObject *parent) :
   Component("1A shutter", parent),
@@ -45,9 +45,9 @@ Shutter1A::Shutter1A(QObject *parent) :
   timer.setSingleShot(true);
   timer.setInterval(relaxTime);
 
-  connect(mode1, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(mode2, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(mode3, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(whiteMode, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(monoMode, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(mrtMode, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(psOpenStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(psCloseStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(ssOpenStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
@@ -78,7 +78,7 @@ Shutter1A::~Shutter1A() {
 
 void Shutter1A::updateConnection() {
   bool connection =
-      mode1->isConnected() && mode2->isConnected() && mode3->isConnected() &&
+      whiteMode->isConnected() && monoMode->isConnected() && mrtMode->isConnected() &&
       psOpenStatus->isConnected() && psCloseStatus->isConnected() &&
       ssOpenStatus->isConnected() && ssCloseStatus->isConnected() &&
       openCommand->isConnected() && closeCommand->isConnected() &&
@@ -185,15 +185,15 @@ void Shutter1A::updateMode() {
     return;
 
   if ( 1 !=
-       mode1->get().toInt() +
-       mode2->get().toInt() +
-       mode3->get().toInt() )
+       whiteMode->get().toInt() +
+       monoMode->get().toInt() +
+       mrtMode->get().toInt() )
     md = INVALID;
-  else if ( mode1->get().toBool() )
+  else if ( whiteMode->get().toBool() )
     md = WHITE;
-  else if ( mode2->get().toBool() )
+  else if ( mrtMode->get().toBool() )
     md = MRT;
-  else if ( mode3->get().toBool() )
+  else if ( monoMode->get().toBool() )
     md = MONO;
 
   emit modeChanged(md);

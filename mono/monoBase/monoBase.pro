@@ -17,10 +17,12 @@ HEADERS += \
 SOURCES += \
     mono.cpp
 
-INCLUDEPATH += . ../../ ../../component/componentBase
+INCLUDEPATH += . ../../ ../../component/componentBase \
+                        ../../shutterFE/shutterFEbase
 
 LIBS += -lqcamotor \
-        -L../../component/componentBase -lcomponent
+        -L../../component/componentBase -lcomponent \
+        -L../../shutterFE/shutterFEbase -lshutterFE
 
 headers.files = $$HEADERS
 headers.path = $$INSTALLBASE/include/imbl
