@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1064</width>
-    <height>471</height>
+    <height>472</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -472,16 +472,6 @@
         </property>
        </widget>
       </item>
-      <item row="9" column="1">
-       <widget class="Tuner" name="bend2ob">
-        <property name="minimum">
-         <double>-2147483647.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>2147483647.000000000000000</double>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="2">
        <widget class="QLabel" name="readDZ">
         <property name="text">
@@ -682,7 +672,30 @@
         </property>
        </widget>
       </item>
+      <item row="9" column="1">
+       <widget class="Tuner" name="bend2ob">
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Curvature of the crystal's bend normalized to the source-to-mono distance:&lt;/p&gt;&lt;p&gt;  D&lt;span style=&quot; vertical-align:sub;&quot;&gt;source-mono&lt;/span&gt;/R&lt;span style=&quot; vertical-align:sub;&quot;&gt;bending&lt;/span&gt;.&lt;/p&gt;&lt;p&gt;Positive for concave and negative for convex bending (see schematic image).&lt;/p&gt;&lt;p&gt;For the flat crystals this parameter is equal to 0. For the concave-bend crystals with the bending center at the source this parameter is 1.0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="minimum">
+         <double>-2147483647.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>2147483647.000000000000000</double>
+        </property>
+       </widget>
+      </item>
      </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="calibrate">
+     <property name="styleSheet">
+      <string notr="true">color: rgb(128, 0, 0);</string>
+     </property>
+     <property name="text">
+      <string>WARNING! Motor(s) calibration may be lost. Click here to calibrate.</string>
+     </property>
     </widget>
    </item>
    <item>

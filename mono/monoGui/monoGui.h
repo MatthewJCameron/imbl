@@ -36,6 +36,9 @@ class MonoGui : public ComponentGui {
 private:
 
   Ui::MonoGui *ui;
+  QDialog * calibrateDialog;
+  QHash<Mono::Motors, QCheckBox*> calibrateBoxes;
+
 
   explicit MonoGui(Mono * mono, QWidget *parent = 0);
   bool dBraggHealth;
@@ -59,6 +62,7 @@ private slots:
   void onEnergySet();
   void onEnergyTune();
   void onZseparationSet();
+  void onCalibration();
 
   void updateConnection(bool con);
   void updateInOut(Mono::InOutPosition iopos);
@@ -77,6 +81,7 @@ private slots:
   void updateMotorX();
   void updateStatus();
   void updateEnergyMotion();
+  void updateCalibration();
 
   void updateLSs();
 

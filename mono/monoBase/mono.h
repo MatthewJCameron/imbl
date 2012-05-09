@@ -56,7 +56,11 @@ private:
   double bendR2X(double curvature, Motors mot);
   double bendX2R(double pos, Motors mot);
 
+
   static QHash<Motors,QCaMotor*> init_motors();
+  static const QHash < Motors, QPair<double,double> > travelRanges;
+  static QHash< Motors, QPair<double,double> > init_ranges();
+
   double motorAngle(double enrg, int crystal, Diffraction diff);
 
   bool iAmMoving;
@@ -71,6 +75,16 @@ private:
   double b2ob;
   double b2ib;
   InOutPosition _inBeam;
+
+  static QEpicsPv * Bragg1Enc;
+  static QEpicsPv * Bragg2Enc;
+  static QEpicsPv * XdistEnc;
+  static QEpicsPv * Bragg1EncLoss;
+  static QEpicsPv * Bragg2EncLoss;
+  static QEpicsPv * XdistEncLoss;
+  QHash<Motors,bool> calibratedMotors;
+  QHash<Motors,bool> incalibration;
+  void calibrate(Mono::Motors motor);
 
 public:
 
@@ -89,6 +103,8 @@ public:
   inline double bend1ib() const {return b1ib;}
   inline double bend2ib() const {return b2ib;}
   inline InOutPosition inBeam() const {return _inBeam;}
+  inline const QHash<Motors,bool> calibrated() const {return calibratedMotors;}
+  bool isCalibrated();
 
   inline bool isMoving() const { return iAmMoving; }
   void wait_stop();
@@ -111,6 +127,7 @@ public slots:
   inline void makeConsistent() { setEnergy(energy(), diffraction()); }
   inline void moveIn() { setInBeam(true); }
   inline void moveOut() { setInBeam(false); }
+  void calibrate( const QList<Mono::Motors> & motors2calibrate = QList<Mono::Motors>() );
 
   void stop();
 
@@ -129,7 +146,19 @@ private slots:
   void updateBend2ob();
   void updateBend1ib();
   void updateBend2ib();
+  void updateCalibration();
 
+  inline void startCalBragg1() {calibrate(Bragg1);}
+  inline void startCalBragg2() {calibrate(Bragg2);}
+  inline void startCalXdist() {calibrate(Xdist);}
+  inline void startCalTilt1() {calibrate(Tilt1);}
+  inline void startCalTilt2() {calibrate(Tilt2);}
+  inline void startCalZ1() {calibrate(Z1);}
+  inline void startCalZ2() {calibrate(Z2);}
+  inline void startCalBend1ob() {calibrate(Bend1ob);}
+  inline void startCalBend1ib() {calibrate(Bend1ib);}
+  inline void startCalBend2ob() {calibrate(Bend2ob);}
+  inline void startCalBend2ib() {calibrate(Bend2ib);}
 
 signals:
 
@@ -147,6 +176,7 @@ signals:
   void bend1ibChanged(double);
   void bend2ibChanged(double);
   void inBeamChanged(Mono::InOutPosition);
+  void calibrationChanged(bool);
 
 };
 
@@ -155,3 +185,13 @@ double energy2bragg(double energy, Mono::Diffraction diff);
 
 
 #endif // MONO_H
+
+
+
+
+
+
+
+
+
+

@@ -59,14 +59,16 @@ bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
 
 MonoGui::MonoGui(QWidget *parent) :
   ComponentGui(new Mono(parent), true, parent),
-  ui(new Ui::MonoGui)
+  ui(new Ui::MonoGui),
+  calibrateDialog(new QDialog(this))
 {
   init();
 }
 
 MonoGui::MonoGui(Mono * mono, QWidget *parent) :
   ComponentGui(mono, true, parent),
-  ui(new Ui::MonoGui)
+  ui(new Ui::MonoGui),
+  calibrateDialog(new QDialog(this))
 {
   init();
 }
@@ -80,9 +82,7 @@ void MonoGui::init() {
 
   ui->setupUi(this);
   ui->motors_2->installEventFilter(this);
-
-  energySetter = new EnergySetRevert(ui->energy);
-  ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
+  ui->motors_1->installEventFilter(this);
 
   ui->motors_1->lock(true);
   ui->motors_2->lock(true);
@@ -100,7 +100,26 @@ void MonoGui::init() {
   ui->motors_2->addMotor(component()->motors[Mono::Bend2ob], true,true);
   ui->motors_2->addMotor(component()->motors[Mono::Bend2ib], true,true);
 
+  energySetter = new EnergySetRevert(ui->energy);
+  ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
+
+
+  QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
+  foreach (Mono::Motors motk, component()->motors.keys()) {
+    QCheckBox * chbk = new QCheckBox(calibrateDialog);
+    chbk->setText(component()->motors[motk]->getDescription());
+    calibrateBoxes[motk] = chbk;
+    calibrateLayout->addWidget(chbk);
+  }
+  QDialogButtonBox * calibrateButtons = new QDialogButtonBox(calibrateDialog);
+  calibrateButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+  connect(calibrateButtons, SIGNAL(accepted()), calibrateDialog, SLOT(accept()));
+  connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
+  calibrateLayout->addWidget(calibrateButtons);
+  calibrateDialog->hide();
+
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
+  connect(component(), SIGNAL(calibrationChanged(bool)), SLOT(updateCalibration()));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
   connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
   connect(component(), SIGNAL(dBraggChanged(double)), SLOT(updateDBragg()));
@@ -155,7 +174,7 @@ void MonoGui::init() {
   connect(component()->motors[Mono::Bend2ob],  SIGNAL(changedMoving(bool)),
           ui->bend2ob, SLOT(setDisabled(bool)));
 
-  foreach(QCaMotor * mot, component()->motors.values()) {
+  foreach(QCaMotor * mot, component()->motors) {
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateLSs()));
     connect(mot, SIGNAL(changedLoLimitStatus(bool)), SLOT(updateLSs()));
   }
@@ -179,6 +198,7 @@ void MonoGui::init() {
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
+  connect(ui->calibrate, SIGNAL(clicked()), SLOT(onCalibration()));
 
   updateConnection(component()->isConnected());
   updateEnergy();
@@ -225,6 +245,21 @@ void MonoGui::updateConnection(bool con) {
     ui->bend2ib->setIncrement(component()->motors[Mono::Bend2ib]->getStep());
     ui->tuneZ->setIncrement(component()->motors[Mono::Z2]->getStep());
   }
+}
+
+void MonoGui::updateCalibration() {
+  if (component()->isCalibrated()) {
+    ui->calibrate->setText("Calibrate motors");
+    ui->calibrate->setStyleSheet("");
+    ui->calibrate->setVisible(ui->advancedWidget->isVisible());
+  } else {
+    ui->calibrate->setText("WARNING! Motor(s) calibration may be lost. Click here to calibrate.");
+    ui->calibrate->setStyleSheet("color: rgb(128, 0, 0);");
+    ui->calibrate->setVisible(true);
+  }
+  foreach (Mono::Motors motk, component()->motors.keys())
+    calibrateBoxes[motk]->setStyleSheet( component()->calibrated()[motk] ?
+                                           "" : "color: rgb(128, 0, 0);" );
 }
 
 
@@ -429,17 +464,36 @@ void MonoGui::updateBend2ib() {
 
 void MonoGui::onAdvancedControl() {
   if (ui->advancedWidget->isVisibleTo(this)) {
+    ui->calibrate->setVisible(!component()->isCalibrated());
     ui->advancedWidget->setVisible(false);
     ui->advanced_pb->setText("Show advanced control");
     ui->advanced_pb->setStyleSheet("");
     ui->zSeparation->setEnabled(false);
     ui->modeSet->setEnabled(false);
   } else if ( PsswDial::ask(this) ) {
+    ui->calibrate->setVisible(true);
     ui->advancedWidget->setVisible(true);
     ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
     ui->zSeparation->setEnabled(true);
     ui->modeSet->setEnabled(true);
+  }
+}
+
+
+void MonoGui::onCalibration() {
+  foreach (Mono::Motors motk, component()->motors.keys()) {
+    calibrateBoxes[motk]->setText(component()->motors[motk]->getDescription());
+    calibrateBoxes[motk]->setChecked(!component()->calibrated()[motk]);
+  }
+  if ( PsswDial::ask(this) &&
+       calibrateDialog->exec() == QDialog::Accepted ) {
+    QList<Mono::Motors> mots;
+    foreach (Mono::Motors motk, component()->motors.keys())
+      if ( calibrateBoxes[motk]->isChecked() )
+        mots << motk;
+    if ( ! mots.isEmpty() )
+      component()->calibrate(mots);
   }
 }
 
