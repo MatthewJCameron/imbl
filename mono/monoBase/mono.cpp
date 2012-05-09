@@ -639,9 +639,9 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
 
   foreach(Motors motk, motors2calibrate)
     if (motk == Xdist)
-      motors[motk]->goLimit(-1, QCaMotor::STARTED); // BUG in EPICS on inverted axis
+      motors[motk]->goHome(-1, QCaMotor::STARTED); // BUG in EPICS on inverted axis
     else
-      motors[motk]->goLimit(1, QCaMotor::STARTED);
+      motors[motk]->goHome(1, QCaMotor::STARTED);
   qtWait(200);
   foreach(Motors motk, motors2calibrate)
     motors[motk]->wait_stop();
