@@ -51,6 +51,8 @@ Mono::Mono(QObject *parent) :
   foreach(QCaMotor * mot, motors) {
     connect(mot, SIGNAL(changedConnected(bool)), SLOT(updateConnection()));
     connect(mot, SIGNAL(changedMoving(bool)), SLOT(updateMotion()));
+    connect(mot, SIGNAL(changedConnected(bool)), SLOT(updateCalibration()));
+    connect(mot, SIGNAL(changedMoving(bool)), SLOT(updateCalibration()));
     connect(mot, SIGNAL(changedUserPosition(double)), SLOT(updateCalibration()));
     connect(mot, SIGNAL(changedLoLimitStatus(bool)), SLOT(updateCalibration()));
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateCalibration()));
@@ -91,10 +93,10 @@ QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   motret[Tilt2]  = new QCaMotor("SR08ID01MCS02:TILT2");
   motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
   motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
-  motret[Bend1ob]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
-  motret[Bend2ob]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
-  motret[Bend1ib]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
-  motret[Bend2ib]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
+  motret[Bend1ob]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
+  motret[Bend2ob]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
+  motret[Bend1ib]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
+  motret[Bend2ib]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
   return motret;
 }
 
@@ -108,10 +110,10 @@ QHash<Mono::Motors, QPair<double,double> > Mono::init_ranges() {
   rangret[Tilt2]  = qMakePair(-5.10,4.81);
   rangret[Z1]     = qMakePair(-49.63,4.16);
   rangret[Z2]     = qMakePair(16.07,34.43);
-  rangret[Bend1ob]  = qMakePair(-0.004,15.195);
-  rangret[Bend2ob]  = qMakePair(-0.093,14.95);
-  rangret[Bend1ib]  = qMakePair(-0.003,15.296);
-  rangret[Bend2ib]  = qMakePair(-0.009,14.959);
+  rangret[Bend1ob]  = qMakePair(-7.5,7.69);
+  rangret[Bend2ob]  = qMakePair(-7.5,7.54);
+  rangret[Bend1ib]  = qMakePair(-7.5,7.76);
+  rangret[Bend2ib]  = qMakePair(-7.5,7.73);
   return rangret;
 }
 
@@ -136,6 +138,7 @@ void Mono::updateConnection() {
   setConnected(con);
 
   if ( isConnected() ) {
+    updateCalibration();
     updateBragg1();
     updateBragg2();
     updateTilt1();
@@ -164,8 +167,9 @@ void Mono::updateMotion() {
 
 bool checkCalibrate (QCaMotor * mot, QPair<double,double> range, double allowance) {
   return
-      mot->getUserPosition() >= range.first - 0.1 &&
-      mot->getUserPosition() <= range.second + 0.1 &&
+      mot->isConnected() &&
+      mot->getUserPosition() >= range.first - allowance &&
+      mot->getUserPosition() <= range.second + allowance &&
       ( ! mot->getLoLimitStatus() || mot->getUserPosition() <= range.first + allowance ) &&
       ( ! mot->getHiLimitStatus() || mot->getUserPosition() >= range.second - allowance );
 }
@@ -173,45 +177,44 @@ bool checkCalibrate (QCaMotor * mot, QPair<double,double> range, double allowanc
 
 void Mono::updateCalibration() {
 
-  if ( ! isConnected() ||
-       ( static_cast<QCaMotor*>(sender()) &&
-         static_cast<QCaMotor*>(sender())->isMoving() ) )
+  if ( static_cast<QCaMotor*>(sender()) &&
+       static_cast<QCaMotor*>(sender())->isMoving() )
     return;
 
   if ( ! sender() || sender() == motors[Bragg1] ||
        sender() == Bragg1Enc || sender() == Bragg1EncLoss )
     calibratedMotors[Bragg1] =
         ! Bragg1EncLoss->get().toBool() &&
-        qAbs( motors[Bragg1]->getUserPosition() - Bragg1Enc->get().toDouble() ) < 0.001 &&
-        checkCalibrate(motors[Bragg1], travelRanges[Bragg1], 0.001);
+        qAbs( motors[Bragg1]->getUserPosition() - Bragg1Enc->get().toDouble() ) < 0.01 &&
+        checkCalibrate(motors[Bragg1], travelRanges[Bragg1], 0.1);
   else if ( ! sender() || sender() == motors[Bragg2] ||
               sender() == Bragg2Enc || sender() == Bragg2EncLoss )
     calibratedMotors[Bragg2] =
         ! Bragg2EncLoss->get().toBool() &&
-        qAbs( motors[Bragg2]->getUserPosition() - Bragg2Enc->get().toDouble() ) < 0.001 &&
-        checkCalibrate(motors[Bragg2], travelRanges[Bragg2], 0.001);
+        qAbs( motors[Bragg2]->getUserPosition() - Bragg2Enc->get().toDouble() ) < 0.01 &&
+        checkCalibrate(motors[Bragg2], travelRanges[Bragg2], 0.1);
   else if ( ! sender() || sender() == motors[Xdist] ||
          sender() == XdistEnc || sender() == XdistEncLoss )
     calibratedMotors[Xdist] =
         ! XdistEncLoss->get().toBool() &&
-        qAbs( motors[Xdist]->getUserPosition() - XdistEnc->get().toDouble() ) < 0.001 &&
-        checkCalibrate(motors[Xdist], travelRanges[Xdist], 0.01);
+        qAbs( motors[Xdist]->getUserPosition() - XdistEnc->get().toDouble() ) < 0.01 &&
+        checkCalibrate(motors[Xdist], travelRanges[Xdist], 0.1);
   else if ( ! sender() || sender() == motors[Z1]  )
-    calibratedMotors[Z1] = checkCalibrate(motors[Z1], travelRanges[Z1], 0.01);
+    calibratedMotors[Z1] = checkCalibrate(motors[Z1], travelRanges[Z1], 0.1);
   else if ( ! sender() || sender() == motors[Z2]  )
-    calibratedMotors[Z2] = checkCalibrate(motors[Z2], travelRanges[Z2], 0.01);
+    calibratedMotors[Z2] = checkCalibrate(motors[Z2], travelRanges[Z2], 0.1);
   else if ( ! sender() || sender() == motors[Tilt1]  )
-    calibratedMotors[Tilt1] = checkCalibrate(motors[Tilt1], travelRanges[Tilt1], 0.01);
+    calibratedMotors[Tilt1] = checkCalibrate(motors[Tilt1], travelRanges[Tilt1], 0.1);
   else if ( ! sender() || sender() == motors[Tilt2]  )
-    calibratedMotors[Tilt2] = checkCalibrate(motors[Tilt2], travelRanges[Tilt2], 0.01);
+    calibratedMotors[Tilt2] = checkCalibrate(motors[Tilt2], travelRanges[Tilt2], 0.1);
   else if ( ! sender() || sender() == motors[Bend1ob]  )
-    calibratedMotors[Bend1ob] = checkCalibrate(motors[Bend1ob], travelRanges[Bend1ob], 0.01);
+    calibratedMotors[Bend1ob] = checkCalibrate(motors[Bend1ob], travelRanges[Bend1ob], 0.1);
   else if ( ! sender() || sender() == motors[Bend2ob]  )
-    calibratedMotors[Bend2ob] = checkCalibrate(motors[Bend2ob], travelRanges[Bend2ob], 0.01);
+    calibratedMotors[Bend2ob] = checkCalibrate(motors[Bend2ob], travelRanges[Bend2ob], 0.1);
   else if ( ! sender() || sender() == motors[Bend1ib]  )
-    calibratedMotors[Bend1ib] = checkCalibrate(motors[Bend1ib], travelRanges[Bend1ib], 0.01);
+    calibratedMotors[Bend1ib] = checkCalibrate(motors[Bend1ib], travelRanges[Bend1ib], 0.1);
   else if ( ! sender() || sender() == motors[Bend2ib]  )
-    calibratedMotors[Bend2ib] = checkCalibrate(motors[Bend2ib], travelRanges[Bend2ib], 0.01);
+    calibratedMotors[Bend2ib] = checkCalibrate(motors[Bend2ib], travelRanges[Bend2ib], 0.1);
 
   emit calibrationChanged(isCalibrated());
 

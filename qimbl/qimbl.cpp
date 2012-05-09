@@ -132,6 +132,7 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
   connect(ui->shfeControl, SIGNAL(clicked()), shfe, SLOT(toggle()));
+  connect(shfe, SIGNAL(enabledChanged(bool)), ui->shfeControl, SLOT(setEnabled(bool)));
 
   connect(sh1A, SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
@@ -139,6 +140,8 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(update_bl_mode()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_bl_mode()));
+  connect(sh1A, SIGNAL(enabledChanged(bool)), ui->sh1AControl1, SLOT(setEnabled(bool)));
+  connect(sh1A, SIGNAL(enabledChanged(bool)), ui->sh1AControl2, SLOT(setEnabled(bool)));
   connect(ui->sh1AControl1, SIGNAL(clicked()), sh1A, SLOT(toggle()));
   connect(ui->sh1AControl2, SIGNAL(clicked()), sh1A, SLOT(toggle()));
 
@@ -206,7 +209,7 @@ Qimbl::Qimbl(QWidget *parent) :
     resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
   }
 
-
+/*
   ui->shIndV1A_c->setStyleSheet("");
   ui->shIndV1A_c->setText("");
   ui->shIndV1A_o->setStyleSheet(shInd_o_style);
@@ -219,6 +222,7 @@ Qimbl::Qimbl(QWidget *parent) :
   ui->shIndVT2_c->setText("");
   ui->shIndVT2_o->setStyleSheet(shInd_o_style);
   ui->shIndVT2_o->setText(shutter_open_string);
+  */
 
 
   update_rfstat();
@@ -437,7 +441,7 @@ void Qimbl::update_bl_mode() {
         ui->blMode->setStyleSheet(red_style);
         ui->blMode->setText("Invalid");
         ui->psControl->setVisible(true);
-        ui->ssControl->setVisible(true);
+        ui->ssControl->setVisible(false);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);
@@ -455,7 +459,7 @@ void Qimbl::update_bl_mode() {
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("White");
         ui->psControl->setVisible(true);
-        ui->ssControl->setVisible(true);
+        ui->ssControl->setVisible(false);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);

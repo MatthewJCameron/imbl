@@ -204,8 +204,7 @@ void Shutter1A::updateEnabled() {
   if ( ! isConnected() )
     return;
   bool newEnabled = enabledStatus->get().toBool() && ! disabledStatus->get().toBool();
-  if (newEnabled != enabled)
-    emit enabledChanged(enabled = newEnabled);
+  emit enabledChanged(enabled = newEnabled);
 }
 
 /*
@@ -220,6 +219,8 @@ Shutter1A::State Shutter1A::stateS() {
 */
 
 bool Shutter1A::open(bool wait) {
+  if ( ! isConnected() || ! isEnabled() )
+    return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   closeCommand->set(0);
@@ -231,6 +232,8 @@ bool Shutter1A::open(bool wait) {
 }
 
 bool Shutter1A::close(bool wait) {
+  if ( ! isConnected() || ! isEnabled() )
+    return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   openCommand->set(0);

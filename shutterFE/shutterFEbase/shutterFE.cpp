@@ -83,8 +83,7 @@ void ShutterFE::updateEnabled() {
   if ( ! isConnected() )
     return;
   bool newEnabled = enabledSts->get().toBool() && ! disabledSts->get().toBool();
-  if (newEnabled != enabled)
-    emit enabledChanged(enabled = newEnabled);
+  emit enabledChanged(enabled = newEnabled);
 }
 
 
@@ -98,6 +97,8 @@ ShutterFE::State ShutterFE::stateS() {
 }
 
 bool ShutterFE::open(bool wait) {
+  if ( ! isConnected() || ! isEnabled() )
+    return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   clsCmd->set(0);
@@ -109,6 +110,8 @@ bool ShutterFE::open(bool wait) {
 }
 
 bool ShutterFE::close(bool wait) {
+  if ( ! isConnected() || ! isEnabled() )
+    return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   opnCmd->set(0);
