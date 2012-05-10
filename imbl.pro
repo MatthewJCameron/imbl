@@ -10,6 +10,7 @@ SUBDIRS = \
     mrtShutter \
     DEImono \
     hutch \
+    valve
     imblgui \
     qimbl
 

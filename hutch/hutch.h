@@ -8,9 +8,11 @@
 class Hutch : public Component {
   Q_OBJECT;
 
-public:
+private:
 
   static const QString pvBaseName;
+
+public:
 
   enum StackColor {
     OFF=0,
