@@ -45,7 +45,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="tpG">
+       <widget class="QDoubleSpinBoxEntered" name="tpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -64,7 +64,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="bpG">
+       <widget class="QDoubleSpinBoxEntered" name="bpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -146,7 +146,7 @@
        </widget>
       </item>
       <item row="1" column="5">
-       <widget class="QDoubleSpinBox" name="voG">
+       <widget class="QDoubleSpinBoxEntered" name="voG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -162,7 +162,7 @@
        </widget>
       </item>
       <item row="2" column="5">
-       <widget class="QDoubleSpinBox" name="vpG">
+       <widget class="QDoubleSpinBoxEntered" name="vpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -223,7 +223,7 @@
        </widget>
       </item>
       <item row="4" column="1">
-       <widget class="QDoubleSpinBox" name="lpG">
+       <widget class="QDoubleSpinBoxEntered" name="lpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -242,7 +242,7 @@
        </widget>
       </item>
       <item row="4" column="5">
-       <widget class="QDoubleSpinBox" name="hoG">
+       <widget class="QDoubleSpinBoxEntered" name="hoG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -279,7 +279,7 @@
        </widget>
       </item>
       <item row="5" column="1">
-       <widget class="QDoubleSpinBox" name="rpG">
+       <widget class="QDoubleSpinBoxEntered" name="rpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -298,7 +298,7 @@
        </widget>
       </item>
       <item row="5" column="5">
-       <widget class="QDoubleSpinBox" name="hpG">
+       <widget class="QDoubleSpinBoxEntered" name="hpG">
         <property name="suffix">
          <string>mm</string>
         </property>
@@ -405,6 +405,11 @@
    <extends>QWidget</extends>
    <header location="global">qmotorstack.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QDoubleSpinBoxEntered</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>hhlSlitsGui.h</header>
   </customwidget>
  </customwidgets>
  <resources/>

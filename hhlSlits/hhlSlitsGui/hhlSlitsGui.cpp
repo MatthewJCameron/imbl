@@ -161,6 +161,8 @@ void HhlSlitsGui::init() {
   connect(ui->gostop_pb, SIGNAL(clicked()), SLOT(onGoPressed()));
   connect(ui->reset_pb, SIGNAL(clicked()), SLOT(onResetPressed()));
   connect(ui->calibrate_pb, SIGNAL(clicked()), SLOT(onAutoCalibration()));
+  foreach( QDoubleSpinBoxEntered * spbxe, findChildren<QDoubleSpinBoxEntered *>() )
+    connect(spbxe, SIGNAL(enterPressed()), SLOT(onGoPressed()));
 
   connect(ui->tpG, SIGNAL(valueChanged(double)), SLOT(onVtbGoalChanged()));
   connect(ui->bpG, SIGNAL(valueChanged(double)), SLOT(onVtbGoalChanged()));

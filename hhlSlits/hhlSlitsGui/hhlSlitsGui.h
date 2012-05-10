@@ -80,5 +80,20 @@ private slots:
 };
 
 
+class QDoubleSpinBoxEntered : public QDoubleSpinBox {
+  Q_OBJECT;
+public:
+  inline QDoubleSpinBoxEntered(QWidget * parent =0) : QDoubleSpinBox(parent) {  }
+signals :
+    void enterPressed();
+protected:
+  inline void keyPressEvent( QKeyEvent * event ) {
+    if ( event->key() == Qt::Key_Enter || event->key() == Qt::Key_Return )
+      emit enterPressed();
+    QDoubleSpinBox::keyPressEvent(event);
+  }
+};
+
+
 
 #endif // HHLSLITSGUI_H
