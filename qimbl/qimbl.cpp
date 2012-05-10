@@ -131,19 +131,17 @@ Qimbl::Qimbl(QWidget *parent) :
 
   connect(shfe, SIGNAL(stateChanged(ShutterFE::State)), SLOT(update_shfe()));
   connect(shfe, SIGNAL(connectionChanged(bool)), SLOT(update_shfe()));
+  connect(shfe, SIGNAL(enabledChanged(bool)), SLOT(update_shfe()));
   connect(ui->shfeControl, SIGNAL(clicked()), shfe, SLOT(toggle()));
-  connect(shfe, SIGNAL(enabledChanged(bool)), ui->shfeControl, SLOT(setEnabled(bool)));
 
   connect(sh1A, SIGNAL(ssStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(stateChanged(Shutter1A::State)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_sh1A()));
+  connect(sh1A, SIGNAL(enabledChanged(bool)), SLOT(update_sh1A()));
   connect(sh1A, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(update_bl_mode()));
   connect(sh1A, SIGNAL(connectionChanged(bool)), SLOT(update_bl_mode()));
-  connect(sh1A, SIGNAL(enabledChanged(bool)), ui->sh1AControl1, SLOT(setEnabled(bool)));
-  connect(sh1A, SIGNAL(enabledChanged(bool)), ui->sh1AControl2, SLOT(setEnabled(bool)));
-  connect(ui->sh1AControl1, SIGNAL(clicked()), sh1A, SLOT(toggle()));
-  connect(ui->sh1AControl2, SIGNAL(clicked()), sh1A, SLOT(toggle()));
+  connect(ui->sh1AControl, SIGNAL(clicked()), sh1A, SLOT(toggle()));
 
   connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
@@ -425,9 +423,18 @@ void Qimbl::update_shfe() {
         ui->shfeControl->setText("Close");
         break;
       case ShutterFE::BETWEEN :
+        ui->shfeSt->setStyleSheet(red_style);
         ui->shfeSt->setText(inprogress_string);
+        ui->shIndFE_c->setStyleSheet(shInd_c_style);
+        ui->shIndFE_c->setText(inprogress_string);
+        ui->shIndFE_o->setStyleSheet(shInd_c_style);
+        ui->shIndFE_o->setText(inprogress_string);
+        ui->shfeControl->setText("Close");
         break;
     }
+    ui->shfeControl->setEnabled(shfe->isEnabled());
+    if ( ! shfe->isEnabled() )
+      ui->shfeControl->setText("Disabled");
   }
 }
 
@@ -440,8 +447,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::INVALID :
         ui->blMode->setStyleSheet(red_style);
         ui->blMode->setText("Invalid");
-        ui->psControl->setVisible(true);
-        ui->ssControl->setVisible(false);
+        ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);
@@ -449,8 +455,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::MONO :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("Mono");
-        ui->psControl->setVisible(false);
-        ui->ssControl->setVisible(true);
+        ui->ssShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
         ui->linkedRight->setVisible(false);
@@ -458,8 +463,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::WHITE :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("White");
-        ui->psControl->setVisible(true);
-        ui->ssControl->setVisible(false);
+        ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);
@@ -467,8 +471,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::MRT :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("MRT");
-        ui->psControl->setVisible(true);
-        ui->ssControl->setVisible(false);
+        ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
         ui->linkedRight->setVisible(false);
@@ -488,66 +491,79 @@ void Qimbl::update_sh1A() {
     set_nolink_style(ui->shIndPS_o);
     set_nolink_style(ui->shIndSS_c);
     set_nolink_style(ui->shIndSS_o);
-  } else {
-    switch (sh1A->psState()) {
-      case Shutter1A::CLOSED :
-        ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
-                                     green_style : red_style);
-        ui->shpsSt->setText(shutter_closed_string);
-        ui->shIndPS_c->setStyleSheet(shInd_c_style);
-        ui->shIndPS_c->setText(shutter_closed_string);
-        ui->shIndPS_o->setStyleSheet("");
-        ui->shIndPS_o->setText("");
-        break;
-      case Shutter1A::OPENED :
-        ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
-                                     red_style : green_style );
-        ui->shpsSt->setText(shutter_open_string);
-        ui->shIndPS_c->setStyleSheet("");
-        ui->shIndPS_c->setText("");
-        ui->shIndPS_o->setStyleSheet(shInd_o_style);
-        ui->shIndPS_o->setText(shutter_open_string);
-        break;
-      case Shutter1A::BETWEEN :
-        ui->shpsSt->setText(inprogress_string);
-        break;
-    }
-    switch (sh1A->ssState()) {
-      case Shutter1A::CLOSED :
-        ui->shssSt->setStyleSheet(red_style);
-        ui->shssSt->setText(shutter_closed_string);
-        ui->shIndSS_c->setStyleSheet(shInd_c_style);
-        ui->shIndSS_c->setText(shutter_closed_string);
-        ui->shIndSS_o->setStyleSheet("");
-        ui->shIndSS_o->setText("");
-        break;
-      case Shutter1A::OPENED :
-        ui->shssSt->setStyleSheet(green_style);
-        ui->shssSt->setText(shutter_open_string);
-        ui->shIndSS_c->setStyleSheet("");
-        ui->shIndSS_c->setText("");
-        ui->shIndSS_o->setStyleSheet(shInd_o_style);
-        ui->shIndSS_o->setText(shutter_open_string);
-        break;
-      case Shutter1A::BETWEEN :
-        ui->shssSt->setText(inprogress_string);
-        break;
-    }
-    switch (sh1A->state()) {
-      case Shutter1A::CLOSED :
-        ui->sh1AControl1->setText("Open");
-        ui->sh1AControl2->setText("Open");
-        break;
-      case Shutter1A::OPENED :
-        ui->sh1AControl1->setText("Close");
-        ui->sh1AControl2->setText("Close");
-        break;
-      case Shutter1A::BETWEEN :
-        break;
-    }
-
-
+    return;
   }
+
+  switch (sh1A->psState()) {
+  case Shutter1A::CLOSED :
+    ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
+                               green_style : red_style);
+    ui->shpsSt->setText(shutter_closed_string);
+    ui->shIndPS_c->setStyleSheet(shInd_c_style);
+    ui->shIndPS_c->setText(shutter_closed_string);
+    ui->shIndPS_o->setStyleSheet("");
+    ui->shIndPS_o->setText("");
+    break;
+  case Shutter1A::OPENED :
+    ui->shpsSt->setStyleSheet( ( sh1A->mode() == Shutter1A::MONO ) ?
+                               red_style : green_style );
+    ui->shpsSt->setText(shutter_open_string);
+    ui->shIndPS_c->setStyleSheet("");
+    ui->shIndPS_c->setText("");
+    ui->shIndPS_o->setStyleSheet(shInd_o_style);
+    ui->shIndPS_o->setText(shutter_open_string);
+    break;
+  case Shutter1A::BETWEEN :
+    ui->shpsSt->setStyleSheet(red_style);
+    ui->shpsSt->setText(inprogress_string);
+    ui->shIndPS_c->setStyleSheet(shInd_c_style);
+    ui->shIndPS_c->setText(inprogress_string);
+    ui->shIndPS_o->setStyleSheet(shInd_c_style);
+    ui->shIndPS_o->setText(inprogress_string);
+    break;
+  }
+
+  switch (sh1A->ssState()) {
+  case Shutter1A::CLOSED :
+    ui->shssSt->setStyleSheet(red_style);
+    ui->shssSt->setText(shutter_closed_string);
+    ui->shIndSS_c->setStyleSheet(shInd_c_style);
+    ui->shIndSS_c->setText(shutter_closed_string);
+    ui->shIndSS_o->setStyleSheet("");
+    ui->shIndSS_o->setText("");
+    break;
+  case Shutter1A::OPENED :
+    ui->shssSt->setStyleSheet(green_style);
+    ui->shssSt->setText(shutter_open_string);
+    ui->shIndSS_c->setStyleSheet("");
+    ui->shIndSS_c->setText("");
+    ui->shIndSS_o->setStyleSheet(shInd_o_style);
+    ui->shIndSS_o->setText(shutter_open_string);
+    break;
+  case Shutter1A::BETWEEN :
+    ui->shssSt->setStyleSheet(red_style);
+    ui->shssSt->setText(inprogress_string);
+    ui->shIndSS_c->setStyleSheet(shInd_c_style);
+    ui->shIndSS_c->setText(inprogress_string);
+    ui->shIndSS_o->setStyleSheet(shInd_c_style);
+    ui->shIndSS_o->setText(inprogress_string);
+    break;
+  }
+
+  switch (sh1A->state()) {
+  case Shutter1A::CLOSED :
+    ui->sh1AControl->setText("Open");
+    break;
+  case Shutter1A::OPENED :
+  case Shutter1A::BETWEEN :
+    ui->sh1AControl->setText("Close");
+    break;
+  }
+  ui->sh1AControl->setEnabled(sh1A->isEnabled());
+  if ( ! sh1A->isEnabled() )
+    ui->sh1AControl->setText("Disabled");
+
+
 }
 
 

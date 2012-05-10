@@ -261,7 +261,7 @@ bool Shutter1A::setOpened(bool opn, bool wait) {
 }
 
 bool Shutter1A::toggle(bool wait) {
-  if (state()==OPENED) return close(wait);
-  else                 return open(wait);
+  if (state()==CLOSED) return open(wait);
+  else                 return close(wait);
 }
 
