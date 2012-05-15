@@ -259,6 +259,8 @@ void Filters::updateMotionState() {
     newMov |= paddle->isMoving();
   if (newMov != iAmMoving)
     emit motionStateChanged(iAmMoving=newMov);
+  if (!isMoving())
+    emit stopped();
 }
 
 
