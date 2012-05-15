@@ -217,14 +217,16 @@ const bool FiltersGui::data_inited = init_data();
 
 FiltersGui::FiltersGui(QWidget *parent) :
   ComponentGui(new Filters(parent), true, parent),
-  ui(new Ui::Filters)
+  ui(new Ui::Filters),
+  calibrateDialog(new QDialog(this))
 {
   init();
 }
 
 FiltersGui::FiltersGui(Filters * flt, QWidget *parent) :
   ComponentGui(flt, false, parent),
-  ui(new Ui::Filters)
+  ui(new Ui::Filters),
+  calibrateDialog(new QDialog(this))
 {
   init();
 }
@@ -240,6 +242,21 @@ void FiltersGui::init() {
 
   ui->setupUi(this);
   ui->advanced->hide();
+
+  QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
+  foreach(Paddle* paddle, component()->paddles) {
+    QCheckBox * chbk = new QCheckBox(calibrateDialog);
+    QCaMotor * mot = paddle->motor();
+    chbk->setText(mot->getDescription());
+    calibrateBoxes[mot] = chbk;
+    calibrateLayout->addWidget(chbk);
+  }
+  QDialogButtonBox * calibrateButtons = new QDialogButtonBox(calibrateDialog);
+  calibrateButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+  connect(calibrateButtons, SIGNAL(accepted()), calibrateDialog, SLOT(accept()));
+  connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
+  calibrateLayout->addWidget(calibrateButtons);
+  calibrateDialog->hide();
 
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
   ui->SpectrumPlot->setAxisMaxMinor(QwtPlot::xBottom, 10);
@@ -392,7 +409,11 @@ void FiltersGui::onAdvancedControl() {
 
 void FiltersGui::onAutoCalibration() {
 
-  if ( ! PsswDial::ask(this) )
+  foreach(Paddle* paddle, component()->paddles)
+    calibrateBoxes[paddle->motor()]->setText(paddle->motor()->getDescription());
+
+  if ( ! PsswDial::ask(this)  ||
+       calibrateDialog->exec() != QDialog::Accepted)
     return;
 
   ShutterFE::State inst(ShutterFE::stateS());
@@ -404,7 +425,10 @@ void FiltersGui::onAutoCalibration() {
 
   QList<QCaMotor*> mlist;
   foreach(Paddle * paddle, component()->paddles)
-    mlist << paddle->motor();
+    if (calibrateBoxes[paddle->motor()]->isChecked())
+      mlist << paddle->motor();
+  if (mlist.isEmpty())
+    return;
 
   QHash<QCaMotor*,double> positions;
   foreach(QCaMotor * mot, mlist) {

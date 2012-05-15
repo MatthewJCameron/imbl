@@ -8,6 +8,7 @@
 
 namespace Ui {
 class MonoGui;
+class WTF;
 }
 
 class Tuner;
@@ -36,7 +37,9 @@ class MonoGui : public ComponentGui {
 private:
 
   Ui::MonoGui *ui;
+  Ui::WTF * wtfUi;
   QDialog * calibrateDialog;
+  QDialog * wtfDialog;
   QHash<Mono::Motors, QCheckBox*> calibrateBoxes;
 
 

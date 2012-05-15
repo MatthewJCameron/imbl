@@ -7,22 +7,45 @@
 
 class Valve : public Component {
   Q_OBJECT;
-private:
-  static const QString pvTemplateStatus;
-  static const QString pvTemplateCommand;
-protected:
-  //SR08ID01EPS01:IGV01_STS
-  //SR08ID01EPS01:IGV01_OpenCloseCmd
-  QEpicsPv * statusPv;
-  QEpicsPv * commandPv;
+
 public:
+  enum State {
+    INVALID = 1,
+    CLOSED = 2,
+    OPENED = 3,
+    MOVING = 4
+  };
+
+private:
+
+  static const QString pvTemplateState;
+  static const QString pvTemplateCommand;
+  State st;
+
+protected:
+  QEpicsPv * statePv;
+  QEpicsPv * commandPv;
+
+public:
+
   explicit Valve(int number, QObject *parent=0);
   ~Valve();
-  inline bool status() { return isConnected() && statusPv->get().toBool(); }
+
+  inline State state() { return st; }
+
 signals:
-  void statusChanged(bool);
+  void stateChanged(Valve::State);
+
+public slots:
+  void setOpened(bool opned);
+  inline void open() {setOpened(true);}
+  inline void close() {setOpened(false);}
+  void toggle();
+
 private slots:
   void updateConnection();
+  void updateState();
+
 };
 
 #endif // VALVE_H

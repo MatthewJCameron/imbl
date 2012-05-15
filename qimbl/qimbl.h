@@ -10,6 +10,7 @@
 #include "filtersGui.h"
 #include "monoGui.h"
 #include "hutch.h"
+#include "valve.h"
 #include "valuebar.h"
 #include <qtpv.h>
 
@@ -40,6 +41,8 @@ private:
 
   ShutterFE * shfe;
   Shutter1A * sh1A;
+  Valve * valve1;
+
   HhlSlitsGui * slits;
   FiltersGui * filters;
   MonoGui * mono;
@@ -73,6 +76,7 @@ private slots:
   void update_vacuum();
   void update_temperature();
   void update_flow();
+  void update_valve_1();
 
 
 };

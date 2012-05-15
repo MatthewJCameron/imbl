@@ -7,6 +7,8 @@
 #include <qtpv.h>
 #include <qwt_thermo.h>
 #include <math.h>
+#include <QApplication>
+#include <QClipboard>
 
 namespace Ui {
 class ValueBar;
@@ -61,12 +63,13 @@ public:
 
   void setLogarithmic(bool lg);
   bool isLogarithmic();
-  void setLoLo(double ll=NAN) {lolo=ll; updateParams();}
-  void setLo(double l=NAN) {lo=l; updateParams();}
-  void setHi(double h=NAN) {hi=h; updateParams();}
-  void setHiHi(double hh=NAN) {hihi=hh; updateParams();}
-  void setMin(double m=NAN) {min=m; updateParams();}
-  void setMax(double m=NAN) {max=m; updateParams();}
+  inline void setLoLo(double ll=NAN) {lolo=ll; updateParams();}
+  inline void setLo(double l=NAN) {lo=l; updateParams();}
+  inline void setHi(double h=NAN) {hi=h; updateParams();}
+  inline void setHiHi(double hh=NAN) {hihi=hh; updateParams();}
+  inline void setMin(double m=NAN) {min=m; updateParams();}
+  inline void setMax(double m=NAN) {max=m; updateParams();}
+  inline void setDescription(const QString & d=QString()) {desc=d; updateParams();};
 
   QGridLayout * internalLayout();
 
@@ -79,6 +82,7 @@ private slots:
   void updateValue();
   void updateParams();
   void updateConnection();
+  void copyPV() {QApplication::clipboard()->setText(pv->pv());}
 
 private:
 
@@ -92,6 +96,7 @@ private:
   double max;
   int prec;
   QString units;
+  QString desc;
   Health _health;
 
   inline void setHealth(Health hlth) { emit healthChenaged(_health=hlth); }

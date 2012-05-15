@@ -59,6 +59,8 @@ private:
 
   Ui::Filters *ui;
   QList<PaddleGui*> paddles;
+  QDialog * calibrateDialog;
+  QHash<QCaMotor*, QCheckBox*> calibrateBoxes;
 
   QwtPlotCurve * wb_curve;
   QwtPlotCurve * current_curve;

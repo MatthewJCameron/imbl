@@ -18,7 +18,8 @@ HEADERS  += monoGui.h \
     tuner.h
 
 FORMS    += monoGui.ui \
-    tuner.ui
+    tuner.ui \
+    wtf.ui
 
 INCLUDEPATH += ../../ \
                ../../component/componentBase \

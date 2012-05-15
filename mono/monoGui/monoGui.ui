@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1064</width>
-    <height>472</height>
+    <width>1096</width>
+    <height>475</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -240,19 +240,6 @@
          </widget>
         </item>
        </layout>
-      </item>
-      <item row="9" column="0">
-       <widget class="QLabel" name="label_17">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Outboard bender</string>
-        </property>
-       </widget>
       </item>
       <item row="7" column="0" colspan="7">
        <widget class="Line" name="line_7">
@@ -674,9 +661,6 @@
       </item>
       <item row="9" column="1">
        <widget class="Tuner" name="bend2ob">
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Curvature of the crystal's bend normalized to the source-to-mono distance:&lt;/p&gt;&lt;p&gt;  D&lt;span style=&quot; vertical-align:sub;&quot;&gt;source-mono&lt;/span&gt;/R&lt;span style=&quot; vertical-align:sub;&quot;&gt;bending&lt;/span&gt;.&lt;/p&gt;&lt;p&gt;Positive for concave and negative for convex bending (see schematic image).&lt;/p&gt;&lt;p&gt;For the flat crystals this parameter is equal to 0. For the concave-bend crystals with the bending center at the source this parameter is 1.0.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
         <property name="minimum">
          <double>-2147483647.000000000000000</double>
         </property>
@@ -684,6 +668,36 @@
          <double>2147483647.000000000000000</double>
         </property>
        </widget>
+      </item>
+      <item row="9" column="0">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <property name="spacing">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_17">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Outboard bender</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="wtf">
+          <property name="toolTip">
+           <string>what are the bending parameters?</string>
+          </property>
+          <property name="text">
+           <string>?</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>

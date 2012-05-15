@@ -2,170 +2,54 @@
 #include "valve.h"
 #include <QDebug>
 
+const QString Valve::pvTemplateState = "SR08ID01EPS01:IGV%1_STS";
+const QString Valve::pvTemplateCommand = "SR08ID01EPS01:IGV%1_OpenCloseCmd";
 
-
-Hutch::Hutch(Hutch::Hutches hu, QObject *parent) :
-  Component("Valve", parent),
-  enabledPv(new QEpicsPv(this)),
-  disabledPv(new QEpicsPv(this)),
-  searchedPv(new QEpicsPv(this)),
-  stackG(new QEpicsPv(this)),
-  stackA(new QEpicsPv(this)),
-  stackR(new QEpicsPv(this)),
-  _stack(OFF),
-  _enabled(false),
-  _state(OPEN)
+Valve::Valve(int number, QObject *parent) :
+  Component("Valve" + QString::number(number), parent),
+  statePv(new QEpicsPv(pvTemplateState.arg(number, 2, 10, QChar('0')), this)),
+  commandPv(new QEpicsPv(pvTemplateCommand.arg(number, 2, 10, QChar('0')), this)),
+  st(INVALID)
 {
-
-  QString baseName="SR08ID01PSS01:";
-  switch (hu) {
-    case H1A:
-      baseName += "HU01A";
-      setObjectName("Hutch 1A");
-      break;
-    case H1B:
-      baseName += "HU01B";
-      setObjectName("Hutch 1B");
-      break;
-    case H2A:
-      baseName += "HU02A";
-      setObjectName("Hutch 2A");
-      break;
-    case H2B:
-      baseName += "HU02B";
-      setObjectName("Hutch 2B");
-      break;
-    case TUN:
-      baseName += "TUNNL";
-      setObjectName("Tunnel");
-      break;
-    case H3A:
-      baseName += "HU03A";
-      setObjectName("Hutch 3A");
-      break;
-    case H3B:
-      baseName += "HU03B";
-      setObjectName("Hutch 3B");
-      break;
-  }
-
-  enabledPv->setPV(baseName+"_ENABLE_STS");
-  disabledPv->setPV(baseName+"_DISABLE_STS");
-  searchedPv->setPV(baseName+"_SEARCHED_STS");
-  stackG->setPV(baseName+"_STK_GREEN_STS");
-  stackA->setPV(baseName+"_STK_AMBER_STS");
-  stackR->setPV(baseName+"_STK_RED_STS");
-  if ( hu == H3B ) {
-    doorsLocked
-        << new QEpicsPv(baseName+"_EST_L_DOOR_LOCK_STS", this)
-        << new QEpicsPv(baseName+"_EST_R_DOOR_LOCK_STS", this)
-        << new QEpicsPv(baseName+"_WST_L_DOOR_LOCK_STS", this)
-        << new QEpicsPv(baseName+"_WST_R_DOOR_LOCK_STS", this);
-    doorsClosed
-        << new QEpicsPv(baseName+"_EST_L_DOOR_SW_STS", this)
-        << new QEpicsPv(baseName+"_EST_R_DOOR_SW_STS", this)
-        << new QEpicsPv(baseName+"_WST_L_DOOR_SW_STS", this)
-        << new QEpicsPv(baseName+"_WST_R_DOOR_SW_STS", this);
-  } else {
-    doorsLocked
-        << new QEpicsPv(baseName+"_L_DOOR_LOCK_STS", this)
-        << new QEpicsPv(baseName+"_R_DOOR_LOCK_STS", this);
-    doorsClosed
-        << new QEpicsPv(baseName+"_L_DOOR_SW_STS", this)
-        << new QEpicsPv(baseName+"_R_DOOR_SW_STS", this);
-  }
-
-  foreach(QEpicsPv * pv, findChildren<QEpicsPv*>() )
-    connect(pv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-
-  connect(enabledPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateEnabled()));
-  connect(disabledPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateEnabled()));
-  connect(searchedPv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  connect(stackG, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
-  connect(stackR, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
-  connect(stackA, SIGNAL(valueUpdated(QVariant)), SLOT(updateStack()));
-  foreach(QEpicsPv * pv, doorsLocked)
-    connect(pv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-  foreach(QEpicsPv * pv, doorsClosed)
-    connect(pv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
-
-  emit stackChanged(_stack);
-  emit stateChanged(_state);
-  emit enabledChanged(_enabled);
-
+  connect(commandPv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(statePv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(statePv, SIGNAL(valueUpdated(QVariant)), SLOT(updateState()));
 }
 
 
-Hutch::~Hutch() {
+Valve::~Valve() {
   foreach(QEpicsPv * pv, findChildren<QEpicsPv*>())
     delete pv;
 }
 
-void Hutch::updateConnection() {
-
-  bool connection = true;
-  foreach(QEpicsPv * pv, findChildren<QEpicsPv*>())
-    connection &= pv->isConnected();
-  setConnected(connection);
-  if (isConnected()) {
-    updateStack();
+void Valve::updateConnection() {
+  setConnected(statePv->isConnected()/* && commandPv->isConnected() */);
+  if (isConnected())
     updateState();
-    updateEnabled();
-  }
 }
 
 
-void Hutch::updateStack() {
-  if ( ! isConnected() )
-    return;
-
-  StackColor newStack;
-  if ( stackR->get().toBool() )
-    newStack = RED;
-  else if ( stackA->get().toBool() )
-    newStack = AMBER;
-  else if ( stackG->get().toBool() )
-    newStack = GREEN;
+void Valve::updateState() {
+  bool ok;
+  int new_st = statePv->get().toInt(&ok);
+  if ( ! statePv->isConnected() | ! ok)
+    st = INVALID;
   else
-    newStack = OFF;
-
-  if (newStack != _stack)
-    emit stackChanged(_stack=newStack);
+    st = (State) new_st;
+  emit stateChanged(state());
 }
 
-
-void Hutch::updateState() {
-  if ( ! isConnected() )
+void Valve::setOpened(bool opned) {
+  if (!isConnected())
     return;
-
-  bool locked = true;
-  foreach(QEpicsPv * pv, doorsLocked)
-    locked &= pv->get().toBool();
-  bool closed = true;
-  foreach(QEpicsPv * pv, doorsClosed)
-    closed &= pv->get().toBool();
-
-  State newState;
-  if ( searchedPv->get().toBool() )
-    newState = SEARCHED;
-  else if ( locked )
-    newState = LOCKED;
-  else if ( closed )
-    newState = CLOSED;
-  else
-    newState = OPEN;
-
-  if (newState != _state)
-    emit stateChanged(_state=newState);
+  commandPv->set( opned ? 2 : 1 );
 }
 
-
-void Hutch::updateEnabled() {
-  if ( ! isConnected() )
-    return;
-  bool newEnab = enabledPv->get().toBool();
-  if (newEnab != _enabled)
-    emit enabledChanged(_enabled=newEnab);
-
+void Valve::toggle() {
+  if (state()==CLOSED)
+    open();
+  else if (state()==OPENED)
+    close();
 }
+
 

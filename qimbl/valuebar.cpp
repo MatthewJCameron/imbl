@@ -66,9 +66,10 @@ ValueBar::ValueBar(const QString &_pv, QWidget *parent):
   prec(0)
 {
   ui->setupUi(this);
-  ui->title->setAlignment( Qt::AlignCenter );
+  ui->title->setToolTip(_pv);
   connect(pv, SIGNAL(valueUpdated(QVariant)), SLOT(updateValue()));
   connect(pv, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  connect(ui->title, SIGNAL(clicked()), SLOT(copyPV()));
 }
 
 
@@ -231,9 +232,12 @@ void ValueBar::updateParams() {
     }
   }
 
-  qv=QEpicsPv::get(pv->pv()+".DESC");
-  if ( qv.isValid() )
-    ui->title->setText(qv.toString());
+  if (desc.isEmpty()) {
+    qv=QEpicsPv::get(pv->pv()+".DESC");
+    if ( qv.isValid() )
+      ui->title->setText(qv.toString());
+  } else
+    ui->title->setText(desc);
 
   qv=QEpicsPv::get(pv->pv()+".EGU");
   if ( qv.isValid() )

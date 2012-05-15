@@ -11,6 +11,7 @@ static const QString nolink_style=
     "color: rgb(255, 128, 128);";
 static const QString nolink_string="No link";
 static const QString inprogress_string="Moving";
+static const QString invalid_string="Invalid";
 
 
 static const QString gray_style=
@@ -58,7 +59,29 @@ const QStringList Qimbl::vacMonitors =
 const QStringList Qimbl::tempMonitors =
     ( QStringList()
       << "SR08FE01TES01:TEMPERATURE_MONITOR"
-      << "SR08FE01TES02:TEMPERATURE_MONITOR") ;
+      << "SR08FE01TES02:TEMPERATURE_MONITOR"
+/*      << "SR08ID01EPS01:TES01_TemperatureMonit"
+      << "SR08ID01EPS01:TES02_TemperatureMonit"
+      << "SR08ID01EPS01:TES03_TemperatureMonit"
+      << "SR08ID01EPS01:TES04_TemperatureMonit"
+      << "SR08ID01EPS01:TES05TemperatureMonit"
+      << "SR08ID01EPS01:TES09TemperatureMonit"
+      << "SR08ID01EPS01:CHL01TES01TempMonitor"
+      << "SR08ID01EPS01:DCM01TES01_TempMonit"
+      << "SR08ID01EPS01:DCM01TES02_TempMonit"
+      << "SR08ID01EPS01:DCM01TES03_TempMonit"
+      << "SR08ID01EPS01:DCM01TES04_TempMonit"
+      << "SR08ID01EPS01:DCM01TES05_TempMonit"
+      << "SR08ID01EPS01:DCM01TES06_TempMonit"
+      << "SR08ID01EPS01:DCM01TES07_TempMonit"
+      << "SR08ID01EPS01:DCM01TES08_TempMonit"
+      << "SR08ID01EPS01:DCM01TES09_TempMonit"
+      << "SR08ID01EPS01:DCM01TES10_TempMonit"
+      << "SR08ID01EPS01:DCM01TES11_TempMonit"
+      << "SR08ID01EPS01:DCM01TES12_TempMonit"
+      << "SR08ID01EPS01:DCM01TES13_TempMonit"
+      << "SR08ID01EPS01:DCM01TES14_TempMonit"
+      << "SR08ID01EPS01:DCM01TES15_TempMonit" */);
 const QStringList Qimbl::flowMonitors =
     ( QStringList()
       << "SR08ID01EPS01:FLM01_FlowMonitor"
@@ -82,6 +105,7 @@ Qimbl::Qimbl(QWidget *parent) :
   eps_disabled(new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_STS")),
   shfe(new ShutterFE(this)),
   sh1A(new Shutter1A(this)),
+  valve1(new Valve(1, this)),
   slits(new HhlSlitsGui(this)),
   filters(new FiltersGui(this)),
   mono(new MonoGui(this))
@@ -146,6 +170,9 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
 
+  connect(valve1, SIGNAL(stateChanged(Valve::State)), SLOT(update_valve_1()));
+  connect(valve1, SIGNAL(connectionChanged(bool)), SLOT(update_valve_1()));
+
   ui->control->addWidget(slits);
   connect(slits->component(), SIGNAL(geometryChanged(double,double,double,double)), SLOT(update_slits()));
   connect(slits->component(), SIGNAL(limitStateChanged(HhlSlits::Limits)), SLOT(update_slits()));
@@ -179,6 +206,8 @@ Qimbl::Qimbl(QWidget *parent) :
   resizer = new ColumnResizer(this);
   foreach(QString str, vacMonitors) {
     ValueBar * vb = new ValueBar(str);
+    if ( str.contains("SR08FE01CCG") ) // FE CC have unclear descriptions
+      vb->setDescription(str);
     vb->setLogarithmic(true);
     vb->setMin(1.0e-09);
     ui->monitorsLayout->addWidget(vb, row++,0);
@@ -207,21 +236,6 @@ Qimbl::Qimbl(QWidget *parent) :
     resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
   }
 
-/*
-  ui->shIndV1A_c->setStyleSheet("");
-  ui->shIndV1A_c->setText("");
-  ui->shIndV1A_o->setStyleSheet(shInd_o_style);
-  ui->shIndV1A_o->setText(shutter_open_string);
-  ui->shIndVT1_c->setStyleSheet("");
-  ui->shIndVT1_c->setText("");
-  ui->shIndVT1_o->setStyleSheet(shInd_o_style);
-  ui->shIndVT1_o->setText(shutter_open_string);
-  ui->shIndVT2_c->setStyleSheet("");
-  ui->shIndVT2_c->setText("");
-  ui->shIndVT2_o->setStyleSheet(shInd_o_style);
-  ui->shIndVT2_o->setText(shutter_open_string);
-  */
-
 
   update_rfstat();
   update_rfcurrent();
@@ -240,6 +254,7 @@ Qimbl::Qimbl(QWidget *parent) :
   update_vacuum();
   update_temperature();
   update_flow();
+  update_valve_1();
 
 
   ui->chooseMonitors->click();
@@ -294,6 +309,40 @@ void Qimbl::update_hutches() {
   else
     foreach(Hutch * hut, hutches.keys())
       updateOneHutch(hut, hutches[hut]);
+}
+
+void Qimbl::update_valve_1() {
+  if ( ! valve1->isConnected() ) {
+    set_nolink_style(ui->shIndV1A_c);
+    set_nolink_style(ui->shIndV1A_o);
+    return;
+  }
+  switch (valve1->state()) {
+    case Valve::OPENED :
+      ui->shIndV1A_c->setStyleSheet("");
+      ui->shIndV1A_c->setText("");
+      ui->shIndV1A_o->setStyleSheet(shInd_o_style);
+      ui->shIndV1A_o->setText(shutter_open_string);
+      break;
+    case Valve::CLOSED :
+      ui->shIndV1A_c->setStyleSheet(shInd_c_style);
+      ui->shIndV1A_c->setText(shutter_closed_string);
+      ui->shIndV1A_o->setStyleSheet("");
+      ui->shIndV1A_o->setText("");
+      break;
+    case Valve::MOVING :
+      ui->shIndV1A_c->setStyleSheet(shInd_c_style);
+      ui->shIndV1A_c->setText(inprogress_string);
+      ui->shIndV1A_o->setStyleSheet(shInd_o_style);
+      ui->shIndV1A_o->setText(inprogress_string);
+      break;
+    case Valve::INVALID :
+      ui->shIndV1A_c->setStyleSheet(red_style);
+      ui->shIndV1A_c->setText(invalid_string);
+      ui->shIndV1A_o->setStyleSheet(red_style);
+      ui->shIndV1A_o->setText(invalid_string);
+      break;
+  }
 }
 
 
@@ -446,7 +495,7 @@ void Qimbl::update_bl_mode() {
     switch (sh1A->mode()) {
       case Shutter1A::INVALID :
         ui->blMode->setStyleSheet(red_style);
-        ui->blMode->setText("Invalid");
+        ui->blMode->setText(invalid_string);
         ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);

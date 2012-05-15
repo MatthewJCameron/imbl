@@ -26,6 +26,7 @@ FORMS    += qimbl.ui \
 QMAKE_LFLAGS += -Wl,-rpath,\'\$$ORIGIN/../lib/imbl\'
 
 INCLUDEPATH += ../ \
+               ../valve \
                ../hutch \
                ../shutterFE/shutterFEgui \
                ../shutterFE/shutterFEbase \
@@ -47,6 +48,7 @@ INCLUDEPATH += ../ \
 LIBS += \
         -lqtpv \
         -lTimeScanMX \
+        -L../valve -lvalve \
         -L../hutch -lhutch \
         -L../shutterFE/shutterFEbase -lshutterFE \
         -L../shutterFE/shutterFEgui -lshutterFEgui \

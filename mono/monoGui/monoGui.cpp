@@ -1,6 +1,7 @@
 #include "monoGui.h"
 #include "error.h"
 #include "ui_monoGui.h"
+#include "ui_wtf.h"
 #include "tuner.h"
 
 
@@ -60,7 +61,9 @@ bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
 MonoGui::MonoGui(QWidget *parent) :
   ComponentGui(new Mono(parent), true, parent),
   ui(new Ui::MonoGui),
-  calibrateDialog(new QDialog(this))
+  wtfUi(new Ui::WTF),
+  calibrateDialog(new QDialog(this)),
+  wtfDialog(new QDialog(this))
 {
   init();
 }
@@ -68,7 +71,9 @@ MonoGui::MonoGui(QWidget *parent) :
 MonoGui::MonoGui(Mono * mono, QWidget *parent) :
   ComponentGui(mono, true, parent),
   ui(new Ui::MonoGui),
-  calibrateDialog(new QDialog(this))
+  wtfUi(new Ui::WTF),
+  calibrateDialog(new QDialog(this)),
+  wtfDialog(new QDialog(this))
 {
   init();
 }
@@ -83,6 +88,9 @@ void MonoGui::init() {
   ui->setupUi(this);
   ui->motors_2->installEventFilter(this);
   ui->motors_1->installEventFilter(this);
+
+  wtfUi->setupUi(wtfDialog);
+  connect(ui->wtf, SIGNAL(clicked()), wtfDialog, SLOT(show()));
 
   ui->motors_1->lock(true);
   ui->motors_2->lock(true);
@@ -117,6 +125,12 @@ void MonoGui::init() {
   connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
   calibrateLayout->addWidget(calibrateButtons);
   calibrateDialog->hide();
+
+  const QString bendTT = wtfUi->textBrowser->toHtml();
+  ui->bend1ib->setToolTip(bendTT);
+  ui->bend1ob->setToolTip(bendTT);
+  ui->bend2ib->setToolTip(bendTT);
+  ui->bend2ob->setToolTip(bendTT);
 
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(calibrationChanged(bool)), SLOT(updateCalibration()));
@@ -486,15 +500,17 @@ void MonoGui::onCalibration() {
     calibrateBoxes[motk]->setText(component()->motors[motk]->getDescription());
     calibrateBoxes[motk]->setChecked(!component()->calibrated()[motk]);
   }
-  if ( PsswDial::ask(this) &&
-       calibrateDialog->exec() == QDialog::Accepted ) {
-    QList<Mono::Motors> mots;
-    foreach (Mono::Motors motk, component()->motors.keys())
-      if ( calibrateBoxes[motk]->isChecked() )
-        mots << motk;
-    if ( ! mots.isEmpty() )
-      component()->calibrate(mots);
-  }
+  if ( ! PsswDial::ask(this) ||
+       calibrateDialog->exec() != QDialog::Accepted )
+    return;
+
+  QList<Mono::Motors> mots;
+  foreach (Mono::Motors motk, component()->motors.keys())
+    if ( calibrateBoxes[motk]->isChecked() )
+      mots << motk;
+  if ( ! mots.isEmpty() )
+    component()->calibrate(mots);
+
 }
 
 
