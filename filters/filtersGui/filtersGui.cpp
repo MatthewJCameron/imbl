@@ -12,7 +12,8 @@
 
 PaddleGui::PaddleGui(Paddle *_pad, QWidget *parent) :
   ComponentGui(_pad,false,parent),
-  ui(new Ui::Paddle)
+  ui(new Ui::Paddle),
+  buttonGroup(new QButtonGroup(this))
 {
 
   ui->setupUi(this);
@@ -22,16 +23,15 @@ PaddleGui::PaddleGui(Paddle *_pad, QWidget *parent) :
   connect(component(), SIGNAL(windowChanged(int)), SLOT(updateWindow(int)));
   connect(component(), SIGNAL(limitStateChanged(bool)), SLOT(updateLabel()));
 
-  ui->buttonGroup = new QButtonGroup(this);
   const QList<Paddle::Window> & windows = component()->windows();
   for(int idx = 0 ; idx<windows.size() ; idx++ ) {
     QRadioButton * curbut = new QRadioButton(windows[idx].second.description(), this);
     curbut->setToolTip(QString::number(windows[idx].first));
-    ui->buttonGroup->addButton(curbut,idx);
+    buttonGroup->addButton(curbut,idx);
     ui->verticalLayout->addWidget(curbut);
   }
 
-  connect(ui->buttonGroup, SIGNAL(buttonClicked(int)), SIGNAL(selectedChanged(int)));
+  connect(buttonGroup, SIGNAL(buttonClicked(int)), SIGNAL(selectedChanged(int)));
 
   adjustSize();
   setMinimumSize(frameSize());
@@ -44,18 +44,12 @@ PaddleGui::~PaddleGui() {
 }
 
 int PaddleGui::selectedWindow() const {
-  return ui->buttonGroup->checkedId();
+  return buttonGroup->checkedId();
 }
 
 void PaddleGui::selectWindow(int win) {
-  /*
-  if ( win < 0 || win >= ui->buttonGroup->buttons().size() )
-    warn("Request to select non-existing window in the paddle.", this);
-  else
-    ui->buttonGroup->buttons()[win]->setChecked(true);
-    */
-  if ( win >= 0 && win < ui->buttonGroup->buttons().size() )
-    ui->buttonGroup->buttons()[win]->setChecked(true);
+  if ( win >= 0 && win < buttonGroup->buttons().size() )
+    buttonGroup->buttons()[win]->setChecked(true);
 }
 
 void PaddleGui::updateConnection(bool con) {
@@ -68,32 +62,32 @@ void PaddleGui::updateConnection(bool con) {
 }
 
 void PaddleGui::updateWindow(int win) {
-  foreach(QAbstractButton* but, ui->buttonGroup->buttons() )
+  foreach(QAbstractButton* but, buttonGroup->buttons() )
     but->setStyleSheet("");
   if ( win >= 0 )
-    ui->buttonGroup->button(win)->setStyleSheet("background-color: rgb(170, 85, 0);");
+    buttonGroup->button(win)->setStyleSheet("background-color: rgb(170, 85, 0);");
   updateLabel();
 }
 
 void PaddleGui::updateMotionState(bool mov) {
-  foreach(QAbstractButton* but, ui->buttonGroup->buttons() )
+  foreach(QAbstractButton* but, buttonGroup->buttons() )
     but->setEnabled(!mov);
   updateLabel();
 }
 
 
 void PaddleGui::updateLabel() {
-  QString text;
+  QString text = component()->description() + "\n";
   if ( ! component()->isConnected() )
-    text = "Disconnected";
+    text += "Disconnected";
   else if ( component()->isMoving() )
-    text = QString::number(component()->motor()->getUserPosition());
+    text += QString::number(component()->motor()->getUserPosition());
   else if (component()->isOnLimit())
-    text = "On limit";
+    text += "On limit";
   else if (component()->window() < 0)
-    text = "Mispositioned!";
+    text += "Mispositioned!";
   else
-    text = QString::number( component()->inclination() * 180 / M_PI ) + QString::fromUtf8("°");
+    text += QString::number( component()->inclination() * 180 / M_PI ) + QString::fromUtf8("°");
   ui->label->setText(text);
 }
 

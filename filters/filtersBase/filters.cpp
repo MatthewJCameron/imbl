@@ -53,7 +53,7 @@ QString Absorber::description() const {
 
 const double Paddle::position_accuracy = 0.1;
 
-Paddle::Paddle(const QString &motorPV, const QList<Window> &_wins, double _incl, QObject *parent) :
+Paddle::Paddle(int order, const QString &motorPV, const QList<Window> &_wins, double _incl, QObject *parent) :
   Component("Filter paddle driven by motor "+motorPV, parent),
   _motor(new QCaMotor(motorPV,this)),
   limitState(false),
@@ -62,6 +62,7 @@ Paddle::Paddle(const QString &motorPV, const QList<Window> &_wins, double _incl,
   iAmMoving(false),
   incl(_incl)
 {
+  setDescription( order > 0 ? "Paddle " + QString::number(order) : "Filter paddle");
   if (incl <= 0 || incl > M_PI/2.0)
     throw_error("Meaningless inclination " + QString::number(incl) + ".", this);
   connect(_motor, SIGNAL(changedUserPosition(double)), SLOT(updatePosiotion()));
@@ -133,13 +134,13 @@ const QString Filters::pvBaseName="SR08ID01FR";
 
 const QList<Paddle*> Filters::paddles =
     ( QList<Paddle*>()
-      << new Paddle(pvBaseName+"01:MTR01", QList<Paddle::Window>()
+      << new Paddle(1, pvBaseName+"01:MTR01", QList<Paddle::Window>()
                     << Paddle::Window( 1.0,   Absorber(Absorber::Empty) )
                     << Paddle::Window( 59.9,  Absorber(Absorber::Beryllium, 0.2) )
                     << Paddle::Window( 124.7, Absorber(Absorber::Beryllium, 0.5) )
                     << Paddle::Window( 189.8, Absorber(Absorber::Graphite, 0.5) ),
                     M_PI/4.0 )
-      << new Paddle(pvBaseName+"02:MTR01", QList<Paddle::Window>()
+      << new Paddle(2, pvBaseName+"02:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
                     << Paddle::Window(65.1,   Absorber(Absorber::Carborundum, 0.25) )
                     << Paddle::Window(130.1 , Absorber(Absorber::Carborundum, 0.5) )
@@ -147,7 +148,7 @@ const QList<Paddle*> Filters::paddles =
                                                         << Absorber::Foil(Absorber::Carborundum, 0.5)
                                                         << Absorber::Foil(Absorber::Carborundum, 0.5) ) ),
                     M_PI/4.0 )
-      << new Paddle(pvBaseName+"03:MTR01", QList<Paddle::Window>()
+      << new Paddle(3, pvBaseName+"03:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,   Absorber(Absorber::Empty) )
                     << Paddle::Window(65.5,  Absorber(Absorber::Beryllium, 0.5) )
                     << Paddle::Window(130.9, Absorber(Absorber::Graphite, 1.0) )
@@ -156,13 +157,13 @@ const QList<Paddle*> Filters::paddles =
                                                        << Absorber::Foil( Absorber::Aluminium, 0.2)
                                                        << Absorber::Foil( Absorber::Graphite, 1.0) ) ),
                     M_PI/4.0 )
-      << new Paddle(pvBaseName+"04:MTR01", QList<Paddle::Window>()
+      << new Paddle(4, pvBaseName+"04:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,   Absorber(Absorber::Empty) )
                     << Paddle::Window(60.4,  Absorber(Absorber::Aluminium, 0.5) )
                     << Paddle::Window(125.9, Absorber(Absorber::Aluminium, 1.0) )
                     << Paddle::Window(190.7, Absorber(Absorber::Copper, 0.5) ),
                     M_PI/4.0)
-      << new Paddle(pvBaseName+"05:MTR01", QList<Paddle::Window>()
+      << new Paddle(5, pvBaseName+"05:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
                     << Paddle::Window(65.7,   Absorber(Absorber::Molybdenum, 0.125) )
                     << Paddle::Window(130.7,  Absorber(Absorber::Copper, 0.5) )

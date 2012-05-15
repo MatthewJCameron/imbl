@@ -56,7 +56,7 @@ private:
 
 public:
 
-  Paddle(const QString &  motorPV, const QList< Window > & _wins, double _incl, QObject * parent=0);
+  Paddle(int order, const QString &  motorPV, const QList< Window > & _wins, double _incl, QObject * parent=0);
 
   inline QCaMotor * motor() const {return _motor;}
   inline bool isMoving() const {return iAmMoving;}

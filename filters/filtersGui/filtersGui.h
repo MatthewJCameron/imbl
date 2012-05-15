@@ -20,6 +20,7 @@ class PaddleGui : public ComponentGui {
 private:
 
   Ui::Paddle *ui;
+  QButtonGroup * buttonGroup;
 
 public:
 
