@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>qimbl</string>
+   <string>IMBL - beamline control</string>
   </property>
   <property name="windowIcon">
    <iconset resource="qimbl.qrc">

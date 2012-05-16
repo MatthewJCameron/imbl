@@ -12,6 +12,10 @@ static const QString nolink_style=
 static const QString nolink_string="No link";
 static const QString inprogress_string="Moving";
 static const QString invalid_string="Invalid";
+static const QString warning_string="WARNING";
+static const QString alarm_string="ALARM";
+static const QString ok_string="OK";
+
 
 
 static const QString gray_style=
@@ -30,7 +34,7 @@ static const QString green_style=
     "border-image: url(:/s_green.svg);"
     "color: rgb(0, 0, 0);";
 
-static const QString shutter_open_string="Opened";
+static const QString shutter_open_string="Open";
 static const QString shutter_closed_string="Closed";
 static const QString shInd_c_style =
     "background-color: rgb(255, 0, 0);"
@@ -802,15 +806,15 @@ void Qimbl::update_vacuum() {
   switch (health) {
     case ValueBar::OK :
       ui->vacSt->setStyleSheet(green_style);
-      ui->vacSt->setText("All OK");
+      ui->vacSt->setText(ok_string);
       break;
     case ValueBar::WARN :
       ui->vacSt->setStyleSheet(yellow_style);
-      ui->vacSt->setText("Warn!");
+      ui->vacSt->setText(warning_string);
       break;
     case ValueBar::ALARM :
       ui->vacSt->setStyleSheet(red_style);
-      ui->vacSt->setText("Alarm!!!");
+      ui->vacSt->setText(alarm_string);
       break;
   }
 }
@@ -824,15 +828,15 @@ void Qimbl::update_temperature() {
   switch (health) {
     case ValueBar::OK :
       ui->tempSt->setStyleSheet(green_style);
-      ui->tempSt->setText("All OK");
+      ui->tempSt->setText(ok_string);
       break;
     case ValueBar::WARN :
       ui->tempSt->setStyleSheet(yellow_style);
-      ui->tempSt->setText("Warn!");
+      ui->tempSt->setText(warning_string);
       break;
     case ValueBar::ALARM :
       ui->tempSt->setStyleSheet(red_style);
-      ui->tempSt->setText("Alarm!!!");
+      ui->tempSt->setText(alarm_string);
       break;
   }
 }
@@ -846,15 +850,15 @@ void Qimbl::update_flow() {
   switch (health) {
     case ValueBar::OK :
       ui->flowSt->setStyleSheet(green_style);
-      ui->flowSt->setText("All OK");
+      ui->flowSt->setText(ok_string);
       break;
     case ValueBar::WARN :
       ui->flowSt->setStyleSheet(yellow_style);
-      ui->flowSt->setText("Warn!");
+      ui->flowSt->setText(warning_string);
       break;
     case ValueBar::ALARM :
       ui->flowSt->setStyleSheet(red_style);
-      ui->flowSt->setText("Alarm!!!");
+      ui->flowSt->setText(alarm_string);
       break;
   }
 }

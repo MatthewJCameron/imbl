@@ -9,6 +9,7 @@
 namespace Ui {
 class MonoGui;
 class WTF;
+class EnergySetter;
 }
 
 class Tuner;
@@ -22,9 +23,10 @@ public:
 signals:
   void revert();
   void set();
+public slots:
+  void updateBraggAngle(double angle);
 private:
-  QPushButton * setBut;
-  QPushButton * revertBut;
+  Ui::EnergySetter * ui;
   bool eventFilter(QObject *obj, QEvent *event);
 };
 
@@ -70,6 +72,7 @@ private slots:
   void updateConnection(bool con);
   void updateInOut(Mono::InOutPosition iopos);
   void updateEnergy();
+  void revertEnergy();
   void updateDBragg();
   void updateDX();
   void updateDZ();
@@ -94,6 +97,18 @@ private:
   bool eventFilter(QObject *obj, QEvent *event);
 
 };
+
+class EnterEscapePressEater : public QObject {
+  Q_OBJECT;
+public:
+  inline explicit EnterEscapePressEater (QWidget * parent = 0) : QObject(parent) {};
+protected:
+  virtual bool eventFilter(QObject * obj, QEvent * event);
+signals:
+  void enterPressed();
+  void escapePressed();
+};
+
 
 
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1096</width>
+    <width>1079</width>
     <height>475</height>
    </rect>
   </property>
@@ -517,9 +517,22 @@
              <number>0</number>
             </property>
             <item>
-             <widget class="QPushButton" name="moveIn">
+             <widget class="QLabel" name="label_15">
               <property name="text">
-               <string>move IN</string>
+               <string>move</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="moveIn">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string> IN </string>
               </property>
               <property name="checkable">
                <bool>true</bool>
@@ -528,8 +541,14 @@
             </item>
             <item>
              <widget class="QPushButton" name="moveOut">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
               <property name="text">
-               <string>move OUT</string>
+               <string>OUT</string>
               </property>
               <property name="checkable">
                <bool>true</bool>

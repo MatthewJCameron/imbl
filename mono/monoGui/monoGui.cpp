@@ -2,25 +2,23 @@
 #include "error.h"
 #include "ui_monoGui.h"
 #include "ui_wtf.h"
+#include "ui_energysetter.h"
 #include "tuner.h"
 
 
 
 EnergySetRevert::EnergySetRevert(QWidget * master) :
   QWidget(static_cast<QWidget*>(master->parent())),
-  setBut(new QPushButton("Set",this)),
-  revertBut(new QPushButton("Revert",this))
+  ui(new Ui::EnergySetter)
 {
-  hide();
-  setAutoFillBackground(true);
-  QHBoxLayout * lay = new QHBoxLayout;
-  lay->setContentsMargins(0, 0, 0, 0);
-  lay->addWidget(setBut);
-  lay->addWidget(revertBut);
-  setLayout(lay);
-  connect(setBut, SIGNAL(clicked()), SIGNAL(set()));
-  connect(revertBut, SIGNAL(clicked()), SIGNAL(revert()));
+  ui->setupUi(this);
+  connect(ui->set, SIGNAL(clicked()), SIGNAL(set()));
+  connect(ui->revert, SIGNAL(clicked()), SIGNAL(revert()));
   master->installEventFilter(this);
+}
+
+void EnergySetRevert::updateBraggAngle(double angle) {
+  ui->braggAngle->setText( "Bragg angle = " + QString::number(angle, 'f', 3) + "deg" );
 }
 
 
@@ -35,21 +33,24 @@ bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
       QRect geom = geometry();
       geom.moveTopLeft(objW->geometry().topLeft()-QPoint(0, height()));
       setGeometry(geom);
-    } else if ( event->type() == QEvent::KeyPress ) {
-      int key = static_cast<QKeyEvent*>(event)->key();
-      if ( key == Qt::Key_Enter || key == Qt::Key_Return ) {
-        setBut->setFocus();
-        setBut->click();
-      } else if ( key == Qt::Key_Escape ) {
-        revertBut->setFocus();
-        revertBut->click();
-      }
     }
   }
   return QObject::eventFilter(obj, event);
 }
 
 
+
+bool EnterEscapePressEater::eventFilter(QObject * obj, QEvent * event) {
+  bool ret = QObject::eventFilter(obj, event);
+  if ( event->type() == QEvent::KeyPress ) {
+    int key = static_cast<QKeyEvent*>(event)->key();
+    if ( key == Qt::Key_Enter || key == Qt::Key_Return )
+      emit enterPressed();
+    else if ( key == Qt::Key_Escape )
+      emit escapePressed();
+  }
+  return ret;
+};
 
 
 
@@ -111,6 +112,11 @@ void MonoGui::init() {
   energySetter = new EnergySetRevert(ui->energy);
   ui->energy->setRange(Mono::energyRange.first, Mono::energyRange.second);
 
+  EnterEscapePressEater * eePress = new EnterEscapePressEater(this);
+  ui->energy->installEventFilter(eePress);
+  ui->si111->installEventFilter(eePress);
+  ui->si311->installEventFilter(eePress);
+
 
   QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
   foreach (Mono::Motors motk, component()->motors.keys()) {
@@ -124,7 +130,9 @@ void MonoGui::init() {
   connect(calibrateButtons, SIGNAL(accepted()), calibrateDialog, SLOT(accept()));
   connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
   calibrateLayout->addWidget(calibrateButtons);
+  calibrateDialog->setWindowTitle("Choose motors to calibrate.");
   calibrateDialog->hide();
+
 
   const QString bendTT = wtfUi->textBrowser->toHtml();
   ui->bend1ib->setToolTip(bendTT);
@@ -198,7 +206,9 @@ void MonoGui::init() {
   connect(ui->si311, SIGNAL(toggled(bool)),  SLOT(onEnergyTune()));
   connect(ui->energy, SIGNAL(valueChanged(double)),  SLOT(onEnergyTune()));
   connect(energySetter, SIGNAL(set()),  SLOT(onEnergySet()));
-  connect(energySetter, SIGNAL(revert()),  SLOT(updateEnergy()));
+  connect(energySetter, SIGNAL(revert()),  SLOT(revertEnergy()));
+  connect(eePress, SIGNAL(enterPressed()),  SLOT(onEnergySet()));
+  connect(eePress, SIGNAL(escapePressed()),  SLOT(revertEnergy()));
   connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
   connect(ui->tuneX, SIGNAL(valueEdited(double)), component(), SLOT(setDX(double)));
   connect(ui->bend1ob, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ob(double)));
@@ -307,18 +317,21 @@ void MonoGui::onEnergyTune() {
       ! component()->motors[Mono::Bragg1]->isMoving() &&
       ! component()->motors[Mono::Bragg2]->isMoving() &&
       ! component()->motors[Mono::Xdist]->isMoving() &&
-      ( enrg != component()->energy() ||
+      ( ( qAbs(enrg - component()->energy()) >= 0.001 ) ||
       ( ui->si111->isChecked() && component()->diffraction() != Mono::Si111 ) ||
       ( ui->si311->isChecked() && component()->diffraction() != Mono::Si311 ) );
+  energySetter->updateBraggAngle(energy2bragg(enrg, ui->si111->isChecked() ?
+                                                Mono::Si111 : Mono::Si311));
   energySetter->setVisible(setrevert);
 }
 
 
 void MonoGui::onEnergySet() {
+  energySetter->hide();
   component()->setEnergy(ui->energy->value(),
                          ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
-  energySetter->hide();
+  revertEnergy();
 }
 
 
@@ -339,7 +352,12 @@ void MonoGui::updateEnergy() {
 
   if ( ui->energy->hasFocus() || ui->si111->hasFocus() || ui->si311->hasFocus() )
     return;
+  else
+    revertEnergy();
 
+}
+
+void MonoGui::revertEnergy() {
   if ( qAbs(ui->energy->value() - component()->energy()) >= 1.0e-03 )
     ui->energy->setValue(component()->energy());
 
@@ -347,10 +365,10 @@ void MonoGui::updateEnergy() {
     ui->si111->setChecked(true);
   else
     ui->si311->setChecked(true);
-
   energySetter->hide();
 
 }
+
 
 
 void MonoGui::updateInOut(Mono::InOutPosition iopos) {
@@ -516,7 +534,7 @@ void MonoGui::onCalibration() {
 
 void MonoGui::updateMotorBragg1() {
   QString msg;
-  msg += QString().sprintf("Crystal 1: %f", component()->motors[Mono::Bragg1]->getUserPosition());
+  msg += QString().sprintf("Angle: %f", component()->motors[Mono::Bragg1]->getUserPosition());
   if ( component()->motors[Mono::Bragg1]->isMoving() )
     msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg1]->getUserGoal());
   ui->readBragg1->setText(msg);
@@ -524,7 +542,7 @@ void MonoGui::updateMotorBragg1() {
 
 void MonoGui::updateMotorBragg2() {
   QString msg;
-  msg += QString().sprintf("Crystal 2: %f", component()->motors[Mono::Bragg2]->getUserPosition());
+  msg += QString().sprintf("Angle: %f", component()->motors[Mono::Bragg2]->getUserPosition());
   if ( component()->motors[Mono::Bragg2]->isMoving() )
     msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg2]->getUserGoal());
   ui->readBragg2->setText(msg);
@@ -532,7 +550,7 @@ void MonoGui::updateMotorBragg2() {
 
 void MonoGui::updateMotorX() {
   QString msg;
-  msg += QString().sprintf("X: %f", component()->motors[Mono::Xdist]->getUserPosition());
+  msg += QString().sprintf("Crystal X separation: %f", component()->motors[Mono::Xdist]->getUserPosition());
   if ( component()->motors[Mono::Xdist]->isMoving() )
     msg += QString().sprintf( " -> %f", component()->motors[Mono::Xdist]->getUserGoal());
   ui->readX->setText(msg);

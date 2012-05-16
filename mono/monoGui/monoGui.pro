@@ -19,7 +19,8 @@ HEADERS  += monoGui.h \
 
 FORMS    += monoGui.ui \
     tuner.ui \
-    wtf.ui
+    wtf.ui \
+    energysetter.ui
 
 INCLUDEPATH += ../../ \
                ../../component/componentBase \

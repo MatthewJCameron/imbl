@@ -520,6 +520,12 @@ void Mono::setDX(double val) {
 void Mono::setInBeam(bool val) {
   if ( ! isConnected() || isMoving() )
     return;
+  if ( ! ShutterFE::setOpenedS(false,true) ) {
+    warn("Can't close the FE shutter."
+         " Switching mono mode failed."
+         " Try to repeat or do it manually.", this);
+    return;
+  }
   motors[Z1]->goUserPosition( val ? 0 : zOut);
 }
 
@@ -599,7 +605,12 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
   foreach(Motors motk, motors2calibrate)
     initialPositions[motk] = motors[motk]->getUserPosition();
 
-  ShutterFE::setOpenedS(false, true);
+  if ( ! ShutterFE::setOpenedS(false,true) ) {
+    warn("Can't close the FE shutter."
+         " Calibration of the mono failed."
+         " Try to repeat or do it manually.", this);
+    return;
+  }
 
   if ( motors2calibrate.contains(Bragg1) && Bragg1EncLoss->get().toBool() ) {
     connect(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg1], SLOT(stop()));
