@@ -362,12 +362,8 @@ double Mono::bendR2X(double curvature, Mono::Motors mot) {
   if (curvature==0.0)
     return zero;
 
-  double dt = curvature / ( rt * source2monoDistance );
-
-  if (dt<0)
-    return -dt + zero + benderGap/2.0;
-  else
-    return -dt + zero - benderGap/2.0;
+  double dt = curvature * rt / source2monoDistance;
+  return -dt + zero + copysign(benderGapH, dt);
 
 }
 
@@ -399,13 +395,13 @@ double Mono::bendX2R(double pos, Mono::Motors mot) {
 
   double dt = -pos + zero;
   double curvature;
-  if ( dt < -benderGap/2.0 )
-    curvature = (dt + benderGap/2.0) / rt;
-  else if ( dt > benderGap/2.0 )
-    curvature = (dt - benderGap/2.0) / rt;
+  if ( dt < -benderGapH )
+    curvature = (dt - benderGapH);
+  else if ( dt > benderGapH )
+    curvature = (dt + benderGapH);
   else
     curvature = 0;
-  return source2monoDistance * curvature;
+  return curvature * source2monoDistance / rt;
 
 }
 

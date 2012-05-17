@@ -9,6 +9,15 @@ namespace Ui {
 class Tuner;
 }
 
+class TunerIncrement : public QDoubleSpinBox {
+  Q_OBJECT;
+public:
+  inline explicit TunerIncrement(QWidget *parent = 0) : QDoubleSpinBox(parent) {}
+public slots:
+  inline void onMotionChange(bool mov) {lineEdit()->setEnabled(!mov); setReadOnly(mov);}
+};
+
+
 class Tuner : public QMDoubleSpinBox {
   Q_OBJECT;
 
@@ -17,6 +26,9 @@ public:
   ~Tuner();
   void setIncrement(double twk);
   void setDecimals(int prec);
+
+public slots:
+  void onMotionChange(bool mov);
 
 private slots:
 

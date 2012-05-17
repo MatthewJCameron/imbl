@@ -47,6 +47,20 @@ bool Tuner::eventFilter(QObject *obj, QEvent *event) {
 }
 
 
+void Tuner::onMotionChange(bool mov) {
+  ui->d10->setEnabled(!mov);
+  ui->d2->setEnabled(!mov);
+  ui->m10->setEnabled(!mov);
+  ui->m2->setEnabled(!mov);
+  ui->minus->setEnabled(!mov);
+  ui->plus->setEnabled(!mov);
+  ui->increment->onMotionChange(mov);
+  lineEdit()->setEnabled(!mov);
+  setReadOnly(mov);
+}
+
+
+
 void Tuner::add() {
   double newVal = value() + ui->increment->value();
   setValue( newVal );

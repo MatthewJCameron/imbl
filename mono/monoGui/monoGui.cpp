@@ -117,7 +117,6 @@ void MonoGui::init() {
   ui->si111->installEventFilter(eePress);
   ui->si311->installEventFilter(eePress);
 
-
   QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
   foreach (Mono::Motors motk, component()->motors.keys()) {
     QCheckBox * chbk = new QCheckBox(calibrateDialog);
@@ -184,17 +183,17 @@ void MonoGui::init() {
   connect(component()->motors[Mono::Z1], SIGNAL(changedMoving(bool)),
           ui->modeSetEnable, SLOT(setDisabled(bool)));
   connect(component()->motors[Mono::Tilt1],  SIGNAL(changedMoving(bool)),
-          ui->tilt1, SLOT(setDisabled(bool)));
+          ui->tilt1, SLOT(onMotionChange(bool)));
   connect(component()->motors[Mono::Tilt2],  SIGNAL(changedMoving(bool)),
-          ui->tilt2, SLOT(setDisabled(bool)));
+          ui->tilt2, SLOT(onMotionChange(bool)));
   connect(component()->motors[Mono::Bend1ib],  SIGNAL(changedMoving(bool)),
-          ui->bend1ib, SLOT(setDisabled(bool)));
+          ui->bend1ib, SLOT(onMotionChange(bool)));
   connect(component()->motors[Mono::Bend1ob],  SIGNAL(changedMoving(bool)),
-          ui->bend1ob, SLOT(setDisabled(bool)));
+          ui->bend1ob, SLOT(onMotionChange(bool)));
   connect(component()->motors[Mono::Bend2ib],  SIGNAL(changedMoving(bool)),
-          ui->bend2ib, SLOT(setDisabled(bool)));
+          ui->bend2ib, SLOT(onMotionChange(bool)));
   connect(component()->motors[Mono::Bend2ob],  SIGNAL(changedMoving(bool)),
-          ui->bend2ob, SLOT(setDisabled(bool)));
+          ui->bend2ob, SLOT(onMotionChange(bool)));
 
   foreach(QCaMotor * mot, component()->motors) {
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateLSs()));
@@ -263,10 +262,14 @@ void MonoGui::updateConnection(bool con) {
     ui->tuneX->setIncrement(component()->motors[Mono::Xdist]->getStep());
     ui->tilt1->setIncrement(component()->motors[Mono::Tilt1]->getStep());
     ui->tilt2->setIncrement(component()->motors[Mono::Tilt2]->getStep());
-    ui->bend1ob->setIncrement(component()->motors[Mono::Bend1ob]->getStep());
-    ui->bend1ib->setIncrement(component()->motors[Mono::Bend1ib]->getStep());
-    ui->bend2ob->setIncrement(component()->motors[Mono::Bend2ob]->getStep());
-    ui->bend2ib->setIncrement(component()->motors[Mono::Bend2ib]->getStep());
+    ui->bend1ob->setIncrement( component()->motors[Mono::Bend1ob]->getStep() *
+                               Mono::source2monoDistance / Mono::bend1rt);
+    ui->bend1ib->setIncrement( component()->motors[Mono::Bend1ib]->getStep()  *
+                               Mono::source2monoDistance / Mono::bend1rt);
+    ui->bend2ob->setIncrement( component()->motors[Mono::Bend2ob]->getStep()  *
+                               Mono::source2monoDistance / Mono::bend2rt);
+    ui->bend2ib->setIncrement( component()->motors[Mono::Bend2ib]->getStep()  *
+                               Mono::source2monoDistance / Mono::bend2rt);
     ui->tuneZ->setIncrement(component()->motors[Mono::Z2]->getStep());
   }
 }
@@ -287,6 +290,7 @@ void MonoGui::updateCalibration() {
 }
 
 
+
 void MonoGui::updateEnergyMotion() {
   bool mov =
       component()->motors[Mono::Bragg1]->isMoving() ||
@@ -298,12 +302,11 @@ void MonoGui::updateEnergyMotion() {
   ui->lockBragg->setDisabled(mov);
   ui->lockDZ->setDisabled(mov);
   ui->lockX->setDisabled(mov);
-  ui->tuneBragg->setDisabled(mov);
-  ui->tuneX->setDisabled(mov);
-  ui->tuneZ->setDisabled(mov);
+  ui->tuneBragg->onMotionChange(mov);
+  ui->tuneX->onMotionChange(mov);
+  ui->tuneZ->onMotionChange(mov);
   ui->zSeparationEnable->setDisabled(mov);
 }
-
 
 void MonoGui::onEnergyTune() {
   const double enrg = ui->energy->value();
@@ -342,6 +345,10 @@ void MonoGui::onZseparationSet() {
 
 void MonoGui::updateEnergy() {
 
+  ui->readRealBragg->setText
+      (QString::number( energy2bragg(component()->energy(), component()->diffraction()), 'f', 3) +
+       "deg");
+
   if (component()->diffraction() == Mono::Si111) {
     ui->si111->setStyleSheet("font: bold;");
     ui->si311->setStyleSheet("");
@@ -373,31 +380,26 @@ void MonoGui::revertEnergy() {
 
 void MonoGui::updateInOut(Mono::InOutPosition iopos) {
   ui->currentInOut->setStyleSheet("");
+  ui->moveIn->setFlat(false);
+  ui->moveOut->setFlat(false);
+  ui->moveIn->setStyleSheet("");
+  ui->moveOut->setStyleSheet("");
+  ui->currentInOut->setText(QString::number(component()->motors[Mono::Z1]->getUserPosition(),'f', 2));
   switch (iopos) {
   case Mono::INBEAM :
       ui->currentInOut->setText("IN beam");
-      ui->moveIn->setChecked(true);
+      ui->moveIn->setFlat(true);
       ui->moveIn->setStyleSheet("font: bold;");
       break;
   case Mono::OUTBEAM :
       ui->currentInOut->setText("OUT of the beam");
-      ui->moveOut->setChecked(true);
+      ui->moveOut->setFlat(true);
       ui->moveOut->setStyleSheet("font: bold;");
       break;
   case Mono::BETWEEN :
-    ui->currentInOut->setText(
-          "between: " +
-          QString::number(component()->motors[Mono::Z1]->getUserPosition(),'f', 2));
-    ui->currentInOut->setStyleSheet(ui->status->styleSheet());
-    ui->moveIn->setChecked(false);
-    ui->moveOut->setChecked(false);
+    //ui->currentInOut->setStyleSheet(ui->status->styleSheet());
     break;
   case Mono::MOVING :
-    ui->currentInOut->setText(
-          "moving: " +
-          QString::number(component()->motors[Mono::Z1]->getUserPosition(),'f', 2));
-    ui->moveIn->setChecked(false);
-    ui->moveOut->setChecked(false);
     break;
   }
   updateStatus();
@@ -533,27 +535,24 @@ void MonoGui::onCalibration() {
 
 
 void MonoGui::updateMotorBragg1() {
-  QString msg;
-  msg += QString().sprintf("Angle: %f", component()->motors[Mono::Bragg1]->getUserPosition());
+  QString msg = QString::number(component()->motors[Mono::Bragg1]->getUserPosition(), 'f');
   if ( component()->motors[Mono::Bragg1]->isMoving() )
-    msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg1]->getUserGoal());
-  ui->readBragg1->setText(msg);
+    msg += " -> " + QString::number(component()->motors[Mono::Bragg1]->getUserGoal(), 'f');
+  ui->readBragg1->setText(msg + " deg");
 }
 
 void MonoGui::updateMotorBragg2() {
-  QString msg;
-  msg += QString().sprintf("Angle: %f", component()->motors[Mono::Bragg2]->getUserPosition());
+  QString msg = QString::number(component()->motors[Mono::Bragg2]->getUserPosition(), 'f');
   if ( component()->motors[Mono::Bragg2]->isMoving() )
-    msg += QString().sprintf( " -> %f", component()->motors[Mono::Bragg2]->getUserGoal());
-  ui->readBragg2->setText(msg);
+    msg += " -> " + QString::number(component()->motors[Mono::Bragg2]->getUserGoal(), 'f');
+  ui->readBragg2->setText(msg + " deg");
 }
 
 void MonoGui::updateMotorX() {
-  QString msg;
-  msg += QString().sprintf("Crystal X separation: %f", component()->motors[Mono::Xdist]->getUserPosition());
+  QString msg = QString::number(component()->motors[Mono::Xdist]->getUserPosition(), 'f', 1);
   if ( component()->motors[Mono::Xdist]->isMoving() )
-    msg += QString().sprintf( " -> %f", component()->motors[Mono::Xdist]->getUserGoal());
-  ui->readX->setText(msg);
+    msg += " -> " + QString::number(component()->motors[Mono::Xdist]->getUserGoal(), 'f', 1);
+  ui->readX->setText(msg + " mm");
 }
 
 
