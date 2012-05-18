@@ -56,9 +56,6 @@ bool EnterEscapePressEater::eventFilter(QObject * obj, QEvent * event) {
 
 
 
-
-
-
 MonoGui::MonoGui(QWidget *parent) :
   ComponentGui(new Mono(parent), true, parent),
   ui(new Ui::MonoGui),
@@ -92,6 +89,7 @@ void MonoGui::init() {
 
   wtfUi->setupUi(wtfDialog);
   connect(ui->wtf, SIGNAL(clicked()), wtfDialog, SLOT(show()));
+
 
   ui->motors_1->lock(true);
   ui->motors_2->lock(true);
@@ -339,7 +337,7 @@ void MonoGui::onEnergySet() {
 
 
 void MonoGui::onZseparationSet() {
-  component()->setZseparation(ui->zSeparation->value(), ui->lockDZ->isChecked());
+  component()->setZseparation(ui->zSeparation->value(), ! ui->lockDZ->isChecked(), ! ui->lockX->isChecked() );
 }
 
 

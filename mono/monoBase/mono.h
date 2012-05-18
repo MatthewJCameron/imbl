@@ -114,7 +114,7 @@ public slots:
   void setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg=true, bool keepDX=true);
   void setDBragg(double val);
   void setDX(double val);
-  void setZseparation(double val, bool keepDZ);
+  void setZseparation(double val, bool keepZ, bool keepX);
   void setDZ(double val);
   void setTilt1(double val);
   void setTilt2(double val);

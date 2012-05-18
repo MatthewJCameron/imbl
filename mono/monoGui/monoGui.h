@@ -10,6 +10,7 @@ namespace Ui {
 class MonoGui;
 class WTF;
 class EnergySetter;
+class Zredistributor;
 }
 
 class Tuner;
@@ -32,7 +33,6 @@ private:
 
 
 
-
 class MonoGui : public ComponentGui {
   Q_OBJECT;
 
@@ -43,7 +43,6 @@ private:
   QDialog * calibrateDialog;
   QDialog * wtfDialog;
   QHash<Mono::Motors, QCheckBox*> calibrateBoxes;
-
 
   explicit MonoGui(Mono * mono, QWidget *parent = 0);
   bool dBraggHealth;
@@ -108,6 +107,8 @@ signals:
   void enterPressed();
   void escapePressed();
 };
+
+
 
 
 

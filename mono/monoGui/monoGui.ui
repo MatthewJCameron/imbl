@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1079</width>
-    <height>501</height>
+    <width>654</width>
+    <height>421</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -346,7 +346,7 @@
        </widget>
       </item>
       <item row="4" column="0">
-       <widget class="QLabel" name="label_7">
+       <widget class="QLabel" name="beamOffsetLabel">
         <property name="text">
          <string>Beam offset</string>
         </property>

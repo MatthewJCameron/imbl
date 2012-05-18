@@ -526,12 +526,21 @@ void Mono::setInBeam(bool val) {
 }
 
 
-void Mono::setZseparation(double val, bool keepDZ) {
+void Mono::setZseparation(double val, bool keepZ, bool keepX) {
   if ( ! isConnected() )
     return;
   emit zSeparationChanged(_zSeparation=val);
-  setEnergy(energy(), diffraction());
-  setDZ(keepDZ ? zTweak() : 0);
+
+  if (keepX)
+    updateX();
+  else
+    setEnergy(energy(), diffraction());
+
+  if (keepZ)
+    updateZ2();
+  else
+    setDZ(zTweak());
+
 }
 
 void Mono::setDZ(double val) {
