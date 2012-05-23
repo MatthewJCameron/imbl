@@ -69,6 +69,10 @@ Shutter1A::Shutter1A(QObject *parent) :
   connect(this, SIGNAL(psStateChanged(Shutter1A::State)), SLOT(updateState()));
   connect(this, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(updateState()));
 
+  connect(whiteMode, SIGNAL(valueUpdated(QVariant)), SLOT(updateMode()));
+  connect(monoMode, SIGNAL(valueUpdated(QVariant)), SLOT(updateMode()));
+  connect(mrtMode, SIGNAL(valueUpdated(QVariant)), SLOT(updateMode()));
+
   updateConnection();
 
 }
