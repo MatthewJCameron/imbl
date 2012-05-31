@@ -4,7 +4,8 @@
 #include "shutterFE.h"
 
 
-static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
+//static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
+static const double esinbq = 1.16298186403225762883;
 static const double sqrt111 = sqrt(3);
 static const double sqrt311 = sqrt(11);
 
@@ -529,17 +530,15 @@ void Mono::setInBeam(bool val) {
 void Mono::setZseparation(double val, bool keepZ, bool keepX) {
   if ( ! isConnected() )
     return;
-  emit zSeparationChanged(_zSeparation=val);
+  _zSeparation=val;
 
-  if (keepX)
-    updateX();
-  else
-    setEnergy(energy(), diffraction());
+  if (keepX) updateX();
+  else       setEnergy(energy(), diffraction());
 
-  if (keepZ)
-    updateZ2();
-  else
-    setDZ(zTweak());
+  if (keepZ) updateZ2();
+  else       setDZ(zTweak());
+
+  emit zSeparationChanged(_zSeparation);
 
 }
 

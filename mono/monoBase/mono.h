@@ -38,7 +38,8 @@ public:
 
   static const double standardZseparation = 25.0; // standard Z-separation of crystals;
   static const double zOut = -45.0; // Z1 when the mono is out of the beam;
-  static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+  //DES// static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+  static const double alpha = -4.652; // asymmetry angle (deg) "+" for 111 "-" for 311
   static const double source2monoDistance = 16.307;//m
 
   static const double benderGapH = 0.3; // halph bender gap
