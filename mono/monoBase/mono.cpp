@@ -482,7 +482,7 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
   }
 
   motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff)
-                                  + ( keepDBragg ? dBragg() * 180 / (1.0e06 * M_PI) : 0 ),
+                                  + ( keepDBragg ? dBragg() : 0 ),
                                   QCaMotor::STARTED);
   motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff),
                                   QCaMotor::STARTED);
@@ -533,7 +533,7 @@ void Mono::setZseparation(double val, bool keepZ, bool keepX) {
   _zSeparation=val;
 
   if (keepX) updateX();
-  else       setEnergy(energy(), diffraction());
+  else       setEnergy(energy(), diffraction(), true, true);
 
   if (keepZ) updateZ2();
   else       setDZ(zTweak());

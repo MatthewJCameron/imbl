@@ -73,12 +73,9 @@ Paddle::Paddle(int order, const QString &motorPV, const QList<Window> &_wins, do
 }
 
 void Paddle::setWindow(int win) {
-  if ( ! isConnected() )
+  if ( ! isConnected() ||
+       win < 0  ||  win >= allWindows.size() )
     return;
-  if (win < 0  ||  win >= allWindows.size()) {
-    warn("Requested window does not exist in the paddle.", this);
-    return;
-  }
   _motor->goUserPosition(allWindows[win].first );
 }
 

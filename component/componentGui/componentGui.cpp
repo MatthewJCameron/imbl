@@ -69,7 +69,7 @@ void ComponentWidget::bringBackWidget() {
 
 const QString PsswDial::psswd = "asdf";
 
-PsswDial::PsswDial(QWidget *parent)
+PsswDial::PsswDial(QWidget *addition, QWidget *parent)
   : QDialog(parent) {
 
   if (objectName().isEmpty())
@@ -77,6 +77,14 @@ PsswDial::PsswDial(QWidget *parent)
   setModal(true);
 
   QVBoxLayout * verticalLayout = new QVBoxLayout(this);
+
+  if (addition) {
+    verticalLayout->addWidget(addition);
+    QFrame * line = new QFrame(this);
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+    verticalLayout->addWidget(line);
+  }
 
   QLabel * label = new QLabel(this);
   label->setText("This functionality is potentially dangerous."
@@ -100,19 +108,50 @@ PsswDial::PsswDial(QWidget *parent)
 }
 
 
+
 bool PsswDial::ask(QWidget *parent) {
 
-  PsswDial dial(parent);
+  PsswDial dial(0, parent);
   DialogCode ret = (DialogCode) dial.exec();
 
   if ( ret == QDialog::Rejected ) {
     return false;
   } else if ( dial.passwd_line->text() != psswd ) {
-    inform("I am sorry, you have entered a wrong password.", parent);
+    QMessageBox::warning(0, "Wrong password", "I am sorry, you have entered a wrong password.");
     return false;
   } else {
     return true;
   }
 
 }
+
+
+bool PsswDial::askAddition(QWidget * addition, QWidget *parent) {
+
+  QWidget * additionParent = static_cast<QWidget*>( addition->parent() );
+  PsswDial dial(addition, parent);
+  DialogCode ret = (DialogCode) dial.exec();
+  addition->setParent(additionParent);
+
+  if ( ret == QDialog::Rejected ) {
+    return false;
+  } else if ( dial.passwd_line->text() != psswd ) {
+    QMessageBox::warning(0, "Wrong password", "I am sorry, you have entered a wrong password.");
+    return false;
+  } else {
+    return true;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+
+
 

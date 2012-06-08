@@ -5,17 +5,13 @@
 const int Shutter1A::relaxTime = 2500; // msec
 
 QEpicsPv * Shutter1A::psOpenStatus =
-    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_STS");
     new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
 QEpicsPv * Shutter1A::psCloseStatus =
-    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_STS");
     new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
 
 QEpicsPv * Shutter1A::ssOpenStatus =
-    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_OPEN_IND_STS");
     new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
 QEpicsPv * Shutter1A::ssCloseStatus =
-    //new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHT_CLOSE_IND_STS");
     new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
 
 QEpicsPv * Shutter1A::openCommand =
@@ -112,7 +108,7 @@ Shutter1A::State Shutter1A::state() const {
         ret = BETWEEN;
       break;
     case MRT:
-      ret = psState();
+      ret = ssState();
       break;
     case INVALID:
       ret = BETWEEN;
@@ -211,16 +207,7 @@ void Shutter1A::updateEnabled() {
   emit enabledChanged(enabled = newEnabled);
 }
 
-/*
-Shutter1A::State Shutter1A::stateS() {
-  Shutter1A sht;
-  if ( ! sht.getReady(2000) ) {
-    warn("Can't connect to the 1A shutter.", sht.objectName());
-    return BETWEEN;
-  }
-  return sht.state();
-}
-*/
+
 
 bool Shutter1A::open(bool wait) {
   if ( ! isConnected() || ! isEnabled() )
@@ -248,16 +235,7 @@ bool Shutter1A::close(bool wait) {
     return psst == CLOSED;
 }
 
-/*
-bool Shutter1A::setOpenedS(bool opn, bool wait) {
-  Shutter1A sht;
-  if ( ! sht.getReady(2000) ) {
-    warn("Can't connect to the 1A shutter.", sht.objectName());
-    return BETWEEN;
-  }
-  return sht.setOpened(opn,wait);
-}
-*/
+
 
 bool Shutter1A::setOpened(bool opn, bool wait) {
   if (opn) return open(wait);
