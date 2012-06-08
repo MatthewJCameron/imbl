@@ -652,8 +652,11 @@ void Qimbl::update_shmrt() {
         ui->shIndMRT_o->setText(shutter_open_string);
         break;
       case MrtShutter::BETWEEN :
+        ui->shmrtSt->setStyleSheet(red_style);
         ui->shmrtSt->setText(inprogress_string);
+        ui->shIndMRT_c->setStyleSheet(shInd_c_style);
         ui->shIndMRT_c->setText(inprogress_string);
+        ui->shIndMRT_o->setStyleSheet(shInd_c_style);
         ui->shIndMRT_o->setText(inprogress_string);
         break;
     }
