@@ -258,13 +258,15 @@ void Mono::updateBragg2() {
 
   const double mAngle = motors[Bragg2]->getUserPosition();
   double bAngle;
-  if ( mAngle >= alpha ) {
+  //DES// if ( mAngle >= alpha ) {
+  if ( true ) { //DES//
     _diff = Si111;
     bAngle = mAngle - alpha;
   } else {
     _diff = Si311;
     bAngle = mAngle + alpha;
   }
+
 
   if ( ( bAngle <= 0 || bAngle >= 90 ) ) {
     if ( ! motors[Bragg2]->isMoving() )

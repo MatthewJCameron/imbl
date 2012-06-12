@@ -87,6 +87,12 @@ void MonoGui::init() {
   ui->motors_2->installEventFilter(this);
   ui->motors_1->installEventFilter(this);
 
+  //DES//
+  ui->diffractions->hide();
+  ui->label_diffraction->hide();
+  ui->energy->setMaximum(Mono::maxEnergy111);
+  //DES//
+
   wtfUi->setupUi(wtfDialog);
   connect(ui->wtf, SIGNAL(clicked()), wtfDialog, SLOT(show()));
 
@@ -330,7 +336,8 @@ void MonoGui::onEnergyTune() {
 void MonoGui::onEnergySet() {
   energySetter->hide();
   component()->setEnergy(ui->energy->value(),
-                         ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
+                         //DES// ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
+                         Mono::Si111,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
   revertEnergy();
 }
