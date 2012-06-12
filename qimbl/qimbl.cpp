@@ -659,6 +659,14 @@ void Qimbl::update_shmrt() {
         ui->shIndMRT_o->setStyleSheet(shInd_c_style);
         ui->shIndMRT_o->setText(inprogress_string);
         break;
+    case MrtShutter::EXPOSING :
+      ui->shmrtSt->setStyleSheet(green_style);
+      ui->shmrtSt->setText("Exposing");
+      ui->shIndMRT_c->setStyleSheet(shInd_o_style);
+      ui->shIndMRT_c->setText("Exposing");
+      ui->shIndMRT_o->setStyleSheet(shInd_o_style);
+      ui->shIndMRT_o->setText("Exposing");
+      break;
     }
   }
 }

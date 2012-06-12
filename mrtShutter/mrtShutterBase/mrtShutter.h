@@ -17,7 +17,8 @@ public:
   enum State {
     OPENED = 1,
     CLOSED = 0,
-    BETWEEN = 2
+    BETWEEN = 2,
+    EXPOSING = 3
   };
 
   enum ExposureMode {
