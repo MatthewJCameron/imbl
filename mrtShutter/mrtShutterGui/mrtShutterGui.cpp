@@ -112,8 +112,12 @@ void MrtShutterGui::updateState(MrtShutter::State state) {
     ui->open->setText("Open");
     break;
   case MrtShutter::BETWEEN :
-    ui->open->setText("In progress");
+    ui->open->setText("Moving");
     break;
+  case MrtShutter::EXPOSING :
+    ui->open->setText("Exposing");
+    break;
+
   }
 }
 

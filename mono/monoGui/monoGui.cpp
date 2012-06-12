@@ -60,7 +60,7 @@ MonoGui::MonoGui(QWidget *parent) :
   ComponentGui(new Mono(parent), true, parent),
   ui(new Ui::MonoGui),
   wtfUi(new Ui::WTF),
-  calibrateDialog(new QDialog(this)),
+  calibrateWidget(new QWidget(this)),
   wtfDialog(new QDialog(this))
 {
   init();
@@ -70,7 +70,7 @@ MonoGui::MonoGui(Mono * mono, QWidget *parent) :
   ComponentGui(mono, true, parent),
   ui(new Ui::MonoGui),
   wtfUi(new Ui::WTF),
-  calibrateDialog(new QDialog(this)),
+  calibrateWidget(new QWidget(this)),
   wtfDialog(new QDialog(this))
 {
   init();
@@ -121,21 +121,15 @@ void MonoGui::init() {
   ui->si111->installEventFilter(eePress);
   ui->si311->installEventFilter(eePress);
 
-  QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
+  QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateWidget);
+  QLabel * label = new QLabel("Choose motors to calibrate", calibrateWidget);
+  calibrateLayout->addWidget(label);
   foreach (Mono::Motors motk, component()->motors.keys()) {
-    QCheckBox * chbk = new QCheckBox(calibrateDialog);
+    QCheckBox * chbk = new QCheckBox(calibrateWidget);
     chbk->setText(component()->motors[motk]->getDescription());
     calibrateBoxes[motk] = chbk;
     calibrateLayout->addWidget(chbk);
   }
-  QDialogButtonBox * calibrateButtons = new QDialogButtonBox(calibrateDialog);
-  calibrateButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
-  connect(calibrateButtons, SIGNAL(accepted()), calibrateDialog, SLOT(accept()));
-  connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
-  calibrateLayout->addWidget(calibrateButtons);
-  calibrateDialog->setWindowTitle("Choose motors to calibrate.");
-  calibrateDialog->hide();
-
 
   const QString bendTT = wtfUi->textBrowser->toHtml();
   ui->bend1ib->setToolTip(bendTT);
@@ -521,12 +515,13 @@ void MonoGui::onAdvancedControl() {
 
 
 void MonoGui::onCalibration() {
+
   foreach (Mono::Motors motk, component()->motors.keys()) {
     calibrateBoxes[motk]->setText(component()->motors[motk]->getDescription());
     calibrateBoxes[motk]->setChecked(!component()->calibrated()[motk]);
   }
-  if ( ! PsswDial::ask(this) ||
-       calibrateDialog->exec() != QDialog::Accepted )
+
+  if (! PsswDial::askAddition(calibrateWidget))
     return;
 
   QList<Mono::Motors> mots;

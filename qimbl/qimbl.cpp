@@ -500,6 +500,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::INVALID :
         ui->blMode->setStyleSheet(red_style);
         ui->blMode->setText(invalid_string);
+        ui->shmrt->setEnabled(false);
         ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
@@ -508,6 +509,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::MONO :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("Mono");
+        ui->shmrt->setEnabled(false);
         ui->ssShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
@@ -516,6 +518,7 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::WHITE :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("White");
+        ui->shmrt->setEnabled(false);
         ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
@@ -524,7 +527,8 @@ void Qimbl::update_bl_mode() {
       case Shutter1A::MRT :
         ui->blMode->setStyleSheet("");
         ui->blMode->setText("MRT");
-        ui->psShutterControlPlacer->addWidget(ui->sh1AControlWidget);
+        ui->shmrt->setEnabled(true);
+        ui->ssShutterControlPlacer->addWidget(ui->sh1AControlWidget);
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
         ui->linkedRight->setVisible(false);
@@ -648,10 +652,21 @@ void Qimbl::update_shmrt() {
         ui->shIndMRT_o->setText(shutter_open_string);
         break;
       case MrtShutter::BETWEEN :
+        ui->shmrtSt->setStyleSheet(red_style);
         ui->shmrtSt->setText(inprogress_string);
+        ui->shIndMRT_c->setStyleSheet(shInd_c_style);
         ui->shIndMRT_c->setText(inprogress_string);
+        ui->shIndMRT_o->setStyleSheet(shInd_c_style);
         ui->shIndMRT_o->setText(inprogress_string);
         break;
+    case MrtShutter::EXPOSING :
+      ui->shmrtSt->setStyleSheet(green_style);
+      ui->shmrtSt->setText("Exposing");
+      ui->shIndMRT_c->setStyleSheet(shInd_o_style);
+      ui->shIndMRT_c->setText("Exposing");
+      ui->shIndMRT_o->setStyleSheet(shInd_o_style);
+      ui->shIndMRT_o->setText("Exposing");
+      break;
     }
   }
 }

@@ -154,7 +154,8 @@ void MrtShutter::updateProgress() {
   // if (newProgress != _progress) // commented out to avoid the situation when change in
   // EXPOSUREINPROGRESS_MONITOR  _and_ REPETITIONSCOMPLETE_MONITOR does not influence the progress.
   // It happens when EXPOSUREINPROGRESS_MONITOR turns to false.
-    emit progressChanged(_progress=newProgress);
+  emit progressChanged(_progress=newProgress);
+  updateState();
 
 }
 
@@ -162,6 +163,8 @@ void MrtShutter::updateState() {
   if (!isConnected())
     return;
   State newState;
+  if (progress())
+    newState = EXPOSING;
   if ( pvs["SHUTTEROPEN_CMD"]->get() != pvs["SHUTTEROPEN_MONITOR"]->get() )
     newState = BETWEEN;
   else if ( pvs["SHUTTEROPEN_MONITOR"]->get().toInt() == 0 )

@@ -40,7 +40,7 @@ private:
 
   Ui::MonoGui *ui;
   Ui::WTF * wtfUi;
-  QDialog * calibrateDialog;
+  QWidget * calibrateWidget;
   QDialog * wtfDialog;
   QHash<Mono::Motors, QCheckBox*> calibrateBoxes;
 

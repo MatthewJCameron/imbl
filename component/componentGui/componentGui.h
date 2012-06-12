@@ -55,16 +55,18 @@ class PsswDial : public QDialog {
 private:
 
   static const QString psswd;
+
   QLineEdit * passwd_line;
   QDialogButtonBox * buttonBox;
 
   QString entered_psswd;
 
-  PsswDial(QWidget *parent = 0);
+  PsswDial(QWidget *addition=0,  QWidget *parent = 0);
 
 public:
 
   static bool ask(QWidget *parent = 0);
+  static bool askAddition(QWidget * addition, QWidget *parent = 0);
 
 };
 

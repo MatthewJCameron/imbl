@@ -212,7 +212,7 @@ const bool FiltersGui::data_inited = init_data();
 FiltersGui::FiltersGui(QWidget *parent) :
   ComponentGui(new Filters(parent), true, parent),
   ui(new Ui::Filters),
-  calibrateDialog(new QDialog(this))
+  chooseMotors(new QWidget(this))
 {
   init();
 }
@@ -220,7 +220,7 @@ FiltersGui::FiltersGui(QWidget *parent) :
 FiltersGui::FiltersGui(Filters * flt, QWidget *parent) :
   ComponentGui(flt, false, parent),
   ui(new Ui::Filters),
-  calibrateDialog(new QDialog(this))
+  chooseMotors(new QWidget(this))
 {
   init();
 }
@@ -237,20 +237,16 @@ void FiltersGui::init() {
   ui->setupUi(this);
   ui->advanced->hide();
 
-  QVBoxLayout *calibrateLayout = new QVBoxLayout(calibrateDialog);
+  QVBoxLayout *calibrateLayout = new QVBoxLayout(chooseMotors);
+  QLabel * label = new QLabel("Choose motors", chooseMotors);
+  calibrateLayout->addWidget(label);
   foreach(Paddle* paddle, component()->paddles) {
-    QCheckBox * chbk = new QCheckBox(calibrateDialog);
+    QCheckBox * chbk = new QCheckBox(chooseMotors);
     QCaMotor * mot = paddle->motor();
     chbk->setText(mot->getDescription());
-    calibrateBoxes[mot] = chbk;
+    chooseMotorBoxes[mot] = chbk;
     calibrateLayout->addWidget(chbk);
   }
-  QDialogButtonBox * calibrateButtons = new QDialogButtonBox(calibrateDialog);
-  calibrateButtons->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
-  connect(calibrateButtons, SIGNAL(accepted()), calibrateDialog, SLOT(accept()));
-  connect(calibrateButtons, SIGNAL(rejected()), calibrateDialog, SLOT(reject()));
-  calibrateLayout->addWidget(calibrateButtons);
-  calibrateDialog->hide();
 
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
   ui->SpectrumPlot->setAxisMaxMinor(QwtPlot::xBottom, 10);
@@ -374,11 +370,31 @@ void FiltersGui::updateSelection() {
 
 
 void FiltersGui::onGoPressed() {
-  if (component()->isMoving())
+
+  if (component()->isMoving()) {
     component()->stop(false);
-  else if ( PsswDial::ask(this) )
-    component()->setWindows(selectedWindows);
+    return;
+  }
+
+  foreach(Paddle* paddle, component()->paddles)
+    chooseMotorBoxes[paddle->motor()]->setText(paddle->motor()->getDescription());
+  foreach(PaddleGui* paddleUI, paddles) {
+    QCaMotor * mot = paddleUI->component()->motor();
+    chooseMotorBoxes[mot]->setText(mot->getDescription());
+    chooseMotorBoxes[mot]->setChecked
+        ( paddleUI->selectedWindow() != paddleUI->component()->window() );
+  }
+  if ( ! PsswDial::askAddition(chooseMotors) )
+    return;
+
+  for (int pcur=0; pcur<paddles.size(); pcur++)
+    if( ! chooseMotorBoxes[paddles[pcur]->component()->motor()]->isChecked()  )
+      selectedWindows[pcur]=-1; // prevents deselected motors from travelling
+  component()->setWindows(selectedWindows);
+  updateSelection();
+
 }
+
 
 void FiltersGui::onResetPressed() {
   foreach(PaddleGui * paddleUI, paddles) {
@@ -404,25 +420,26 @@ void FiltersGui::onAdvancedControl() {
 void FiltersGui::onAutoCalibration() {
 
   foreach(Paddle* paddle, component()->paddles)
-    calibrateBoxes[paddle->motor()]->setText(paddle->motor()->getDescription());
+    chooseMotorBoxes[paddle->motor()]->setText(paddle->motor()->getDescription());
 
-  if ( ! PsswDial::ask(this)  ||
-       calibrateDialog->exec() != QDialog::Accepted)
+  foreach(QCheckBox *box, chooseMotorBoxes)
+    box->setChecked(false);
+  if (! PsswDial::askAddition(chooseMotors))
+    return;
+
+  QList<QCaMotor*> mlist;
+  foreach(Paddle * paddle, component()->paddles)
+    if (chooseMotorBoxes[paddle->motor()]->isChecked())
+      mlist << paddle->motor();
+  if (mlist.isEmpty())
     return;
 
   ShutterFE::State inst(ShutterFE::stateS());
   if ( ! ShutterFE::setOpenedS(false,true) ) {
-    warn("Can't close the FE shutter."
-         " Calibration failed. Try to repeat or do it manually.", this);
+    QMessageBox::warning(this, "Shutter error.",
+                         "Can't close the FE shutter. Calibration failed. Try to repeat or do it manually.");
     return;
   }
-
-  QList<QCaMotor*> mlist;
-  foreach(Paddle * paddle, component()->paddles)
-    if (calibrateBoxes[paddle->motor()]->isChecked())
-      mlist << paddle->motor();
-  if (mlist.isEmpty())
-    return;
 
   QHash<QCaMotor*,double> positions;
   foreach(QCaMotor * mot, mlist) {
@@ -437,8 +454,9 @@ void FiltersGui::onAutoCalibration() {
   foreach(QCaMotor * mot, mlist)
     allLimitsTriggered &= mot->getLoLimitStatus();
   if ( ! allLimitsTriggered ) {
-    warn("Could not reach at least one of the motor limits."
-         " Calibration failed. Try to repeat or do it manually.", this);
+    QMessageBox::warning(this, "Calibration error.",
+                         "Could not reach at least one of the motor limits."
+                         " Calibration failed. Try to repeat or do it manually.");
     return;
   }
 
