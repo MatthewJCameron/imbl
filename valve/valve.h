@@ -20,11 +20,9 @@ private:
 
   static const QString pvTemplateState;
   static const QString pvTemplateCommand;
-  State st;
-
-protected:
   QEpicsPv * statePv;
   QEpicsPv * commandPv;
+  State st;
 
 public:
 
