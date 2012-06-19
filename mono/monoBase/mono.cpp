@@ -673,7 +673,7 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
       QEpicsPv::set(motors[motk]->getPv()+":ENCODER_HMZ.PROC", 1, -1);
 
   foreach(Motors motk, motors2calibrate)
-    motors[motk]->goUserPosition(initialPositions[motk], QCaMotor::STOPPED);
+    motors[motk]->goUserPosition(initialPositions[motk], QCaMotor::STARTED);
   qtWait(200);
   foreach(Motors motk, motors2calibrate)
     motors[motk]->wait_stop();
