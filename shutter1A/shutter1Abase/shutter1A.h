@@ -80,8 +80,8 @@ signals:
   void stateChanged(Shutter1A::State);
   void modeChanged(Shutter1A::Mode);
   void relaxChanged();
-  //void opened();
-  //void closed();
+  void opened();
+  void closed();
   void enabledChanged(bool);
 
 protected slots:

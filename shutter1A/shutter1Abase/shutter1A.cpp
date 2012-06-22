@@ -175,6 +175,10 @@ void Shutter1A::updateState() {
   }
   setDescription(desc);
   emit stateChanged(state());
+  if (state() == OPENED)
+    emit opened();
+  else if (state() == CLOSED)
+    emit closed();
 }
 
 
