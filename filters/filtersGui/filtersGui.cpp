@@ -448,11 +448,13 @@ void FiltersGui::onAutoCalibration() {
     mot->goLimit(-1,QCaMotor::STARTED); // go to find the hardware limits
   }
 
-  component()->wait_stop();
+  //component()->wait_stop();
 
   bool allLimitsTriggered = true;
-  foreach(QCaMotor * mot, mlist)
+  foreach(QCaMotor * mot, mlist) {
+    mot->wait_stop();
     allLimitsTriggered &= mot->getLoLimitStatus();
+  }
   if ( ! allLimitsTriggered ) {
     QMessageBox::warning(this, "Calibration error.",
                          "Could not reach at least one of the motor limits."

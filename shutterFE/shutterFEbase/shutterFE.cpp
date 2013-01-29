@@ -97,8 +97,10 @@ ShutterFE::State ShutterFE::stateS() {
 }
 
 bool ShutterFE::open(bool wait) {
-  if ( ! isConnected() || ! isEnabled() )
+  if ( ! isConnected() )
     return false;
+  if ( ! isEnabled() )
+    return state() == OPENED;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   clsCmd->set(0);
@@ -110,8 +112,10 @@ bool ShutterFE::open(bool wait) {
 }
 
 bool ShutterFE::close(bool wait) {
-  if ( ! isConnected() || ! isEnabled() )
+  if ( ! isConnected() )
     return false;
+  if ( ! isEnabled() )
+    return state() == CLOSED;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   opnCmd->set(0);
