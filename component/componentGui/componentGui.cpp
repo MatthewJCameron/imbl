@@ -20,8 +20,8 @@ ComponentGui::ComponentGui(Component * _comp, bool _deleteComponent, QWidget * p
 
 
 ComponentGui::~ComponentGui() {
-  if (deleteComponent)
-    delete comp;
+  //if (deleteComponent)
+ //   delete comp;
 }
 
 Component * ComponentGui::component() const {
