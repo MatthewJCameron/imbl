@@ -115,7 +115,7 @@ Qimbl::Qimbl(QWidget *parent) :
   mono(new MonoGui(this))
 {
 
-  //QEpicsPv::setDebugLevel(1);
+  QEpicsPv::setDebugLevel(1);
 
   ui->setupUi(this);
   connect(ui->chooseComponent, SIGNAL(buttonClicked(QAbstractButton*)),
