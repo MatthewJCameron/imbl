@@ -254,7 +254,7 @@ void FiltersGui::init() {
   ui->SpectrumPlot->setAxisTitle(QwtPlot::xBottom, "Photon energy, keV");
 
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-  ui->SpectrumPlot->setAxisScale(QwtPlot::yLeft, spectrumMin, 1.0);
+  ui->SpectrumPlot->setAxisScale(QwtPlot::yLeft, 1.0e-5, 1.0);
 
   QwtPlotGrid * SpectrumGrid = new QwtPlotGrid;
   SpectrumGrid->enableXMin(true);
