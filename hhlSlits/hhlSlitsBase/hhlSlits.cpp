@@ -4,10 +4,10 @@
 const QSizeF HhlSlits::fullbeam = QSizeF( 68.0, 4.1 );
 const QString HhlSlits::pvBaseName = "SR08ID01SLW01:";
 
-QCaMotor * HhlSlits::vOpen  = new QCaMotor(pvBaseName+"OPENING");
-QCaMotor * HhlSlits::vPos   = new QCaMotor(pvBaseName+"POSITION");
-QCaMotor * HhlSlits::hLeft  = new QCaMotor(pvBaseName+"LEFT");
-QCaMotor * HhlSlits::hRight = new QCaMotor(pvBaseName+"RIGHT");
+QCaMotor * HhlSlits::vOpen  = new QCaMotor("SR08ID01SLW01:OPENING");
+QCaMotor * HhlSlits::vPos   = new QCaMotor("SR08ID01SLW01:POSITION");
+QCaMotor * HhlSlits::hLeft  = new QCaMotor("SR08ID01MCS02:LEFT");
+QCaMotor * HhlSlits::hRight = new QCaMotor("SR08ID01MCS02:RIGHT");
 
 const double  HhlSlits::vOpenCalibre = 0;
 const double  HhlSlits::vPosCalibre = -2.2537;
