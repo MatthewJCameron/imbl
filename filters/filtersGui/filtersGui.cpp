@@ -191,6 +191,7 @@ static bool init_data() {
 
   loadMu(Absorber::Beryllium, mu[Absorber::Beryllium], energies);
   loadMu(Absorber::Graphite, mu[Absorber::Graphite], energies);
+  loadMu(Absorber::GraphiteHD, mu[Absorber::GraphiteHD], energies);
   loadMu(Absorber::Aluminium, mu[Absorber::Aluminium], energies);
   loadMu(Absorber::Copper, mu[Absorber::Copper], energies);
   loadMu(Absorber::Silver, mu[Absorber::Silver], energies);

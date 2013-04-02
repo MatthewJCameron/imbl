@@ -11,6 +11,7 @@ public:
     Empty,
     Beryllium,
     Graphite,
+    GraphiteHD,
     Aluminium,
     Copper,
     Silver,

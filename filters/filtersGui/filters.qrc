@@ -10,5 +10,6 @@
         <file>mu-Cu.dat</file>
         <file>mu-Mo.dat</file>
         <file>mu-SiC.dat</file>
+        <file>mu-C[hd].dat</file>
     </qresource>
 </RCC>

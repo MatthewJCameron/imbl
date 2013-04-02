@@ -6,6 +6,7 @@ QString materialName(Absorber::Material material){
   case Absorber::Empty: return "None";
   case Absorber::Beryllium: return "Be";
   case Absorber::Graphite: return "C";
+  case Absorber::GraphiteHD: return "C[hd]";
   case Absorber::Aluminium: return "Al";
   case Absorber::Copper: return "Cu";
   case Absorber::Silver: return "Ag";
@@ -135,7 +136,7 @@ const QList<Paddle*> Filters::paddles =
                     << Paddle::Window( 1.0,   Absorber(Absorber::Empty) )
                     << Paddle::Window( 59.9,  Absorber(Absorber::Graphite, 5.0) )
                     << Paddle::Window( 124.7, Absorber(Absorber::Graphite, 3.0) )
-                    << Paddle::Window( 189.8, Absorber(Absorber::Graphite, 2.0) ),
+                    << Paddle::Window( 189.8, Absorber(Absorber::GraphiteHD, 10.0) ),
                     M_PI/4.0 )
       << new Paddle(2, pvBaseName+"02:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
