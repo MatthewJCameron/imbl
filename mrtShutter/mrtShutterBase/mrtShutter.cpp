@@ -241,9 +241,10 @@ void MrtShutter::stop() {
 }
 
 void MrtShutter::setExposure(double val) {
-  if ( exposure() + minRelax() >= cycle() ||
-       exposureMode() == SOFT )
-    setCycle( exposure() + minRelax() + 1 );
+  double delta = cycle() - exposure();
+  if ( delta < minRelax() )
+    delta = minRelax();
+  setCycle( val + delta );
   pvs["EXPOSUREPERIOD_CMD"]->set( (int)(/*10**/val) );
 }
 
