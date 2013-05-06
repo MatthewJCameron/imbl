@@ -207,8 +207,9 @@ void MrtShutter::trig(bool wait) {
        ! progress() )
     return;
   pvs["SOFTWARETRIGGEREVENT_CMD"]->set(1);
-  if (wait)
-    qtWait(this, SIGNAL(progressChanged(int)), exposure() + cycle() );
+  if ( wait &&
+       ! qtWait(this, SIGNAL(progressChanged(int)), 5000 ) )     // 5sec waiting
+      qDebug() << "MRT shutter: proggress did not update in 5 seconds after the trig.";
 }
 
 void MrtShutter::start(bool beAwareOf1A) {
@@ -225,7 +226,7 @@ void MrtShutter::start(bool beAwareOf1A) {
   // If I call pvs["EXPOSURESTART_CMD"]->set(1) from within this function
   // there is a chance that the progressChanged signals will all be emited before this function returns what
   // makes it difficult to catch them to monitor the progress to detect the finish of the exposure.
-  QTimer::singleShot(beAwareOf1A ? 1000 : 0, this, SLOT(actual_start()));
+  QTimer::singleShot(beAwareOf1A ? 1500 : 0, this, SLOT(actual_start()));
 }
 
 void MrtShutter::actual_start() {
