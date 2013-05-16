@@ -220,10 +220,9 @@ bool Shutter1A::open(bool wait) {
     qtWait(&timer, SIGNAL(timeout()));
   closeCommand->set(0);
   openCommand->set(1);
-  if ( psst != OPENED && wait )
-    return qtWait(this, SIGNAL(opened()), transitionTime);
-  else
-    return psst == OPENED ;
+  if ( state() != OPENED && wait )
+    qtWait(this, SIGNAL(opened()), transitionTime);
+  return state() == OPENED ;
 }
 
 bool Shutter1A::close(bool wait) {
@@ -233,10 +232,9 @@ bool Shutter1A::close(bool wait) {
     qtWait(&timer, SIGNAL(timeout()));
   openCommand->set(0);
   closeCommand->set(1);
-  if ( psst != CLOSED && wait )
-    return qtWait(this, SIGNAL(closed()), transitionTime);
-  else
-    return psst == CLOSED;
+  if ( state() != CLOSED && wait )
+    qtWait(this, SIGNAL(closed()), transitionTime);
+  return state() == CLOSED;
 }
 
 

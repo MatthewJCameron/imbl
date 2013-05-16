@@ -24,7 +24,7 @@ public:
   };
 
   static const QString pvBaseName;
-  static const int transitionTime = 2000; // msec
+  static const int transitionTime = 5000; // msec
 
 protected:
 
