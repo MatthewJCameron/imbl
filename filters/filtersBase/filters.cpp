@@ -134,9 +134,9 @@ const QList<Paddle*> Filters::paddles =
     ( QList<Paddle*>()
       << new Paddle(1, pvBaseName+"01:MTR01", QList<Paddle::Window>()
                     << Paddle::Window( 1.0,   Absorber(Absorber::Empty) )
-                    << Paddle::Window( 56.6,  Absorber(Absorber::Graphite, 10.0) )
-                    << Paddle::Window( 121.4, Absorber(Absorber::Graphite, 3.0) )
-                    << Paddle::Window( 186.5, Absorber(Absorber::GraphiteHD, 5.0) ),
+                    << Paddle::Window( 54.6,  Absorber(Absorber::Graphite, 10.0) )
+                    << Paddle::Window( 119.4, Absorber(Absorber::Graphite, 3.0) )
+                    << Paddle::Window( 184.5, Absorber(Absorber::GraphiteHD, 5.0) ),
                     M_PI/4.0 )
       << new Paddle(2, pvBaseName+"02:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
