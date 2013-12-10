@@ -134,26 +134,28 @@ const QList<Paddle*> Filters::paddles =
     ( QList<Paddle*>()
       << new Paddle(1, pvBaseName+"01:MTR01", QList<Paddle::Window>()
                     << Paddle::Window( 1.0,   Absorber(Absorber::Empty) )
-                    << Paddle::Window( 54.5,  Absorber(Absorber::Graphite, 10.0) )
-                    << Paddle::Window( 119.5, Absorber(Absorber::Graphite, 3.0) )
-                    << Paddle::Window( 184.2, Absorber(Absorber::GraphiteHD, 5.0) ),
+                    << Paddle::Window( 54.5,  Absorber(Absorber::Empty) )
+                    << Paddle::Window( 119.5, Absorber(Absorber::Empty) )
+                    << Paddle::Window( 184.2, Absorber(Absorber::Empty) ),
                     M_PI/4.0 )
       << new Paddle(2, pvBaseName+"02:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
-                    << Paddle::Window(62.1,   Absorber(Absorber::Graphite, 1.0) )
+                    << Paddle::Window(62.1,   Absorber(Absorber::GraphiteHD, 5.0) )
                     << Paddle::Window(127.1 , Absorber(Absorber::Graphite, 5.0) )
-                    << Paddle::Window(192.1,  Absorber(Absorber::Molybdenum, 0.125) ),
+                    << Paddle::Window(192.1,  Absorber(Absorber::Graphite, 3.0) ),
                     M_PI/4.0 )
       << new Paddle(3, pvBaseName+"03:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,   Absorber(Absorber::Empty) )
-                    << Paddle::Window(61.7,  Absorber(Absorber::Molybdenum, 0.5) )
-                    << Paddle::Window(126.7, Absorber(Absorber::Aluminium, 0.5) )
-                    << Paddle::Window(191.6, Absorber(Absorber::Molybdenum, 1.0) ),
+                    << Paddle::Window(61.7,  Absorber(Absorber::GraphiteHD, 10.0) )
+                    << Paddle::Window(126.7, Absorber(Absorber::Graphite, 5.0) )
+                    << Paddle::Window(191.6, Absorber(Absorber::Aluminium, 1.0) ),
                     M_PI/4.0 )
       << new Paddle(4, pvBaseName+"04:MTR01", QList<Paddle::Window>()
                     << Paddle::Window(1.0,   Absorber(Absorber::Empty) )
                     << Paddle::Window(57.0,  Absorber(Absorber::Aluminium, 1.0) )
-                    << Paddle::Window(121.9, Absorber(Absorber::Copper, 0.5) )
+                    << Paddle::Window(121.9, Absorber( QList<Absorber::Foil>()
+					    	       << Absorber::Foil(Absorber::Aluminium, 1.0) 
+					    	       << Absorber::Foil(Absorber::Molybdenum, 1.0)  ) )
                     << Paddle::Window(186.7, Absorber(Absorber::Copper, 1.0) ),
                     M_PI/4.0)
       << new Paddle(5, pvBaseName+"05:MTR01", QList<Paddle::Window>()
