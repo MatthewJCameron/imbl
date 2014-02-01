@@ -47,10 +47,10 @@ public:
   static const double bend2rt = 62.2;
   static const double bend1BraggCorrection = 0.00373;
   static const double bend2BraggCorrection = 0.00326;
-  static const double bender1ibZero = 0.38;
-  static const double bender1obZero = -0.30;
+  static const double bender1ibZero = 0.0;
+  static const double bender1obZero = 0.0;
   static const double bender2ibZero = 0.0;
-  static const double bender2obZero = 0.13;
+  static const double bender2obZero = 0.0;
 
 private:
 
