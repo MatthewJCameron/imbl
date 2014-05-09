@@ -93,6 +93,9 @@ void MonoGui::init() {
   ui->energy->setMaximum(Mono::maxEnergy111);
   //DES//
 
+  //hide calibration while not sorted out
+  ui->calibrate->setVisible(false);
+
   wtfUi->setupUi(wtfDialog);
   connect(ui->wtf, SIGNAL(clicked()), wtfDialog, SLOT(show()));
 
@@ -136,6 +139,34 @@ void MonoGui::init() {
   ui->bend1ob->setToolTip(bendTT);
   ui->bend2ib->setToolTip(bendTT);
   ui->bend2ob->setToolTip(bendTT);
+  ui->readB1ib ->setDecimals(ui->bend1ib->decimals());
+  ui->readB1ib->setFormat('f');
+  ui->readB1ib->setToolTip(bendTT);
+  ui->readB1ob ->setDecimals(ui->bend1ob->decimals());
+  ui->readB1ob->setFormat('f');
+  ui->readB1ob->setToolTip(bendTT);
+  ui->readB2ib->setDecimals(ui->bend2ib->decimals());
+  ui->readB2ib->setFormat('f');
+  ui->readB2ib->setToolTip(bendTT);
+  ui->readB2ob->setDecimals(ui->bend2ob->decimals());
+  ui->readB2ob->setFormat('f');
+  ui->readB2ob->setToolTip(bendTT);
+  ui->readB1->setDecimals(ui->bends1->decimals());
+  ui->readB1->setFormat('f');
+  ui->readB1->setToolTip(bendTT);
+  ui->bends1->setToolTip(bendTT);
+  ui->readB2->setDecimals(ui->bends2->decimals());
+  ui->readB2->setFormat('f');
+  ui->readB2->setToolTip(bendTT);
+  ui->bends2->setToolTip(bendTT);
+
+  ui->readTilt1->setDecimals(ui->tilt1->decimals());
+  ui->readTilt1->setFormat('f');
+  ui->readTilt2->setDecimals(ui->tilt1->decimals());
+  ui->readTilt2->setFormat('f');
+
+
+
 
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(calibrationChanged(bool)), SLOT(updateCalibration()));
@@ -208,6 +239,10 @@ void MonoGui::init() {
   connect(eePress, SIGNAL(escapePressed()),  SLOT(revertEnergy()));
   connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
   connect(ui->tuneX, SIGNAL(valueEdited(double)), component(), SLOT(setDX(double)));
+  connect(ui->bends1, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ob(double)));
+  connect(ui->bends1, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ib(double)));
+  connect(ui->bends2, SIGNAL(valueEdited(double)), component(), SLOT(setBend2ob(double)));
+  connect(ui->bends2, SIGNAL(valueEdited(double)), component(), SLOT(setBend2ib(double)));
   connect(ui->bend1ob, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ob(double)));
   connect(ui->bend2ob, SIGNAL(valueEdited(double)), component(), SLOT(setBend2ob(double)));
   connect(ui->bend1ib, SIGNAL(valueEdited(double)), component(), SLOT(setBend1ib(double)));
@@ -276,11 +311,11 @@ void MonoGui::updateCalibration() {
   if (component()->isCalibrated()) {
     ui->calibrate->setText("Calibrate motors");
     ui->calibrate->setStyleSheet("");
-    ui->calibrate->setVisible(ui->advancedWidget->isVisible());
+    //ui->calibrate->setVisible(ui->advancedWidget->isVisible());
   } else {
     ui->calibrate->setText("WARNING! Motor(s) calibration may be lost. Click here to calibrate.");
     ui->calibrate->setStyleSheet("color: rgb(128, 0, 0);");
-    ui->calibrate->setVisible(true);
+    //ui->calibrate->setVisible(true);
   }
   foreach (Mono::Motors motk, component()->motors.keys())
     calibrateBoxes[motk]->setStyleSheet( component()->calibrated()[motk] ?
@@ -454,62 +489,143 @@ void MonoGui::updateStatus() {
 }
 
 void MonoGui::updateTilt1() {
-  ui->readTilt1->setText(QString::number(component()->tilt1(), 'f', ui->tilt1->decimals()));
+  ui->readTilt1->setValue(component()->tilt1());
   if ( ! component()->motors[Mono::Tilt1]->isMoving() )
     ui->tilt1->setValue(component()->tilt1());
 }
 
 
 void MonoGui::updateTilt2() {
-  ui->readTilt2->setText(QString::number(component()->tilt2(), 'f', ui->tilt2->decimals()));
+  ui->readTilt2->setValue(component()->tilt2());
   if ( ! component()->motors[Mono::Tilt2]->isMoving() )
     ui->tilt2->setValue(component()->tilt2());
 }
 
 
 void MonoGui::updateBend1ob() {
-  ui->readB1ob->setText(QString::number(component()->bend1ob(), 'f', ui->bend1ob->decimals()));
+  ui->readB1ob->setValue(component()->bend1ob());
   if ( ! component()->motors[Mono::Bend1ob]->isMoving() )
     ui->bend1ob->setValue(component()->bend1ob());
+  updateBend1();
 }
 
 
 void MonoGui::updateBend1ib() {
-  ui->readB1ib->setText(QString::number(component()->bend1ib(), 'f', ui->bend1ib->decimals()));
+  ui->readB1ib->setValue(component()->bend1ib());
   if ( ! component()->motors[Mono::Bend1ib]->isMoving() )
     ui->bend1ib->setValue(component()->bend1ib());
+  updateBend1();
 }
 
+
+void MonoGui::updateBend1() {
+  const double val = ( component()->bend1ib() + component()->bend1ob() ) / 2.0 ;
+  ui->readB1->setValue(val);
+  if ( ! component()->motors[Mono::Bend1ib]->isMoving() &&
+       ! component()->motors[Mono::Bend1ob]->isMoving() )
+    ui->bends1->setValue(val);
+}
+
+
 void MonoGui::updateBend2ob() {
-  ui->readB2ob->setText(QString::number(component()->bend2ob(), 'f', ui->bend2ob->decimals()));
+  ui->readB2ob->setValue(component()->bend2ob());
   if ( ! component()->motors[Mono::Bend2ob]->isMoving() )
     ui->bend2ob->setValue(component()->bend2ob());
+  updateBend2();
 }
 
 
 void MonoGui::updateBend2ib() {
-  ui->readB2ib->setText(QString::number(component()->bend2ib(), 'f', ui->bend2ib->decimals()));
+  ui->readB2ib->setValue(component()->bend2ib());
   if ( ! component()->motors[Mono::Bend2ib]->isMoving() )
     ui->bend2ib->setValue(component()->bend2ib());
+  updateBend2();
+}
+
+void MonoGui::updateBend2() {
+  const double val = ( component()->bend2ib() + component()->bend2ob() ) / 2.0 ;
+  ui->readB2->setValue(val);
+  if ( ! component()->motors[Mono::Bend2ib]->isMoving() &&
+       ! component()->motors[Mono::Bend2ob]->isMoving() )
+    ui->bends2->setValue(val);
 }
 
 
-
 void MonoGui::onAdvancedControl() {
+
   if (ui->advancedWidget->isVisibleTo(this)) {
-    ui->calibrate->setVisible(!component()->isCalibrated());
+
+    //ui->calibrate->setVisible(!component()->isCalibrated());
     ui->advancedWidget->setVisible(false);
     ui->advanced_pb->setText("Show advanced control");
     ui->advanced_pb->setStyleSheet("");
     ui->zSeparation->setEnabled(false);
     ui->modeSet->setEnabled(false);
+
+    ui->tilt1->setVisible(false);
+    ui->label_tilt_1->setVisible(false);
+    ui->readTilt1->setVisible(false);
+    ui->tilt2->setVisible(false);
+    ui->label_tilt_2->setVisible(false);
+    ui->readTilt2->setVisible(false);
+
+    ui->bendlay->setVisible(true);
+    ui->readB2->setVisible(true);
+    ui->bends2->setVisible(true);
+    ui->label_benders1->setVisible(true);
+    ui->readB1->setVisible(true);
+    ui->bends1->setVisible(true);
+
+    ui->label_bend_1->setVisible(false);
+    ui->label_bend_2->setVisible(false);
+    ui->label_bend_1_sec->setVisible(false);
+    ui->label_bend_2_sec->setVisible(false);
+    ui->bend1ib->setVisible(false);
+    ui->bend2ib->setVisible(false);
+    ui->readB1ib->setVisible(false);
+    ui->readB2ib->setVisible(false);
+    ui->bend1ob->setVisible(false);
+    ui->bend2ob->setVisible(false);
+    ui->readB1ob->setVisible(false);
+    ui->readB2ob->setVisible(false);
+
+
   } else if ( PsswDial::ask(this) ) {
-    ui->calibrate->setVisible(true);
+
+    //ui->calibrate->setVisible(true);
     ui->advancedWidget->setVisible(true);
     ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
     ui->zSeparation->setEnabled(true);
     ui->modeSet->setEnabled(true);
+
+    ui->tilt1->setVisible(true);
+    ui->label_tilt_1->setVisible(true);
+    ui->readTilt1->setVisible(true);
+    ui->tilt2->setVisible(true);
+    ui->label_tilt_2->setVisible(true);
+    ui->readTilt2->setVisible(true);
+
+    ui->bendlay->setVisible(false);
+    ui->readB2->setVisible(false);
+    ui->bends2->setVisible(false);
+    ui->label_benders1->setVisible(false);
+    ui->readB1->setVisible(false);
+    ui->bends1->setVisible(false);
+
+    ui->label_bend_1->setVisible(true);
+    ui->label_bend_2->setVisible(true);
+    ui->label_bend_1_sec->setVisible(true);
+    ui->label_bend_2_sec->setVisible(true);
+    ui->bend1ib->setVisible(true);
+    ui->bend2ib->setVisible(true);
+    ui->readB1ib->setVisible(true);
+    ui->readB2ib->setVisible(true);
+    ui->bend1ob->setVisible(true);
+    ui->bend2ob->setVisible(true);
+    ui->readB1ob->setVisible(true);
+    ui->readB2ob->setVisible(true);
+
   }
 }
 

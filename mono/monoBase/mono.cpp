@@ -4,8 +4,8 @@
 #include "shutterFE.h"
 
 
-//static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
-static const double esinbq = 1.16298186403225762883;
+static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l)
+//static const double esinbq = 1.16298186403225762883;
 static const double sqrt111 = sqrt(3);
 static const double sqrt311 = sqrt(11);
 
@@ -59,8 +59,12 @@ Mono::Mono(QObject *parent) :
     connect(mot, SIGNAL(changedHiLimitStatus(bool)), SLOT(updateCalibration()));
   }
   connect(motors[Z1],     SIGNAL(changedMoving(bool)), SLOT(updateZ1()));
-  connect(motors[Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateBragg1()));
-  connect(motors[Bragg2], SIGNAL(changedUserPosition(double)), SLOT(updateBragg2()));
+  connect(motors[Bragg1], SIGNAL(changedUserPosition(double)), SLOT(updateDBragg()));
+  connect(motors[Bend1ob], SIGNAL(changedUserPosition(double)), SLOT(updateDBragg()));
+  connect(motors[Bend1ib], SIGNAL(changedUserPosition(double)), SLOT(updateDBragg()));
+  connect(motors[Bragg2], SIGNAL(changedUserPosition(double)), SLOT(updateEnergy()));
+  connect(motors[Bend2ob], SIGNAL(changedUserPosition(double)), SLOT(updateEnergy()));
+  connect(motors[Bend2ib], SIGNAL(changedUserPosition(double)), SLOT(updateEnergy()));
   connect(motors[Tilt1],  SIGNAL(changedUserPosition(double)), SLOT(updateTilt1()));
   connect(motors[Tilt2],  SIGNAL(changedUserPosition(double)), SLOT(updateTilt2()));
   connect(motors[Z1],     SIGNAL(changedUserPosition(double)), SLOT(updateZ1()));
@@ -140,8 +144,8 @@ void Mono::updateConnection() {
 
   if ( isConnected() ) {
     updateCalibration();
-    updateBragg1();
-    updateBragg2();
+    updateDBragg();
+    updateEnergy();
     updateTilt1();
     updateTilt2();
     updateZ1();
@@ -241,17 +245,20 @@ double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
 }
 
 
-void Mono::updateBragg1() {
+void Mono::updateDBragg() {
   if ( ! motors[Bragg1]->isConnected() || ! motors[Bragg2]->isConnected() ||
        motors[Bragg2]->isMoving() )
     return;
-  _dBragg = motors[Bragg1]->getUserPosition()- motorAngle(energy(), 1, diffraction());
+  _dBragg =
+      motors[Bragg1]->getUserPosition()
+      - motorAngle(energy(), 1, diffraction())
+      - ( benderCorrection(Bend1ib) + benderCorrection(Bend1ob) ) / 2.0 ;
   //_dBragg = 1.0e6*delta*M_PI/180.0; //murad
   emit dBraggChanged(_dBragg);
 }
 
 
-void Mono::updateBragg2() {
+void Mono::updateEnergy() {
 
   if ( ! motors[Bragg2]->isConnected() )
     return;
@@ -275,8 +282,10 @@ void Mono::updateBragg2() {
     return;
   }
 
+  bAngle -= benderBraggCorrection() ;
+
   _energy = esinbq * ( diffraction()==Si111 ? sqrt111 : sqrt311 ) / sin(bAngle*M_PI/180);
-  updateBragg1();
+  updateDBragg();
   updateX();
   emit energyChanged(_energy);
 
@@ -339,79 +348,95 @@ void Mono::updateTilt2() {
 
 double Mono::bendR2X(double curvature, Mono::Motors mot) {
 
-  double zero;
+  if (curvature==0.0)
+    return 0;
+
   double rt;
   switch (mot) {
   case Bend1ob:
-    zero = bender1obZero;
-    rt = bend1rt;
-    break;
   case Bend1ib:
-    zero = bender1ibZero;
     rt = bend1rt;
     break;
   case Bend2ob:
-    zero = bender2obZero;
-    rt = bend2rt;
-    break;
   case Bend2ib:
-    zero = bender2ibZero;
     rt = bend2rt;
     break;
   default:
     return 0;
   }
 
-  if (curvature==0.0)
-    return zero;
-
   double dt = curvature * rt / source2monoDistance;
-  return zero - dt - copysign(benderGapH, dt);
+  return - dt - copysign(benderGapH, dt);
 
 }
 
 
-double Mono::bendX2R(double pos, Mono::Motors mot) {
+double Mono::bendX2R(Mono::Motors mot) {
 
-  double zero;
   double rt;
   switch (mot) {
   case Bend1ob:
-    zero = bender1obZero;
-    rt = bend1rt;
-    break;
   case Bend1ib:
-    zero = bender1ibZero;
     rt = bend1rt;
     break;
   case Bend2ob:
-    zero = bender2obZero;
-    rt = bend2rt;
-    break;
   case Bend2ib:
-    zero = bender2ibZero;
     rt = bend2rt;
     break;
   default:
     return 0;
   }
 
-  double Dt = zero - pos;
-  double dt;
-  if ( Dt < -benderGapH )
-    dt = Dt + benderGapH;
-  else if ( Dt > benderGapH )
-    dt = Dt - benderGapH;
-  else
-    dt = 0;
+  const double pos = motors[mot]->getUserPosition();
+  double dt=0;
+  if ( pos > benderGapH )
+    dt = benderGapH - pos;
+  else if ( pos < -benderGapH )
+    dt = -benderGapH - pos;
+
   return dt * source2monoDistance / rt;
 
 }
 
+
+double Mono::benderCorrection(Mono::Motors mot) {
+
+  double ct;
+  switch (mot) {
+  case Bend1ob:
+  case Bend1ib:
+    ct = bend1BraggCorrection;
+    break;
+  case Bend2ob:
+  case Bend2ib:
+    ct = bend2BraggCorrection;
+    break;
+  default:
+    return 0;
+  }
+
+  const double pos = motors[mot]->getUserPosition();
+  double dt=0;
+  if ( pos > benderGapH )
+    dt = benderGapH - pos;
+  else if ( pos < -benderGapH )
+    dt = -benderGapH - pos;
+
+  return dt * ct;
+
+}
+
+
+double Mono::benderBraggCorrection() {
+  return ( benderCorrection(Bend2ib) + benderCorrection(Bend2ob) ) / 2.0;
+}
+
+
+
 void Mono::updateBend1ob() {
   if ( ! motors[Bend1ob]->isConnected() )
     return;
-  b1ob = bendX2R(motors[Bend1ob]->getUserPosition(), Bend1ob);
+  b1ob = bendX2R(Bend1ob);
   emit bend1obChanged(bend1ob());
 }
 
@@ -419,7 +444,7 @@ void Mono::updateBend1ob() {
 void Mono::updateBend2ob() {
   if ( ! motors[Bend2ob]->isConnected() )
     return;
-  b2ob = bendX2R(motors[Bend2ob]->getUserPosition(), Bend2ob);
+  b2ob = bendX2R(Bend2ob);
   emit bend2obChanged(bend2ob());
 }
 
@@ -427,7 +452,7 @@ void Mono::updateBend2ob() {
 void Mono::updateBend1ib() {
   if ( ! motors[Bend1ib]->isConnected() )
     return;
-  b1ib = bendX2R(motors[Bend1ib]->getUserPosition(), Bend1ib);
+  b1ib = bendX2R(Bend1ib);
   emit bend1ibChanged(bend1ib());
 }
 
@@ -435,7 +460,7 @@ void Mono::updateBend1ib() {
 void Mono::updateBend2ib() {
   if ( ! motors[Bend2ib]->isConnected() )
     return;
-  b2ib = bendX2R(motors[Bend2ib]->getUserPosition(), Bend2ib);
+  b2ib = bendX2R(Bend2ib);
   emit bend2ibChanged(bend2ib());
 }
 
@@ -486,14 +511,15 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
   motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff)
                                   + ( keepDBragg ? dBragg() : 0 ),
                                   QCaMotor::STARTED);
-  motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff),
+  motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff)
+                                  + benderBraggCorrection(),
                                   QCaMotor::STARTED);
   motors[Xdist]->goUserPosition( zSeparation() / tan(2*braggA*M_PI/180) +
                                  + ( keepDX ? dX() : 0 ),
                                  QCaMotor::STARTED);
 
-  QTimer::singleShot(0, this, SLOT(updateBragg1()));
-  QTimer::singleShot(0, this, SLOT(updateBragg2()));
+  QTimer::singleShot(0, this, SLOT(updateDBragg()));
+  QTimer::singleShot(0, this, SLOT(updateEnergy()));
   QTimer::singleShot(0, this, SLOT(updateX()));
 
 }

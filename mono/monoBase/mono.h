@@ -36,7 +36,7 @@ public:
 
   static const QHash<Motors,QCaMotor*> motors;
 
-  static const double standardZseparation = 25.0; // standard Z-separation of crystals;
+  static const double standardZseparation = 20.0; // standard Z-separation of crystals;
   static const double zOut = -45.0; // Z1 when the mono is out of the beam;
   //DES// static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
   static const double alpha = -4.652; // asymmetry angle (deg) "+" for 111 "-" for 311
@@ -45,17 +45,15 @@ public:
   static const double benderGapH = 0.3; // halph bender gap
   static const double bend1rt = 58.112;
   static const double bend2rt = 62.2;
-  static const double bend1BraggCorrection = 0.00373;
-  static const double bend2BraggCorrection = 0.00326;
-  static const double bender1ibZero = 0.0;
-  static const double bender1obZero = 0.0;
-  static const double bender2ibZero = 0.0;
-  static const double bender2obZero = 0.0;
+  static const double bend1BraggCorrection = 0.00373; // deg(correction) / mm(tip travel)
+  static const double bend2BraggCorrection = 0.00326; // deg(correction) / mm(tip travel)
 
 private:
 
   double bendR2X(double curvature, Motors mot);
-  double bendX2R(double pos, Motors mot);
+  double bendX2R(Motors mot);
+  double benderCorrection(Motors mot);
+  double benderBraggCorrection();
 
 
   static QHash<Motors,QCaMotor*> init_motors();
@@ -135,8 +133,8 @@ private slots:
 
   void updateMotion();
   void updateConnection();
-  void updateBragg1();
-  void updateBragg2();
+  void updateDBragg();
+  void updateEnergy();
   void updateTilt1();
   void updateTilt2();
   void updateZ1();

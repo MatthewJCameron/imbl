@@ -173,6 +173,7 @@ Qimbl::Qimbl(QWidget *parent) :
 
   connect(ui->shmrt->component(), SIGNAL(stateChanged(MrtShutter::State)), SLOT(update_shmrt()));
   connect(ui->shmrt->component(), SIGNAL(connectionChanged(bool)), SLOT(update_shmrt()));
+  connect(sh1A, SIGNAL(modeChanged(Shutter1A::Mode)), SLOT(update_shmrt()));
 
   connect(valve1, SIGNAL(stateChanged(Valve::State)), SLOT(update_valve_1()));
   connect(valve1, SIGNAL(connectionChanged(bool)), SLOT(update_valve_1()));
@@ -633,32 +634,40 @@ void Qimbl::update_shmrt() {
   } else if ( ui->shmrt->component()->progress() ) {
     ui->shmrtSt->setStyleSheet(red_style);
     ui->shmrtSt->setText("Running: " + QString::number(ui->shmrt->component()->progress()));
+  }
+
+  if ( sh1A->mode() != Shutter1A::MRT ) {
+    ui->shmrtSt->setStyleSheet(green_style);
+    ui->shIndMRT_c->setStyleSheet("");
+    ui->shIndMRT_c->setText("");
+    ui->shIndMRT_o->setStyleSheet(shInd_o_style);
+    ui->shIndMRT_o->setText(shutter_open_string);
   } else {
     switch (ui->shmrt->component()->state()) {
-      case MrtShutter::CLOSED :
-        ui->shmrtSt->setStyleSheet(red_style);
-        ui->shmrtSt->setText(shutter_closed_string);
-        ui->shIndMRT_c->setStyleSheet(shInd_c_style);
-        ui->shIndMRT_c->setText(shutter_closed_string);
-        ui->shIndMRT_o->setStyleSheet(shInd_c_style);
-        ui->shIndMRT_o->setText("");
-        break;
-      case MrtShutter::OPENED :
-        ui->shmrtSt->setStyleSheet(green_style);
-        ui->shmrtSt->setText(shutter_open_string);
-        ui->shIndMRT_c->setStyleSheet("");
-        ui->shIndMRT_c->setText("");
-        ui->shIndMRT_o->setStyleSheet(shInd_o_style);
-        ui->shIndMRT_o->setText(shutter_open_string);
-        break;
-      case MrtShutter::BETWEEN :
-        ui->shmrtSt->setStyleSheet(red_style);
-        ui->shmrtSt->setText(inprogress_string);
-        ui->shIndMRT_c->setStyleSheet(shInd_c_style);
-        ui->shIndMRT_c->setText(inprogress_string);
-        ui->shIndMRT_o->setStyleSheet(shInd_c_style);
-        ui->shIndMRT_o->setText(inprogress_string);
-        break;
+    case MrtShutter::CLOSED :
+      ui->shmrtSt->setStyleSheet(red_style);
+      ui->shmrtSt->setText(shutter_closed_string);
+      ui->shIndMRT_c->setStyleSheet(shInd_c_style);
+      ui->shIndMRT_c->setText(shutter_closed_string);
+      ui->shIndMRT_o->setStyleSheet(shInd_c_style);
+      ui->shIndMRT_o->setText("");
+      break;
+    case MrtShutter::OPENED :
+      ui->shmrtSt->setStyleSheet(green_style);
+      ui->shmrtSt->setText(shutter_open_string);
+      ui->shIndMRT_c->setStyleSheet("");
+      ui->shIndMRT_c->setText("");
+      ui->shIndMRT_o->setStyleSheet(shInd_o_style);
+      ui->shIndMRT_o->setText(shutter_open_string);
+      break;
+    case MrtShutter::BETWEEN :
+      ui->shmrtSt->setStyleSheet(red_style);
+      ui->shmrtSt->setText(inprogress_string);
+      ui->shIndMRT_c->setStyleSheet(shInd_c_style);
+      ui->shIndMRT_c->setText(inprogress_string);
+      ui->shIndMRT_o->setStyleSheet(shInd_c_style);
+      ui->shIndMRT_o->setText(inprogress_string);
+      break;
     case MrtShutter::EXPOSING :
       ui->shmrtSt->setStyleSheet(green_style);
       ui->shmrtSt->setText("Exposing");
