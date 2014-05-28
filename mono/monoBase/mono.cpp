@@ -525,11 +525,16 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
 }
 
 
+
+
 void Mono::setDBragg(double val) {
   if ( ! isConnected() || isMoving() )
     return;
-  motors[Bragg1]->goUserPosition( motorAngle(energy(), 1, diffraction()) + val,
-                                  QCaMotor::STARTED);
+  motors[Bragg1]->goUserPosition(
+        val
+        + motorAngle(energy(), 1, diffraction())
+        + ( benderCorrection(Bend1ib) + benderCorrection(Bend1ob) ) / 2.0,
+        QCaMotor::STARTED);
 }
 
 
