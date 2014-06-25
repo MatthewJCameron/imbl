@@ -509,7 +509,8 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
   }
 
   motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff)
-                                  + ( keepDBragg ? dBragg() : 0 ),
+                                  + ( keepDBragg ? dBragg() : 0 )
+                                  + ( benderCorrection(Bend1ib) + benderCorrection(Bend1ob) ) / 2.0,
                                   QCaMotor::STARTED);
   motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff)
                                   + benderBraggCorrection(),
