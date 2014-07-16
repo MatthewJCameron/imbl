@@ -17,7 +17,7 @@ public:
   enum Diffraction { Si111, Si311 };
 
   static const QPair<double,double> energyRange;
-  static const double maxEnergy111 = 100.0; // keV
+  static const double maxEnergy111 = 150.0; // keV
   static const double minEnergy311 = 31.0; // keV
 
   enum Motors {
