@@ -4,7 +4,7 @@
 #include "shutterFE.h"
 
 
-static const double esinbq = 1.141394581356; // E * sin(Bragg) / sqrt (h*h + k*k + l*l) PRACTICE
+static const double esinbq = 1.141394581356; // E * sin(Bragg) / sqrt (h*h + k*k + l*l) PRACTIC
 //static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l) THEORY
 //static const double esinbq = 1.16298186403225762883;
 static const double sqrt111 = sqrt(3);
