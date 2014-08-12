@@ -69,10 +69,6 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["SOFTWARETRIGGEREVENT_CMD"]    = new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_CMD");
   _pvs["SOFTWARETRIGGEREVENT_MONITOR"]= new QEpicsPv(pvBaseName+"SOFTWARETRIGGEREVENT_MONITOR");
   _pvs["MINCYCLETIME_MONITOR"]        = new QEpicsPv(pvBaseName+"MINCYCLETIME_MONITOR");
-  _pvs["BLADE2ACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2ACTIVATIONTIME_MONITOR");
-  _pvs["BLADE1DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE1DEACTIVATIONTIME_MONITOR");
-  _pvs["BLADE2DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2DEACTIVATIONTIME_MONITOR");
-
 
   return _pvs;
 
@@ -134,11 +130,7 @@ void MrtShutter::updateRepeats() {
 void MrtShutter::updateMinRelax() {
   if (!isConnected())
     return;
-  double newMinRelax = /*0.1 * */(
-        pvs["MINCYCLETIME_MONITOR"]->get().toInt() +
-        pvs["BLADE2ACTIVATIONTIME_MONITOR"]->get().toInt() +
-        pvs["BLADE1DEACTIVATIONTIME_MONITOR"]->get().toInt() +
-        pvs["BLADE2DEACTIVATIONTIME_MONITOR"]->get().toInt() );
+  double newMinRelax = /*0.1 * */( pvs["MINCYCLETIME_MONITOR"]->get().toInt() );
   if (newMinRelax != _minRelax)
     emit minRelaxChanged(_minRelax=newMinRelax);
 }
@@ -165,12 +157,13 @@ void MrtShutter::updateState() {
   State newState;
   if (progress())
     newState = EXPOSING;
-  if ( pvs["SHUTTEROPEN_CMD"]->get() != pvs["SHUTTEROPEN_MONITOR"]->get() )
+  else if ( pvs["SHUTTEROPEN_CMD"]->get() != pvs["SHUTTEROPEN_MONITOR"]->get() )
     newState = BETWEEN;
   else if ( pvs["SHUTTEROPEN_MONITOR"]->get().toInt() == 0 )
     newState = CLOSED;
   else
     newState = OPENED;
+
   if (newState != _state)
     emit stateChanged(_state=newState);
   updateCanStart();
