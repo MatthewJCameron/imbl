@@ -77,10 +77,11 @@ void MrtShutterGui::updateProgress(int prog) {
   ui->progressBar->setValue(prog-1);
   ui->trig->setEnabled(true);
 
+  ui->start->setText( prog ? "Stop" : "Expose" );
+
   if ( wasProg == (bool) prog )
     return;
   wasProg = (bool) prog;
-
 
 
   ui->progressBar->setVisible( prog &&
@@ -90,8 +91,6 @@ void MrtShutterGui::updateProgress(int prog) {
   ui->open->setEnabled(!prog);
   ui->trig->setVisible(prog &&
                        component()->exposureMode() == MrtShutter::SOFT);
-
-  ui->start->setText( prog ? "Stop" : "Expose" );
 
   ui->exposure->setEnabled(!prog);
   ui->timerParameters->setEnabled(!prog);
@@ -108,13 +107,11 @@ void MrtShutterGui::updateCanStart(bool can) {
 void MrtShutterGui::updateState(MrtShutter::State state) {
   switch (state) {
   case MrtShutter::OPENED :
+  case MrtShutter::BETWEEN :
     ui->open->setText("Close");
     break;
   case MrtShutter::CLOSED :
     ui->open->setText("Open");
-    break;
-  case MrtShutter::BETWEEN :
-    ui->open->setText("Moving");
     break;
   case MrtShutter::EXPOSING :
     ui->open->setText("Exposing");
