@@ -27,6 +27,7 @@ void MrtShutterGui::init() {
   connect(ui->cycle, SIGNAL(valueEdited(double)), component(), SLOT(setCycle(double)));
   connect(ui->exposure, SIGNAL(valueEdited(double)), component(), SLOT(setExposure(double)));
   connect(ui->repititions, SIGNAL(valueChanged(int)), component(), SLOT(setRepeats(int)));
+  connect(ui->powerReset, SIGNAL(clicked()), component(), SLOT(resetPower()));
 
   connect(ui->start, SIGNAL(clicked()), SLOT(onStartStop()));
   connect(ui->open, SIGNAL(clicked()), SLOT(onOpenClose()));
@@ -45,6 +46,7 @@ void MrtShutterGui::init() {
           SLOT(updateState(MrtShutter::State)));
   connect(component(), SIGNAL(exposureModeChanged(MrtShutter::ExposureMode)),
           SLOT(updateExposureMode(MrtShutter::ExposureMode)));
+  connect(component(), SIGNAL(powerStatusChanged(QString)), ui->powerState, SLOT(setText(QString)) );
 
   updateConnection(component()->isConnected());
 

@@ -78,6 +78,7 @@ public slots:
   void setExposureMode(ExposureMode val);
   void setCycle(double msec);
   void setRepeats(int val);
+  void resetPower();
 
 private slots:
   void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
@@ -95,6 +96,7 @@ protected slots:
   void updateCanStart();
   void updateValuesOK();
   void updateMinRelax();
+  void updatePowerStatus();
 
 
 signals:
@@ -108,6 +110,7 @@ signals:
   void stateChanged(MrtShutter::State);
   void canStartChanged(bool);
   void valuesOKchanged(bool);
+  void powerStatusChanged(const QString & sts);
 
 };
 

@@ -39,6 +39,7 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(pvs["BLADE2ACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
   connect(pvs["BLADE1DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
   connect(pvs["BLADE2DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
+  connect(pvs["POWERDOWNSTATUS_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updatePowerStatus()));
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
@@ -72,6 +73,8 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["BLADE2ACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2ACTIVATIONTIME_MONITOR");
   _pvs["BLADE1DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE1DEACTIVATIONTIME_MONITOR");
   _pvs["BLADE2DEACTIVATIONTIME_MONITOR"]= new QEpicsPv(pvBaseName+"BLADE2DEACTIVATIONTIME_MONITOR");
+  _pvs["POWERDOWNSTATUS_MONITOR"]= new QEpicsPv(pvBaseName+"POWERDOWNSTATUS_MONITOR");
+  _pvs["RESETPOWERDOWN_CMD"]= new QEpicsPv(pvBaseName+"RESETPOWERDOWN_CMD");
 
 
   return _pvs;
@@ -197,6 +200,15 @@ void MrtShutter::updateValuesOK() {
   updateCanStart();
 }
 
+
+void MrtShutter::updatePowerStatus() {
+  emit powerStatusChanged( pvs["POWERDOWNSTATUS_MONITOR"]->get().toString() );
+}
+
+
+
+
+
 void MrtShutter::setOpened(bool opn) {
   pvs["SHUTTEROPEN_CMD"]->set(opn ? 1 : 0);
 }
@@ -260,6 +272,10 @@ void MrtShutter::setCycle(double val) {
 
 void MrtShutter::setRepeats(int val) {
   pvs["EXPOSUREREPEATS_CMD"]->set(val);
+}
+
+void MrtShutter::resetPower() {
+  pvs["RESETPOWERDOWN_CMD"]->set(1);
 }
 
 
