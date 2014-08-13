@@ -27,7 +27,8 @@ void MrtShutterGui::init() {
   connect(ui->cycle, SIGNAL(valueEdited(double)), component(), SLOT(setCycle(double)));
   connect(ui->exposure, SIGNAL(valueEdited(double)), component(), SLOT(setExposure(double)));
   connect(ui->repititions, SIGNAL(valueChanged(int)), component(), SLOT(setRepeats(int)));
-  connect(ui->powerReset, SIGNAL(clicked()), component(), SLOT(resetPower()));
+  connect(ui->resetTrips, SIGNAL(clicked()), component(), SLOT(resetPower()));
+  connect(ui->resetTrips, SIGNAL(clicked()), component(), SLOT(resetLimitErrors()));
 
   connect(ui->start, SIGNAL(clicked()), SLOT(onStartStop()));
   connect(ui->open, SIGNAL(clicked()), SLOT(onOpenClose()));
@@ -46,7 +47,9 @@ void MrtShutterGui::init() {
           SLOT(updateState(MrtShutter::State)));
   connect(component(), SIGNAL(exposureModeChanged(MrtShutter::ExposureMode)),
           SLOT(updateExposureMode(MrtShutter::ExposureMode)));
-  connect(component(), SIGNAL(powerStatusChanged(QString)), ui->powerState, SLOT(setText(QString)) );
+  connect(component(), SIGNAL(powerStatusChanged(bool)), SLOT(updateHealth()) );
+  connect(component(), SIGNAL(limitErrorsChanged(int,int,int)), SLOT(updateHealth()) );
+  connect(component(), SIGNAL(tempFlagsChanged(bool,bool,bool,bool)), SLOT(updateHealth()) );
 
   updateConnection(component()->isConnected());
 
@@ -130,6 +133,51 @@ void MrtShutterGui::updateValuesOK(bool ok) {
   ui->cycle->setStyleSheet(ok ? "" : nonOKstyle);
   ui->exposure->setStyleSheet(ok ? "" : nonOKstyle);
 }
+
+
+
+void MrtShutterGui::updateHealth() {
+
+  if ( ! component()->isConnected() )
+    return;
+
+  bool warn1, warn2, err1, err2;
+  component()->tempFlags( &warn1, &warn2, &err1, &err2 );
+  int closeErr, openErr, restingErr;
+  component()->limitErrors( &closeErr, &openErr, &restingErr );
+
+  QString ttip;
+
+  if ( ! component()->powerStatus() || err1 || err2 ) {
+    ui->health->setStyleSheet("background-color: rgb(255, 0, 0);");
+    ui->resetTrips->setEnabled(true);
+    ttip="ERROR!";
+  } else if ( warn1 || warn2 || closeErr || openErr || restingErr ) {
+    ui->health->setStyleSheet("background-color: rgb(255, 255, 0);");
+    ui->resetTrips->setEnabled(true);
+    ttip="Warning.";
+  } else {
+    ui->health->setStyleSheet("background-color: rgb(0, 255, 0);");
+    ui->resetTrips->setEnabled(false);
+    ttip="All OK.";
+  }
+
+  ttip += QString("\n") +
+      "Power is " + ( component()->powerStatus() ? "ON" : "OFF" ) + ".\n"
+      "Coil 1 temperature is " + ( err1 ? "TRIPPED!" : ( warn1 ? "Warning." : "OK.") ) + "\n"
+      "Coil 2 temperature is " + ( err2 ? "TRIPPED!" : ( warn2 ? "Warning." : "OK.") ) + "\n"
+      "Close limit errors: " + QString::number(closeErr) + "\n"
+      "Open limit errors: " + QString::number(openErr) + "\n"
+      "Resting limit errors: " + QString::number(restingErr);
+
+  ui->health->setToolTip(ttip);
+
+}
+
+
+
+
+
 
 
 void MrtShutterGui::onOpenClose() {

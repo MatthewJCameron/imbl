@@ -638,6 +638,7 @@ void Qimbl::update_shmrt() {
 
   if ( sh1A->mode() != Shutter1A::MRT ) {
     ui->shmrtSt->setStyleSheet(green_style);
+    ui->shmrtSt->setText(shutter_open_string);
     ui->shIndMRT_c->setStyleSheet("");
     ui->shIndMRT_c->setText("");
     ui->shIndMRT_o->setStyleSheet(shInd_o_style);

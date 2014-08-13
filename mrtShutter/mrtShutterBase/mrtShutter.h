@@ -65,6 +65,9 @@ public:
   inline bool canStart() const {return _canStart;}
   inline bool valuesOK() const {return _valuesOK;}
   inline double minRelax() const {return _minRelax;}
+  bool powerStatus();
+  void tempFlags(bool * warn1=0, bool * warn2=0, bool * err1=0, bool * err2=0);
+  void limitErrors(int * closeErr=0, int * openErr=0, int * restingErr=0);
 
 public slots:
 
@@ -79,6 +82,7 @@ public slots:
   void setCycle(double msec);
   void setRepeats(int val);
   void resetPower();
+  void resetLimitErrors();
 
 private slots:
   void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
@@ -97,6 +101,8 @@ protected slots:
   void updateValuesOK();
   void updateMinRelax();
   void updatePowerStatus();
+  void updateLimitErrors();
+  void updateTempFlags();
 
 
 signals:
@@ -110,7 +116,9 @@ signals:
   void stateChanged(MrtShutter::State);
   void canStartChanged(bool);
   void valuesOKchanged(bool);
-  void powerStatusChanged(const QString & sts);
+  void powerStatusChanged(bool pwr);
+  void limitErrorsChanged(int closeErr, int openErr, int restingErr);
+  void tempFlagsChanged(bool warn1, bool warn2, bool err1, bool err2);
 
 };
 

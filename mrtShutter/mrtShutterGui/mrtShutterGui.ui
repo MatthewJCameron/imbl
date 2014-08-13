@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>300</height>
+    <width>327</width>
+    <height>369</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,21 +19,24 @@
      <item>
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>Power:</string>
+        <string>Health:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="powerState">
+      <widget class="QLabel" name="health">
        <property name="text">
-        <string>TextLabel</string>
+        <string/>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="powerReset">
+      <widget class="QPushButton" name="resetTrips">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="text">
-        <string>Reset trip</string>
+        <string>Reset trips</string>
        </property>
       </widget>
      </item>
@@ -104,16 +107,7 @@
    <item>
     <widget class="QWidget" name="timerParameters" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <property name="leftMargin">
-       <number>0</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="rightMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
+      <property name="margin">
        <number>0</number>
       </property>
       <item row="0" column="1">
@@ -180,7 +174,7 @@
      <property name="sizeHint" stdset="0">
       <size>
        <width>20</width>
-       <height>40</height>
+       <height>0</height>
       </size>
      </property>
     </spacer>

@@ -36,10 +36,14 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(pvs["PSSENABLE_MONITOR"],           SIGNAL(valueChanged(QVariant)) , SLOT(updateCanStart()));
   connect(pvs["EXPOSURETRIGGERMODE_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateExposureMode()));
   connect(pvs["MINCYCLETIME_MONITOR"],        SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
-  connect(pvs["BLADE2ACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
-  connect(pvs["BLADE1DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
-  connect(pvs["BLADE2DEACTIVATIONTIME_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updateMinRelax()));
-  connect(pvs["POWERDOWNSTATUS_MONITOR"], SIGNAL(valueChanged(QVariant)) , SLOT(updatePowerStatus()));
+  connect(pvs["POWERDOWNSTATUS_MONITOR"],     SIGNAL(valueChanged(QVariant)) , SLOT(updatePowerStatus()));
+  connect(pvs["OPENLIMITERRORS_MONITOR"],     SIGNAL(valueChanged(QVariant)), SLOT(updateLimitErrors()));
+  connect(pvs["CLOSELIMITERRORS_MONITOR"],    SIGNAL(valueChanged(QVariant)), SLOT(updateLimitErrors()));
+  connect(pvs["RESTINGLIMITERRORS_MONITOR"],  SIGNAL(valueChanged(QVariant)), SLOT(updateLimitErrors()));
+  connect(pvs["TEMPWARNFLAG1_MONITOR"],       SIGNAL(valueChanged(QVariant)), SLOT(updateTempFlags()));
+  connect(pvs["TEMPWARNFLAG2_MONITOR"],       SIGNAL(valueChanged(QVariant)), SLOT(updateTempFlags()));
+  connect(pvs["TEMPTRIPFLAG1_MONITOR"],       SIGNAL(valueChanged(QVariant)), SLOT(updateTempFlags()));
+  connect(pvs["TEMPTRIPFLAG2_MONITOR"],       SIGNAL(valueChanged(QVariant)), SLOT(updateTempFlags()));
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
@@ -72,6 +76,14 @@ const QHash<QString,QEpicsPv*> MrtShutter::init_static() {
   _pvs["MINCYCLETIME_MONITOR"]        = new QEpicsPv(pvBaseName+"MINCYCLETIME_MONITOR");
   _pvs["POWERDOWNSTATUS_MONITOR"]= new QEpicsPv(pvBaseName+"POWERDOWNSTATUS_MONITOR");
   _pvs["RESETPOWERDOWN_CMD"]= new QEpicsPv(pvBaseName+"RESETPOWERDOWN_CMD");
+  _pvs["OPENLIMITERRORS_MONITOR"]= new QEpicsPv(pvBaseName+"OPENLIMITERRORS_MONITOR");
+  _pvs["CLOSELIMITERRORS_MONITOR"]= new QEpicsPv(pvBaseName+"CLOSELIMITERRORS_MONITOR");
+  _pvs["RESTINGLIMITERRORS_MONITOR"]= new QEpicsPv(pvBaseName+"RESTINGLIMITERRORS_MONITOR");
+  _pvs["CLEARLIMITERRORS_CMD"]= new QEpicsPv(pvBaseName+"CLEARLIMITERRORS_CMD");
+  _pvs["TEMPWARNFLAG1_MONITOR"]= new QEpicsPv(pvBaseName+"TEMPWARNFLAG1_MONITOR");
+  _pvs["TEMPWARNFLAG2_MONITOR"]= new QEpicsPv(pvBaseName+"TEMPWARNFLAG2_MONITOR");
+  _pvs["TEMPTRIPFLAG1_MONITOR"]= new QEpicsPv(pvBaseName+"TEMPTRIPFLAG1_MONITOR");
+  _pvs["TEMPTRIPFLAG2_MONITOR"]= new QEpicsPv(pvBaseName+"TEMPTRIPFLAG2_MONITOR");
 
   return _pvs;
 
@@ -93,6 +105,9 @@ void MrtShutter::updateConnection() {
     updateState();
     updateValuesOK();
     updateCanStart();
+    updatePowerStatus();
+    updateLimitErrors();
+    updateTempFlags();
   }
 }
 
@@ -195,10 +210,58 @@ void MrtShutter::updateValuesOK() {
 
 
 void MrtShutter::updatePowerStatus() {
-  emit powerStatusChanged( pvs["POWERDOWNSTATUS_MONITOR"]->get().toString() );
+  emit powerStatusChanged( powerStatus() );
+}
+
+bool MrtShutter::powerStatus() {
+  return pvs["POWERDOWNSTATUS_MONITOR"]->get().toBool() ;
 }
 
 
+void MrtShutter::updateLimitErrors() {
+  if (!isConnected())
+    return;
+  emit limitErrorsChanged(
+      pvs["CLOSELIMITERRORS_MONITOR"]->get().toInt(),
+      pvs["OPENLIMITERRORS_MONITOR"]->get().toInt(),
+      pvs["RESTINGLIMITERRORS_MONITOR"]->get().toInt() );
+}
+
+void MrtShutter::limitErrors(int * closeErr, int * openErr, int * restingErr) {
+  if (!isConnected())
+    return;
+  if (closeErr)
+    *closeErr = pvs["CLOSELIMITERRORS_MONITOR"]->get().toInt();
+  if (openErr)
+    *openErr = pvs["OPENLIMITERRORS_MONITOR"]->get().toInt();
+  if (restingErr)
+    *restingErr = pvs["RESTINGLIMITERRORS_MONITOR"]->get().toInt();
+}
+
+
+void MrtShutter::updateTempFlags() {
+  if (!isConnected())
+    return;
+  emit tempFlagsChanged(
+      pvs["TEMPWARNFLAG1_MONITOR"]->get().toBool(),
+      pvs["TEMPWARNFLAG2_MONITOR"]->get().toBool(),
+      pvs["TEMPTRIPFLAG1_MONITOR"]->get().toBool(),
+      pvs["TEMPTRIPFLAG2_MONITOR"]->get().toBool() );
+}
+
+
+void MrtShutter::tempFlags(bool *warn1, bool *warn2, bool *err1, bool *err2) {
+  if (!isConnected())
+    return;
+  if (warn1)
+    *warn1 = pvs["TEMPWARNFLAG1_MONITOR"]->get().toBool();
+  if (warn2)
+    *warn2 = pvs["TEMPWARNFLAG2_MONITOR"]->get().toBool();
+  if (err1)
+    *err1 = pvs["TEMPTRIPFLAG1_MONITOR"]->get().toBool();
+  if (err2)
+    *err2 = pvs["TEMPTRIPFLAG2_MONITOR"]->get().toBool();
+}
 
 
 
@@ -269,6 +332,10 @@ void MrtShutter::setRepeats(int val) {
 
 void MrtShutter::resetPower() {
   pvs["RESETPOWERDOWN_CMD"]->set(1);
+}
+
+void MrtShutter::resetLimitErrors() {
+  pvs["CLEARLIMITERRORS_CMD"]->set(1);
 }
 
 

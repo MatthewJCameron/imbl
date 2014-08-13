@@ -37,6 +37,7 @@ protected slots:
   void updateProgress(int prog);
   void updateCanStart(bool can);
   void updateExposureMode(MrtShutter::ExposureMode mode);
+  void updateHealth();
 
   void onStartStop();
   void onOpenClose();
