@@ -47,6 +47,8 @@ MrtShutter::MrtShutter(QObject * parent) :
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
+  connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)));
+
   updateConnection();
 
 }
@@ -175,8 +177,8 @@ void MrtShutter::updateState() {
   State newState;
   if (progress())
     newState = EXPOSING;
-  else if ( pvs["SHUTTEROPEN_CMD"]->get() != pvs["SHUTTEROPEN_MONITOR"]->get() )
-    newState = BETWEEN;
+  //else if ( pvs["SHUTTEROPEN_CMD"]->get() != pvs["SHUTTEROPEN_MONITOR"]->get() )
+  //  newState = BETWEEN;
   else if ( pvs["SHUTTEROPEN_MONITOR"]->get().toInt() == 0 )
     newState = CLOSED;
   else
@@ -266,8 +268,17 @@ void MrtShutter::tempFlags(bool *warn1, bool *warn2, bool *err1, bool *err2) {
 
 
 void MrtShutter::setOpened(bool opn) {
-  pvs["SHUTTEROPEN_CMD"]->set(opn ? 1 : 0);
+  if ( opn )
+    shut1A->open(false);
+  pvs["SHUTTEROPEN_CMD"]->set( opn ? 1 : 0 );
 }
+
+void MrtShutter::acknowledgeSS(bool req) {
+  qDebug() << "REQ" << req;
+  if ( ! req )
+    setOpened(false);
+}
+
 
 void MrtShutter::trig(bool wait) {
   if ( ! isConnected() ||
