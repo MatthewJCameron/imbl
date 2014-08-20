@@ -47,7 +47,7 @@ MrtShutter::MrtShutter(QObject * parent) :
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
-  connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)), Qt::DirectConnection);
+  connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)));
 
   updateConnection();
 
