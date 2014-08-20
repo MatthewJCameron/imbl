@@ -47,7 +47,7 @@ MrtShutter::MrtShutter(QObject * parent) :
 
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
-  connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)));
+  connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)), Qt::DirectConnection);
 
   updateConnection();
 
@@ -116,7 +116,7 @@ void MrtShutter::updateConnection() {
 void MrtShutter::updateCycle() {
   if (!isConnected())
     return;
-  double newCycle = /* 0.1 * */ pvs["CYCLEPERIOD_MONITOR"]->get().toInt();
+  double newCycle = 0.1 * pvs["CYCLEPERIOD_MONITOR"]->get().toInt();
   if (newCycle != _cycle)
     emit cycleChanged(_cycle=newCycle);
 }
@@ -124,7 +124,7 @@ void MrtShutter::updateCycle() {
 void MrtShutter::updateExposure() {
   if (!isConnected())
     return;
-  double newExposure =/*  0.1 * */ pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
+  double newExposure =  0.1 * pvs["EXPOSUREPERIOD_MONITOR"]->get().toInt();
   if (newExposure != _exposure)
     emit exposureChanged(_exposure=newExposure);
 }
@@ -150,7 +150,7 @@ void MrtShutter::updateRepeats() {
 void MrtShutter::updateMinRelax() {
   if (!isConnected())
     return;
-  double newMinRelax = /*0.1 * */( pvs["MINCYCLETIME_MONITOR"]->get().toInt() );
+  double newMinRelax = 0.1 * ( pvs["MINCYCLETIME_MONITOR"]->get().toInt() );
   if (newMinRelax != _minRelax)
     emit minRelaxChanged(_minRelax=newMinRelax);
 }
@@ -325,7 +325,7 @@ void MrtShutter::setExposure(double val) {
   if ( delta < minRelax() )
     delta = minRelax();
   setCycle( val + delta );
-  pvs["EXPOSUREPERIOD_CMD"]->set( (int)(/*10**/val) );
+  pvs["EXPOSUREPERIOD_CMD"]->set( (int)( 10 * val) );
 }
 
 void MrtShutter::setExposureMode(ExposureMode val) {
@@ -334,7 +334,7 @@ void MrtShutter::setExposureMode(ExposureMode val) {
 
 
 void MrtShutter::setCycle(double val) {
-  pvs["CYCLEPERIOD_CMD"]->set( (int)(/*10**/val) );
+  pvs["CYCLEPERIOD_CMD"]->set( (int)( 10 * val) );
 }
 
 void MrtShutter::setRepeats(int val) {
