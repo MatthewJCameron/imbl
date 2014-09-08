@@ -19,6 +19,7 @@ public:
   static const QPair<double,double> energyRange;
   static const double maxEnergy111 = 150.0; // keV
   static const double minEnergy311 = 31.0; // keV
+  static const QString pvBaseName;
 
   enum Motors {
     Bragg1,
