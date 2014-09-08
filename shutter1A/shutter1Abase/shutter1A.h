@@ -83,6 +83,7 @@ signals:
   void opened();
   void closed();
   void enabledChanged(bool);
+  void toggleRequested(bool req);
 
 protected slots:
 

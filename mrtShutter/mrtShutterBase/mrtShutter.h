@@ -86,7 +86,7 @@ public slots:
 
 private slots:
   void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
-
+  void acknowledgeSS(bool req);
 
 protected slots:
 

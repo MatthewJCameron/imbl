@@ -218,6 +218,7 @@ bool Shutter1A::open(bool wait) {
     return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
+  emit toggleRequested(1);
   closeCommand->set(0);
   openCommand->set(1);
   if ( state() != OPENED && wait )
@@ -230,6 +231,7 @@ bool Shutter1A::close(bool wait) {
     return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
+  emit toggleRequested(0);
   openCommand->set(0);
   closeCommand->set(1);
   if ( state() != CLOSED && wait )
