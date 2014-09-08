@@ -6,7 +6,6 @@
 
 static const double esinbq = 1.141394581356; // E * sin(Bragg) / sqrt (h*h + k*k + l*l) PRACTIC
 //static const double esinbq = 1.1414666995476608627; // E * sin(Bragg) / sqrt (h*h + k*k + l*l) THEORY
-//static const double esinbq = 1.16298186403225762883;
 static const double sqrt111 = sqrt(3);
 static const double sqrt311 = sqrt(11);
 
@@ -17,18 +16,18 @@ double energy2bragg(double energy, Mono::Diffraction diff) {
       * 180.0 / M_PI ;
 }
 
+const QString Mono::pvBaseName = "SR08ID01DCM01:";
 
 const QHash<Mono::Motors,QCaMotor*> Mono::motors=Mono::init_motors();
 const QHash < Mono::Motors, QPair<double,double> > Mono::travelRanges = Mono::init_ranges();
-QEpicsPv * Mono::Bragg1Enc = new QEpicsPv("SR08ID01MCS01:BRAGG1:ENCODER");
-QEpicsPv * Mono::Bragg2Enc = new QEpicsPv("SR08ID01MCS01:BRAGG2:ENCODER");
-QEpicsPv * Mono::XdistEnc = new QEpicsPv("SR08ID01MCS01:X:ENCODER");
-QEpicsPv * Mono::Bragg1EncLoss = new QEpicsPv("SR08ID01MCS01:BRAGG1:ELOSS");
-QEpicsPv * Mono::Bragg2EncLoss = new QEpicsPv("SR08ID01MCS01:BRAGG2:ELOSS");
-QEpicsPv * Mono::XdistEncLoss = new QEpicsPv("SR08ID01MCS01:X:ELOSS");
+QEpicsPv * Mono::Bragg1Enc = new QEpicsPv(Mono::pvBaseName + "BRAGG1:ENCODER");
+QEpicsPv * Mono::Bragg2Enc = new QEpicsPv(Mono::pvBaseName + "BRAGG2:ENCODER");
+QEpicsPv * Mono::XdistEnc = new QEpicsPv(Mono::pvBaseName + "X:ENCODER");
+QEpicsPv * Mono::Bragg1EncLoss = new QEpicsPv(Mono::pvBaseName + "BRAGG1:ELOSS");
+QEpicsPv * Mono::Bragg2EncLoss = new QEpicsPv(Mono::pvBaseName + "BRAGG2:ELOSS");
+QEpicsPv * Mono::XdistEncLoss = new QEpicsPv(Mono::pvBaseName + "X:ELOSS");
 
 const QPair<double,double> Mono::energyRange = qMakePair<double,double>(16.0,195.0);
-
 
 
 Mono::Mono(QObject *parent) :
@@ -92,17 +91,17 @@ Mono::Mono(QObject *parent) :
 
 QHash<Mono::Motors,QCaMotor*> Mono::init_motors() {
   QHash<Mono::Motors,QCaMotor*> motret;
-  motret[Xdist]  = new QCaMotor("SR08ID01MCS01:X");
-  motret[Bragg1] = new QCaMotor("SR08ID01MCS01:BRAGG1");
-  motret[Bragg2] = new QCaMotor("SR08ID01MCS01:BRAGG2");
-  motret[Tilt1]  = new QCaMotor("SR08ID01MCS02:TILT1");
-  motret[Tilt2]  = new QCaMotor("SR08ID01MCS02:TILT2");
-  motret[Z1]     = new QCaMotor("SR08ID01MCS01:Z1");
-  motret[Z2]     = new QCaMotor("SR08ID01MCS01:Z2");
-  motret[Bend1ob]  = new QCaMotor("SR08ID01MCS02:BENDER1OB");
-  motret[Bend2ob]  = new QCaMotor("SR08ID01MCS02:BENDER2OB");
-  motret[Bend1ib]  = new QCaMotor("SR08ID01MCS02:BENDER1IB");
-  motret[Bend2ib]  = new QCaMotor("SR08ID01MCS02:BENDER2IB");
+  motret[Xdist]  = new QCaMotor(pvBaseName + "X");
+  motret[Bragg1] = new QCaMotor(pvBaseName + "BRAGG1");
+  motret[Bragg2] = new QCaMotor(pvBaseName + "BRAGG2");
+  motret[Tilt1]  = new QCaMotor(pvBaseName + "TILT1");
+  motret[Tilt2]  = new QCaMotor(pvBaseName + "TILT2");
+  motret[Z1]     = new QCaMotor(pvBaseName + "Z1");
+  motret[Z2]     = new QCaMotor(pvBaseName + "Z2");
+  motret[Bend1ob]  = new QCaMotor(pvBaseName + "BENDER1OB");
+  motret[Bend2ob]  = new QCaMotor(pvBaseName + "BENDER2OB");
+  motret[Bend1ib]  = new QCaMotor(pvBaseName + "BENDER1IB");
+  motret[Bend2ib]  = new QCaMotor(pvBaseName + "BENDER2IB");
   return motret;
 }
 
