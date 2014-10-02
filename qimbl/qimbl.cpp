@@ -486,7 +486,7 @@ void Qimbl::update_shfe() {
         ui->shfeControl->setText("Close");
         break;
     }
-    ui->shfeControl->setEnabled(shfe->isEnabled());
+    // ui->shfeControl->setEnabled(shfe->isEnabled());
     if ( ! shfe->isEnabled() )
       ui->shfeControl->setText("Disabled");
   }
