@@ -487,8 +487,8 @@ void Qimbl::update_shfe() {
         break;
     }
     // ui->shfeControl->setEnabled(shfe->isEnabled());
-    if ( ! shfe->isEnabled() )
-      ui->shfeControl->setText("Disabled");
+    // if ( ! shfe->isEnabled() )
+    //  ui->shfeControl->setText("Disabled");
   }
 }
 
@@ -617,9 +617,9 @@ void Qimbl::update_sh1A() {
     ui->sh1AControl->setText("Close");
     break;
   }
-  ui->sh1AControl->setEnabled(sh1A->isEnabled());
-  if ( ! sh1A->isEnabled() )
-    ui->sh1AControl->setText("Disabled");
+  //ui->sh1AControl->setEnabled(sh1A->isEnabled());
+  //if ( ! sh1A->isEnabled() )
+  //  ui->sh1AControl->setText("Disabled");
 
 
 }

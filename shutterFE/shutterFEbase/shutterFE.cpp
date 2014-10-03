@@ -114,8 +114,8 @@ bool ShutterFE::open(bool wait) {
 bool ShutterFE::close(bool wait) {
   if ( ! isConnected() )
     return false;
-  if ( ! isEnabled() )
-    return state() == CLOSED;
+  //if ( ! isEnabled() )
+  //  return state() == CLOSED;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   opnCmd->set(0);

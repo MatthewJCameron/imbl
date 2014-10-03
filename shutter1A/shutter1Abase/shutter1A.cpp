@@ -227,7 +227,7 @@ bool Shutter1A::open(bool wait) {
 }
 
 bool Shutter1A::close(bool wait) {
-  if ( ! isConnected() || ! isEnabled() )
+  if ( ! isConnected() )
     return false;
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
