@@ -156,17 +156,19 @@ const QList<Paddle*> Filters::paddles =
                                                        << Absorber::Foil(Absorber::Aluminium, 1.0)
                                                        << Absorber::Foil(Absorber::Aluminium, 1.0) ) )
                     << Paddle::Window(121.9, Absorber( QList<Absorber::Foil>()
-					    	       << Absorber::Foil(Absorber::Aluminium, 1.0) 
-					    	       << Absorber::Foil(Absorber::Molybdenum, 1.0)  ) )
+                                                       << Absorber::Foil(Absorber::Aluminium, 1.0)
+                                                       << Absorber::Foil(Absorber::Molybdenum, 1.0)  ) )
                     << Paddle::Window(186.7, Absorber( Absorber::Copper, 1.0) ),
-                    M_PI/4.0) 
+                    M_PI/4.0)
       << new Paddle(5, pvBaseName+"5", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
                     << Paddle::Window(60.4,   Absorber( QList<Absorber::Foil>()
-                                                       << Absorber::Foil(Absorber::Aluminium, 1.0)
-                                                       << Absorber::Foil(Absorber::Molybdenum, 1.0) ) )
+                                                        << Absorber::Foil(Absorber::Aluminium, 1.0)
+                                                        << Absorber::Foil(Absorber::Molybdenum, 1.0) ) )
                     << Paddle::Window(125.4,  Absorber(Absorber::Copper, 1.0) )
-                    << Paddle::Window(190.5, Absorber(Absorber::Copper, 0.32) ) ,
+                    << Paddle::Window(190.5, Absorber( QList<Absorber::Foil>()
+                                                       << Absorber::Foil(Absorber::Aluminium, 1.0)
+                                                       << Absorber::Foil(Absorber::Aluminium, 1.0) ) ) ,
                     M_PI/4.0 ) );
 
 Filters::Filters(QObject *parent) :

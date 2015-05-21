@@ -275,7 +275,6 @@ void MrtShutter::setOpened(bool opn) {
 }
 
 void MrtShutter::acknowledgeSS(bool req) {
-  qDebug() << "REQ" << req;
   if ( ! req )
     setOpened(false);
 }
