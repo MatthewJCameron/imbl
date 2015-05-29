@@ -236,9 +236,9 @@ bool Mono::isCalibrated() {
 double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
   switch (crystal) {
   case 1:
-    return energy2bragg(enrg, diff) + (diff == Si111 ? -1.0*alpha : alpha);
+    return energy2bragg(enrg, diff) - 15.156015866278 ; // + (diff == Si111 ? -1.0*alpha : alpha);
   case 2:
-    return energy2bragg(enrg, diff) + (diff == Si111 ? alpha : -1.0*alpha);
+    return energy2bragg(enrg, diff) + 15.367584133722; // + (diff == Si111 ? alpha : -1.0*alpha);
   default:
     return 0;
   }
@@ -268,7 +268,7 @@ void Mono::updateEnergy() {
   //DES// if ( mAngle >= alpha ) {
   if ( true ) { //DES//
     _diff = Si111;
-    bAngle = mAngle - alpha;
+    bAngle = mAngle - 15.367584133722;  // - alpha;
   } else {
     _diff = Si311;
     bAngle = mAngle + alpha;
@@ -296,7 +296,8 @@ void Mono::updateX() {
   if ( ! motors[Bragg1]->isConnected() ||
        ! motors[Xdist]->isConnected() )
     return;
-  const double xDist = zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180);
+  const double xDist = zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180)
+                       - 3.86217642235412456176 ;
   _dX = motors[Xdist]->getUserPosition() - xDist;
   emit dXChanged(_dX);
 }
@@ -543,7 +544,7 @@ void Mono::setDX(double val) {
   if ( ! isConnected() || isMoving() )
     return;
   motors[Xdist]->goUserPosition
-      ( zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val,
+      ( zSeparation() / tan(2*energy2bragg(energy(),diffraction())*M_PI/180) + val - 3.86217642235412456176,
         QCaMotor::STARTED);
 }
 
