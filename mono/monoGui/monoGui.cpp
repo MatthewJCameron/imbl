@@ -94,7 +94,7 @@ void MonoGui::init() {
   //DES//
 
   //hide calibration while not sorted out
-  ui->calibrate->setVisible(false);
+  ui->calibrate->hide();
 
   wtfUi->setupUi(wtfDialog);
   connect(ui->wtf, SIGNAL(clicked()), wtfDialog, SLOT(show()));
@@ -365,8 +365,7 @@ void MonoGui::onEnergyTune() {
 void MonoGui::onEnergySet() {
   energySetter->hide();
   component()->setEnergy(ui->energy->value(),
-                         //DES// ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
-                         Mono::Si111,
+                         ui->si111->isChecked() ? Mono::Si111 : Mono::Si311,
                          ui->lockBragg->isChecked(), ui->lockX->isChecked());
   revertEnergy();
 }

@@ -236,9 +236,9 @@ bool Mono::isCalibrated() {
 double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
   switch (crystal) {
   case 1:
-    return energy2bragg(enrg, diff) - 15.156015866278 ; // + (diff == Si111 ? -1.0*alpha : alpha);
+    return energy2bragg(enrg, diff) + (diff == Si111 ? -15.156015866278 : alpha); //TODO
   case 2:
-    return energy2bragg(enrg, diff) + 15.367584133722; // + (diff == Si111 ? alpha : -1.0*alpha);
+    return energy2bragg(enrg, diff) + (diff == Si111 ? 15.367584133722 : -1.0*alpha); //TODO
   default:
     return 0;
   }
@@ -265,10 +265,10 @@ void Mono::updateEnergy() {
 
   const double mAngle = motors[Bragg2]->getUserPosition();
   double bAngle;
-  //DES// if ( mAngle >= alpha ) {
-  if ( true ) { //DES//
+  if ( mAngle >= alpha ) {
+  //if ( true ) { //DES//
     _diff = Si111;
-    bAngle = mAngle - 15.367584133722;  // - alpha;
+    bAngle = mAngle - 15.367584133722;  // - alpha; //TODO
   } else {
     _diff = Si311;
     bAngle = mAngle + alpha;
@@ -509,16 +509,14 @@ void Mono::setEnergy(double enrg, Mono::Diffraction diff, bool keepDBragg, bool 
     return;
   }
 
-  motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff)
-                                  + ( keepDBragg ? dBragg() : 0 )
+  const double ddbragg = keepDBragg ? dBragg() : 0;
+  const double ddx = keepDX ? dX() : 0;
+
+  motors[Bragg1]->goUserPosition( motorAngle(enrg, 1, diff) + ddbragg
                                   + ( benderCorrection(Bend1ib) + benderCorrection(Bend1ob) ) / 2.0,
                                   QCaMotor::STARTED);
-  motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff)
-                                  + benderBraggCorrection(),
-                                  QCaMotor::STARTED);
-  motors[Xdist]->goUserPosition( zSeparation() / tan(2*braggA*M_PI/180) +
-                                 + ( keepDX ? dX() : 0 ),
-                                 QCaMotor::STARTED);
+  motors[Bragg2]->goUserPosition( motorAngle(enrg, 2, diff) + benderBraggCorrection(), QCaMotor::STARTED);
+  motors[Xdist]->goUserPosition( zSeparation() / tan(2*braggA*M_PI/180) + ddx - 3.86217642235412456176, QCaMotor::STARTED);
 
   QTimer::singleShot(0, this, SLOT(updateDBragg()));
   QTimer::singleShot(0, this, SLOT(updateEnergy()));
