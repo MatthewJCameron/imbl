@@ -140,7 +140,7 @@ const QList<Paddle*> Filters::paddles =
                     M_PI/2.0 )
       << new Paddle(2, pvBaseName+"2", QList<Paddle::Window>()
                     << Paddle::Window(1.0,    Absorber(Absorber::Empty) )
-                    << Paddle::Window(62.0,   Absorber(Absorber::GraphiteHD, 5.0) )
+                    << Paddle::Window(61.97,   Absorber(Absorber::GraphiteHD, 5.0) )
                     << Paddle::Window(127.0 , Absorber(Absorber::Graphite, 5.0) )
                     << Paddle::Window(192.05,  Absorber(Absorber::Graphite, 3.0) ),
                     M_PI/4.0 )
