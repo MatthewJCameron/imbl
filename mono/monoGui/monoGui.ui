@@ -159,6 +159,9 @@
           <property name="text">
            <string>lock</string>
           </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item>
@@ -300,6 +303,9 @@
           </property>
           <property name="text">
            <string>lock</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
