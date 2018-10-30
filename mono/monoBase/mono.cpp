@@ -133,8 +133,12 @@ void Mono::wait_stop() {
 
 void Mono::updateConnection() {
   bool con = true;
-  foreach(QCaMotor * mot, motors)
-    con &= mot->isConnected();
+//  foreach(QCaMotor * mot, motors)
+//    con &= mot->isConnected();
+
+  con &= motors[Bragg1]->isConnected() &&
+         motors[Bragg2]->isConnected() &&
+         motors[Xdist]->isConnected();
   con &=
       Bragg1Enc->isConnected() && Bragg1EncLoss->isConnected() &&
       Bragg2Enc->isConnected() && Bragg2EncLoss->isConnected() &&
@@ -164,8 +168,11 @@ void Mono::updateMotion() {
   if (!isConnected())
     return;
   bool newMov = false;
-  foreach(QCaMotor * mot, motors)
-    newMov |= mot->isMoving();
+//  foreach(QCaMotor * mot, motors)
+//    newMov |= mot->isMoving();
+  newMov |= motors[Bragg1]->isMoving() &&
+         motors[Bragg2]->isMoving() &&
+         motors[Xdist]->isMoving();
   emit motionChanged(iAmMoving=newMov);
 }
 

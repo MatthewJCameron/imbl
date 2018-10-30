@@ -13,15 +13,12 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
            qimbl.cpp \
-           valuebar.cpp \
            columnresizer.cpp
 
 HEADERS  += qimbl.h \
-            valuebar.h \
     columnresizer.h
 
-FORMS    += qimbl.ui \
-            valuebar.ui
+FORMS    += qimbl.ui
 
 QMAKE_LFLAGS += -Wl,-rpath,\'\$$ORIGIN/../lib/imbl\'
 

@@ -11,7 +11,6 @@
 #include "monoGui.h"
 #include "hutch.h"
 #include "valve.h"
-#include "valuebar.h"
 #include <qtpv.h>
 
 namespace Ui {
@@ -31,7 +30,7 @@ private:
   QEpicsPv * rfstat;
   QEpicsPv * rfcurrent;
   QEpicsPv * rfenergy;
-  QEpicsPv * wigglergap;
+  QEpicsPv * wigglerfield;
   QEpicsPv * bl_enabled;
   QEpicsPv * bl_disabled;
   QEpicsPv * eps_enabled;
@@ -47,14 +46,6 @@ private:
   FiltersGui * filters;
   MonoGui * mono;
 
-  static const QStringList vacMonitors;
-  static const QStringList tempMonitors;
-  static const QStringList flowMonitors;
-  QList<ValueBar*> vacBars;
-  QList<ValueBar*> tempBars;
-  QList<ValueBar*> flowBars;
-
-
 private slots:
 
   void chooseComponent(QAbstractButton* but);
@@ -62,7 +53,7 @@ private slots:
   void update_rfstat();
   void update_rfcurrent();
   void update_rfenergy();
-  void update_wigglergap();
+  void update_wigglerfield();
   void update_bl_status();
   void update_eps_status();
   void update_bl_mode();
@@ -73,11 +64,7 @@ private slots:
   void update_slits();
   void update_filters();
   void update_mono();
-  void update_vacuum();
-  void update_temperature();
-  void update_flow();
   void update_valve_1();
-
 
 };
 

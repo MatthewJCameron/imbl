@@ -53,56 +53,13 @@ static void set_nolink_style(QLabel* lab) {
 
 
 
-
-const QStringList Qimbl::vacMonitors =
-    ( QStringList()
-      << "SR08ID01CCG01:PRESSURE_MONITOR"
-      << "SR08ID01CCG02:PRESSURE_MONITOR"
-      << "SR08FE01CCG01:PRESSURE_MONITOR"
-      << "SR08FE01CCG02:PRESSURE_MONITOR" ) ;
-const QStringList Qimbl::tempMonitors =
-    ( QStringList()
-      << "SR08FE01TES01:TEMPERATURE_MONITOR"
-      << "SR08FE01TES02:TEMPERATURE_MONITOR"
-/*      << "SR08ID01EPS01:TES01_TemperatureMonit"
-      << "SR08ID01EPS01:TES02_TemperatureMonit"
-      << "SR08ID01EPS01:TES03_TemperatureMonit"
-      << "SR08ID01EPS01:TES04_TemperatureMonit"
-      << "SR08ID01EPS01:TES05TemperatureMonit"
-      << "SR08ID01EPS01:TES09TemperatureMonit"
-      << "SR08ID01EPS01:CHL01TES01TempMonitor"
-      << "SR08ID01EPS01:DCM01TES01_TempMonit"
-      << "SR08ID01EPS01:DCM01TES02_TempMonit"
-      << "SR08ID01EPS01:DCM01TES03_TempMonit"
-      << "SR08ID01EPS01:DCM01TES04_TempMonit"
-      << "SR08ID01EPS01:DCM01TES05_TempMonit"
-      << "SR08ID01EPS01:DCM01TES06_TempMonit"
-      << "SR08ID01EPS01:DCM01TES07_TempMonit"
-      << "SR08ID01EPS01:DCM01TES08_TempMonit"
-      << "SR08ID01EPS01:DCM01TES09_TempMonit"
-      << "SR08ID01EPS01:DCM01TES10_TempMonit"
-      << "SR08ID01EPS01:DCM01TES11_TempMonit"
-      << "SR08ID01EPS01:DCM01TES12_TempMonit"
-      << "SR08ID01EPS01:DCM01TES13_TempMonit"
-      << "SR08ID01EPS01:DCM01TES14_TempMonit"
-      << "SR08ID01EPS01:DCM01TES15_TempMonit" */);
-const QStringList Qimbl::flowMonitors =
-    ( QStringList()
-      << "SR08ID01EPS01:FLM01_FlowMonitor"
-      << "SR08ID01EPS01:FLM02_FlowMonitor"
-      << "SR08ID01EPS01:FLM03_FlowMonitor"
-      << "SR08ID01EPS01:FLM04_FlowMonitor"
-      << "SR08ID01EPS01:FLM05_FlowMonitor"
-      << "SR08ID01EPS01:FLM06_FlowMonitor" );
-
-
 Qimbl::Qimbl(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::Qimbl),
   rfstat(new QEpicsPv("SR11BCM01:STORED_BEAM_STATUS")),
   rfcurrent(new QEpicsPv("SR11BCM01:CURRENT_MONITOR")),
   rfenergy(new QEpicsPv("SR00:BEAM_ENERGY_MONITOR")),
-  wigglergap(new QEpicsPv("SR08ID01:GAP_MONITOR")),
+  wigglerfield(new QEpicsPv("SR08ID01:GAP_MONITOR")),
   bl_enabled(new QEpicsPv("SR08ID01PSS01:BL_ENABLE_STS")),
   bl_disabled(new QEpicsPv("SR08ID01PSS01:BL_DISABLE_STS")),
   eps_enabled(new QEpicsPv("SR08ID01PSS01:FES_EPS_ENABLE_STS")),
@@ -140,8 +97,8 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(rfenergy, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfenergy()));
   connect(rfenergy, SIGNAL(connectionChanged(bool)), SLOT(update_rfenergy()));
 
-  connect(wigglergap, SIGNAL(valueUpdated(QVariant)), SLOT(update_wigglergap()));
-  connect(wigglergap, SIGNAL(connectionChanged(bool)), SLOT(update_wigglergap()));
+  connect(wigglerfield, SIGNAL(valueUpdated(QVariant)), SLOT(update_wigglerfield()));
+  connect(wigglerfield, SIGNAL(connectionChanged(bool)), SLOT(update_wigglerfield()));
 
   hutches.insert( new Hutch(Hutch::H1A), ui->st1A);
   hutches.insert( new Hutch(Hutch::H1B), ui->st1B);
@@ -204,48 +161,10 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(mono->component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
 
-  ColumnResizer* resizer;
-  int row;
-
-  row=1;
-  resizer = new ColumnResizer(this);
-  foreach(QString str, vacMonitors) {
-    ValueBar * vb = new ValueBar(str);
-    if ( str.contains("SR08FE01CCG") ) // FE CC have unclear descriptions
-      vb->setDescription(str);
-    vb->setLogarithmic(true);
-    vb->setMin(1.0e-09);
-    ui->monitorsLayout->addWidget(vb, row++,0);
-    vacBars << vb;
-    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_vacuum()));
-    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
-  }
-  row=1;
-  foreach(QString str, tempMonitors) {
-    ValueBar * vb = new ValueBar(str);
-    ui->monitorsLayout->addWidget(vb, row++,1);
-    tempBars << vb;
-    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_temperature()));
-    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
-  }
-  row=1;
-  foreach(QString str, flowMonitors) {
-    ValueBar * vb = new ValueBar(str);
-    vb->setLo(5);
-    vb->setLoLo(5);
-    vb->setHi(45);
-    vb->setHiHi(45);
-    ui->monitorsLayout->addWidget(vb, row++,2);
-    flowBars << vb;
-    connect(vb, SIGNAL(healthChenaged(ValueBar::Health)), SLOT(update_flow()));
-    resizer->addWidgetsFromGridLayout(vb->internalLayout(),0);
-  }
-
-
   update_rfstat();
   update_rfcurrent();
   update_rfenergy();
-  update_wigglergap();
+  update_wigglerfield();
   update_bl_status();
   update_eps_status();
   update_bl_mode();
@@ -256,13 +175,7 @@ Qimbl::Qimbl(QWidget *parent) :
   update_slits();
   update_filters();
   update_mono();
-  update_vacuum();
-  update_temperature();
-  update_flow();
   update_valve_1();
-
-
-  ui->chooseMonitors->click();
 
 }
 
@@ -279,8 +192,6 @@ void Qimbl::chooseComponent(QAbstractButton* but) {
     ui->control->setCurrentWidget(mono);
   else if (but == ui->chooseSlits)
     ui->control->setCurrentWidget(slits);
-  else if (but == ui->chooseMonitors)
-    ui->control->setCurrentWidget(ui->monitors);
   else if (but == ui->chooseShutters)
     ui->control->setCurrentWidget(ui->shutters);
 }
@@ -441,12 +352,12 @@ void Qimbl::update_rfenergy() {
 }
 
 
-void Qimbl::update_wigglergap() {
-  if ( ! wigglergap->isConnected() ) {
-    set_nolink_style(ui->wigglergap);
+void Qimbl::update_wigglerfield() {
+  if ( ! wigglerfield->isConnected() ) {
+    set_nolink_style(ui->wigglerfield);
   } else {
-    ui->wigglergap->setStyleSheet("");
-    ui->wigglergap->setText(QString::number(wigglergap->get().toDouble(), 'f', 3) + "mm");
+    ui->wigglerfield->setStyleSheet("");
+    ui->wigglerfield->setText(QString::number(wigglerfield->get().toDouble(), 'f', 3) + "T");
   }
 }
 
@@ -821,73 +732,6 @@ void Qimbl::update_mono() {
   ui->bend2->setText(QString::number(mono->component()->bend2ob(),'f',2) + "/" +
                      QString::number(mono->component()->bend2ib(),'f',2));
 }
-
-
-void Qimbl::update_vacuum() {
-  ValueBar::Health health = ValueBar::OK;
-  foreach (ValueBar * vb, vacBars)
-    if (vb->health() > health)
-      health = vb->health();
-  switch (health) {
-    case ValueBar::OK :
-      ui->vacSt->setStyleSheet(green_style);
-      ui->vacSt->setText(ok_string);
-      break;
-    case ValueBar::WARN :
-      ui->vacSt->setStyleSheet(yellow_style);
-      ui->vacSt->setText(warning_string);
-      break;
-    case ValueBar::ALARM :
-      ui->vacSt->setStyleSheet(red_style);
-      ui->vacSt->setText(alarm_string);
-      break;
-  }
-}
-
-
-void Qimbl::update_temperature() {
-  ValueBar::Health health = ValueBar::OK;
-  foreach (ValueBar * vb, tempBars)
-    if (vb->health() > health)
-      health = vb->health();
-  switch (health) {
-    case ValueBar::OK :
-      ui->tempSt->setStyleSheet(green_style);
-      ui->tempSt->setText(ok_string);
-      break;
-    case ValueBar::WARN :
-      ui->tempSt->setStyleSheet(yellow_style);
-      ui->tempSt->setText(warning_string);
-      break;
-    case ValueBar::ALARM :
-      ui->tempSt->setStyleSheet(red_style);
-      ui->tempSt->setText(alarm_string);
-      break;
-  }
-}
-
-
-void Qimbl::update_flow() {
-  ValueBar::Health health = ValueBar::OK;
-  foreach (ValueBar * vb, flowBars)
-    if (vb->health() > health)
-      health = vb->health();
-  switch (health) {
-    case ValueBar::OK :
-      ui->flowSt->setStyleSheet(green_style);
-      ui->flowSt->setText(ok_string);
-      break;
-    case ValueBar::WARN :
-      ui->flowSt->setStyleSheet(yellow_style);
-      ui->flowSt->setText(warning_string);
-      break;
-    case ValueBar::ALARM :
-      ui->flowSt->setStyleSheet(red_style);
-      ui->flowSt->setText(alarm_string);
-      break;
-  }
-}
-
 
 
 
