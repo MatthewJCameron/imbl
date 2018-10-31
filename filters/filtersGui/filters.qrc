@@ -11,5 +11,6 @@
         <file>mu-Mo.dat</file>
         <file>mu-SiC.dat</file>
         <file>mu-C[hd].dat</file>
+        <file>WS.2D.dat</file>
     </qresource>
 </RCC>
