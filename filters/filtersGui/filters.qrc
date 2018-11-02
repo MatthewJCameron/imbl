@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>arrow.svg</file>
-        <file>flux.dat</file>
         <file>mu-Ag.dat</file>
         <file>mu-Al.dat</file>
         <file>mu-Au.dat</file>
@@ -11,6 +10,8 @@
         <file>mu-Mo.dat</file>
         <file>mu-SiC.dat</file>
         <file>mu-C[hd].dat</file>
-        <file>WS.2D.dat</file>
+        <file>SCMW.2Dflux.dat</file>
+        <file>SCMW.energy.dat</file>
+        <file>SCMW.fields.dat</file>
     </qresource>
 </RCC>
