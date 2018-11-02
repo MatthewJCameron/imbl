@@ -13,5 +13,6 @@
         <file>SCMW.2Dflux.dat</file>
         <file>SCMW.energy.dat</file>
         <file>SCMW.fields.dat</file>
+        <file>mu-Pb.dat</file>
     </qresource>
 </RCC>
