@@ -505,7 +505,7 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
+         <item row="9" column="0">
           <spacer name="verticalSpacer">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -525,7 +525,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
+         <item row="5" column="1">
           <widget class="QLabel" name="blSt">
            <property name="text">
             <string>TextLabel</string>
@@ -538,18 +538,18 @@
          <item row="2" column="0">
           <widget class="QLabel" name="label_20">
            <property name="text">
-            <string>Energy</string>
+            <string>Electron energy</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_22">
            <property name="text">
             <string>EPS</string>
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QLabel" name="epsSt">
            <property name="text">
             <string>TextLabel</string>
@@ -559,7 +559,7 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label_21">
            <property name="text">
             <string>Beamline</string>
@@ -587,14 +587,14 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
+         <item row="4" column="0">
           <widget class="QLabel" name="label_10">
            <property name="text">
             <string>Storage ring</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="1">
+         <item row="4" column="1">
           <widget class="QLabel" name="rfSt">
            <property name="text">
             <string>TextLabel</string>

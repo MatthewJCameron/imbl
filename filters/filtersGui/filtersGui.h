@@ -67,6 +67,8 @@ private:
   QwtPlotCurve * current_curve;
   QwtPlotCurve * new_curve;
 
+  QEpicsPv * wigglerfield;
+
   static const bool data_inited;
 
   explicit FiltersGui(Filters * flt, QWidget *parent = 0);
@@ -84,9 +86,11 @@ public:
 private slots:
 
   void updateConnection(bool con);
-  void updateTrain();
-  void updateSelection();
+  void updatePlot();
   void updateMotion(bool mov);
+  void updateFields();
+  void addFilter();
+  void remFilter();
 
   void onGoPressed();
   void onResetPressed();

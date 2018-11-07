@@ -13,9 +13,22 @@ QString materialName(Absorber::Material material){
   case Absorber::Gold: return "Au";
   case Absorber::Molybdenum: return "Mo";
   case Absorber::Carborundum: return "SiC";
+  case Absorber::Lead: return "Pb";
   default : return "";
   }
 }
+
+const QList<Absorber::Material> Absorber::knownMaterials = QList<Absorber::Material>()
+    << Absorber::Beryllium
+    << Absorber::Graphite
+    << Absorber::GraphiteHD
+    << Absorber::Aluminium
+    << Absorber::Copper
+    << Absorber::Silver
+    << Absorber::Gold
+    << Absorber::Molybdenum
+    << Absorber::Carborundum
+    << Absorber::Lead;
 
 Absorber::Absorber(Material _material, double _thickness) {
   if (_thickness < 0.0 )

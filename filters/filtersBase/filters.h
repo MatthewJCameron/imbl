@@ -17,8 +17,10 @@ public:
     Silver,
     Gold,
     Molybdenum,
-    Carborundum
+    Carborundum,
+    Lead
   };
+  static const QList<Absorber::Material> knownMaterials;
   typedef QPair<Material, double> Foil;
 private:
   QList<Foil> _sandwich;

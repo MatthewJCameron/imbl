@@ -96,72 +96,32 @@ void PaddleGui::updateLabel() {
 
 
 
-
-
-static double max(const QVector<double> & vec){
-  if ( vec.isEmpty() )
-    warn("Operation on empty vector.");
-  double cmax = vec[0];
-  foreach (double cur, vec)
-    if (cur > cmax) cmax = cur;
-  return cmax;
-}
-
-static const QVector<double> operator*(const QVector<double> & vec, double cof) {
-  QVector<double> nvec;
-  for (int i=0 ; i<vec.size() ; i++)
-    nvec << vec[i] * cof;
-  return nvec;
-}
-
-static void loadData ( const QString & filename, QPolygonF & storage) {
+static void loadData ( const QString & filename, QVector<double> & storage) {
   storage.clear();
   QFile funcf(filename);
   if ( ! funcf.open(QIODevice::ReadOnly) )
     throw_error("Could not open input file \"" + filename + "\".");
   QString rd;
   while ( ! funcf.atEnd()  &&   !(rd = funcf.readLine()).isEmpty() ) {
-    float toread1, toread2;
-    if ( sscanf( rd.toAscii(), "%f %f\n", &toread1, &toread2 ) != 2 )
-      throw_error("Could not scan float from input file"
-                  " \"" + filename + "\".");
-    storage << QPointF(toread1,toread2);
+    bool ok;
+    double rdnum = rd.toDouble(&ok);
+    if ( ! ok )
+      throw_error("Could not read float from \"" + rd + "\""
+                  " in input file \"" + filename + "\".");
+    storage << rdnum;
   }
   funcf.close();
 }
 
 
-static void loadMu(Absorber::Material mat, QVector<double> & dat, const QVector<double> & en){
-  int size = en.size();
-  QPolygonF data;
-  loadData(":/mu-" + materialName(mat) + ".dat", data);
-  if (data.size() != size)
-    throw_error("File with the " + materialName(mat)
-                + " absorption coefficient has unexpected size ("
-                + QString::number(data.size()) + " != " + QString::number(size) + ").");
-  for (int i = 0; i<size ; i++) {
-    if ( en[i] != data[i].x() )
-      throw_error("X axis of the " + materialName(mat)
-                  + " absorption coefficient data do not match one of the whitebeam."
-                  + " See string " + QString::number(i) + ": "
-                  + QString::number(en[i]) + " != " + QString::number(data[i].x()) + "."  );
-    else
-      dat << data[i].y();
-  }
-}
-
-
-
-
-
 const double spectrumMin=1.0e-11;
 static QVector<double> energies;
-static QVector<double> whitebeam;
+static QVector<double> fields;
+static QVector< QVector<double> > fluxdata;
 static QHash< Absorber::Material, QVector<double> > mu;
 
 void absorb(QVector<double> & inout, const QList<Absorber::Foil> & train) {
-  const int size = whitebeam.size();
-  inout = whitebeam * ( 1/max(whitebeam) );
+  const int size = energies.size();
   foreach(Absorber::Foil foil, train)
     if ( foil.first != Absorber::Empty && foil.second > 0.0 )
       for (int i=0 ; i<size ; i++)
@@ -176,44 +136,61 @@ static bool init_data() {
 
   Q_INIT_RESOURCE(filters);
 
-  QPolygonF data;
-  loadData(":/flux.dat", data);
-  if (data.size()<=100)
-    throw_error("File with the white beam spectrum has size less than 100 ("
-                + QString::number(data.size()) + ").");
+  loadData(":/SCMW.energy.dat", energies);
+  loadData(":/SCMW.fields.dat", fields);
 
-  foreach (QPointF point, data) {
-    energies << point.x();
-    whitebeam << point.y();
+  const int ensize = energies.size();
+
+  mu[Absorber::Empty] = QVector<double>(ensize, 0.0);
+  foreach(Absorber::Material mat, Absorber::knownMaterials) {
+    loadData(":/mu-" + materialName(mat) + ".dat", mu[mat]);
+    if (mu[mat].size() != ensize)
+      throw_error("File with the " + materialName(mat)
+                  + " absorption coefficient has unexpected size ("
+                  + QString::number(mu[mat].size()) + " != " + QString::number(ensize) + ").");
   }
 
-  mu[Absorber::Empty] = QVector<double>(energies.size(), 0.0);
+  QFile funcf(":/SCMW.2Dflux.dat");
+  if ( ! funcf.open(QIODevice::ReadOnly) )
+    throw_error("Could not open input file \"" + funcf.fileName() + "\".");
+  QString rd;
 
-  loadMu(Absorber::Beryllium, mu[Absorber::Beryllium], energies);
-  loadMu(Absorber::Graphite, mu[Absorber::Graphite], energies);
-  loadMu(Absorber::GraphiteHD, mu[Absorber::GraphiteHD], energies);
-  loadMu(Absorber::Aluminium, mu[Absorber::Aluminium], energies);
-  loadMu(Absorber::Copper, mu[Absorber::Copper], energies);
-  loadMu(Absorber::Silver, mu[Absorber::Silver], energies);
-  loadMu(Absorber::Gold, mu[Absorber::Gold], energies);
-  loadMu(Absorber::Molybdenum, mu[Absorber::Molybdenum], energies);
-  loadMu(Absorber::Carborundum, mu[Absorber::Carborundum], energies);
+  while ( ! funcf.atEnd()  &&   !(rd = funcf.readLine()).isEmpty() ) {
 
-  energies = energies * 0.001; // eV -> keV
+    QStringList column = rd.split(" ");
+    if (column.size() != ensize)
+      throw_error("File with the flux data has unexpected size ("
+                  + QString::number(column.size()) + " != " + QString::number(ensize) + ").");
+    fluxdata << QVector<double>(ensize);
+
+    bool ok;
+    for (int enidx=0 ; enidx<ensize ; enidx++) {
+      double flx = column[enidx].toDouble(&ok);
+      if ( ! ok )
+        throw_error("Could not read float from \"" + column[enidx] + "\""
+                    " in input file \"" + funcf.fileName() + "\".");
+      fluxdata.last()[enidx] = flx;
+    }
+
+  }
+
+  funcf.close();
+
+  if ( fluxdata.size() != fields.size() )
+    throw_error("File with the flux data has an unexpected number of strings ("
+                + QString::number(fluxdata.size()) + " != " + QString::number(fields.size()) + ").");
 
   return true;
 
 }
-
-
-
 
 const bool FiltersGui::data_inited = init_data();
 
 FiltersGui::FiltersGui(QWidget *parent) :
   ComponentGui(new Filters(parent), true, parent),
   ui(new Ui::Filters),
-  chooseMotors(new QWidget(this))
+  chooseMotors(new QWidget(this)),
+  wigglerfield(new QEpicsPv("SR08ID01:GAP_MONITOR"))
 {
   init();
 }
@@ -221,7 +198,8 @@ FiltersGui::FiltersGui(QWidget *parent) :
 FiltersGui::FiltersGui(Filters * flt, QWidget *parent) :
   ComponentGui(flt, false, parent),
   ui(new Ui::Filters),
-  chooseMotors(new QWidget(this))
+  chooseMotors(new QWidget(this)),
+  wigglerfield(new QEpicsPv("SR08ID01:GAP_MONITOR"))
 {
   init();
 }
@@ -251,11 +229,11 @@ void FiltersGui::init() {
 
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
   ui->SpectrumPlot->setAxisMaxMinor(QwtPlot::xBottom, 10);
-  ui->SpectrumPlot->setAxisScale(QwtPlot::xBottom, energies.first(), energies.last());
+  ui->SpectrumPlot->setAxisScale(QwtPlot::xBottom, /*energies.first()*/ 10.0, energies.last());
   ui->SpectrumPlot->setAxisTitle(QwtPlot::xBottom, "Photon energy, keV");
 
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
-  ui->SpectrumPlot->setAxisScale(QwtPlot::yLeft, 1.0e-5, 1.0);
+  ui->SpectrumPlot->setAxisScale(QwtPlot::yLeft, 1.0e-9, 1.0);
 
   QwtPlotGrid * SpectrumGrid = new QwtPlotGrid;
   SpectrumGrid->enableXMin(true);
@@ -267,7 +245,6 @@ void FiltersGui::init() {
   QPen pen;
 
   wb_curve = new QwtPlotCurve("White Beam");
-  wb_curve->setSamples(energies, whitebeam * ( 1/max(whitebeam) ));
   pen = QPen(QColor(0,0,0));
   pen.setWidth(8);
   wb_curve->setPen(pen);
@@ -297,20 +274,35 @@ void FiltersGui::init() {
     PaddleGui * paddleUI = new PaddleGui(paddle,this);
     ui->motors->addMotor(paddle->motor(), true, true);
     ui->paddles_layout->addWidget(paddleUI);
-    connect(paddleUI, SIGNAL(selectedChanged(int)), SLOT(updateSelection()));
+    connect(paddleUI, SIGNAL(selectedChanged(int)), SLOT(updatePlot()));
     paddles << paddleUI;
   }
 
-  connect(component(), SIGNAL(trainChanged(QList<Absorber::Foil>)), SLOT(updateTrain()));
+  connect(component(), SIGNAL(trainChanged(QList<Absorber::Foil>)), SLOT(updatePlot()));
   connect(component(), SIGNAL(motionStateChanged(bool)), SLOT(updateMotion(bool)));
+
+  connect(wigglerfield, SIGNAL(valueUpdated(QVariant)), SLOT(updateFields()));
+  connect(wigglerfield, SIGNAL(connectionChanged(bool)), SLOT(updateFields()));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->gostop_pb, SIGNAL(clicked()), SLOT(onGoPressed()));
   connect(ui->reset_pb, SIGNAL(clicked()), SLOT(onResetPressed()));
   connect(ui->calibrate_pb, SIGNAL(clicked()), SLOT(onAutoCalibration()));
+  connect(ui->fldPlot, SIGNAL(valueChanged(double)), SLOT(updatePlot()));
+  connect(ui->fldLock, SIGNAL(toggled(bool)), SLOT(updateFields()));
 
-  updateTrain();
-  updateSelection();
+  updatePlot();
+
+  ui->additionalFilters->horizontalHeader()->setStretchLastSection(false);
+  ui->additionalFilters->horizontalHeader()->setResizeMode(0,QHeaderView::Stretch);
+  ui->additionalFilters->horizontalHeader()->setResizeMode(1,QHeaderView::Stretch);
+  ui->additionalFilters->horizontalHeader()->setResizeMode(2,QHeaderView::Fixed);
+  ui->additionalFilters->insertRow(0);
+  QToolButton * addFilterBut = new QToolButton(ui->additionalFilters);
+  addFilterBut->setText("add");
+  connect(addFilterBut, SIGNAL(clicked()), SLOT(addFilter()));
+  ui->additionalFilters->setCellWidget(0,0,addFilterBut);
+  ui->additionalFilters->setSpan(0,0,1,3);
 
 }
 
@@ -334,7 +326,7 @@ void FiltersGui::updateConnection(bool con) {
 
   if (con) {
     updateMotion(component()->isMoving());
-    updateTrain();
+    updatePlot();
     QTimer::singleShot(0, this, SLOT(onResetPressed()));
   }
 
@@ -346,14 +338,31 @@ void FiltersGui::updateMotion(bool mov) {
   ui->calibrate_pb->setEnabled(!mov);
 }
 
-void FiltersGui::updateTrain() {
-  QVector<double> cs;
-  absorb(cs, component()->train());
-  current_curve->setSamples(energies, cs);
-  ui->SpectrumPlot->replot();
-}
 
-void FiltersGui::updateSelection() {
+void FiltersGui::updatePlot() {
+
+  const float field = ui->fldPlot->value();
+  int fidx=0;
+  while ( fidx < fields.size()  &&  fields[fidx] < field )
+    fidx++;
+  if (fidx >= fields.size())
+    return;
+  if ( fidx  &&  fields[fidx] - field > field - fields[fidx-1] )
+    fidx--;
+  QVector<double> spectrum = fluxdata[fidx];
+
+  wb_curve->setSamples(energies, spectrum);
+
+  QList<Absorber::Foil> add_train;
+  for (int aidx=1 ; aidx < ui->additionalFilters->rowCount() ; aidx++) {
+    QComboBox * mat = dynamic_cast<QComboBox*>(ui->additionalFilters->cellWidget(aidx, 0));
+    Absorber::Material mt =
+        mat ? Absorber::Material(mat->itemData(mat->currentIndex()).toInt()) : Absorber::Empty;
+    QDoubleSpinBox * thick = dynamic_cast<QDoubleSpinBox*>(ui->additionalFilters->cellWidget(aidx, 1));
+    add_train << Absorber::Foil( mt, thick ? thick->value() : 0.0 );
+  }
+  absorb(spectrum, add_train);
+
   QList<Absorber::Foil> new_train;
   selectedWindows.clear();
   foreach(PaddleGui* paddleUI, paddles) {
@@ -363,10 +372,64 @@ void FiltersGui::updateSelection() {
       new_train << foil;
     }
   }
-  QVector<double> ns;
+  QVector<double> ns(spectrum);
   absorb(ns, new_train);
   new_curve->setSamples(energies, ns);
+
+  QVector<double> cs(spectrum);
+  absorb(cs, component()->train());
+  current_curve->setSamples(energies, cs);
+
   ui->SpectrumPlot->replot();
+
+}
+
+void FiltersGui::updateFields() {
+  if ( ! wigglerfield->isConnected() )
+    return;
+  const float field = wigglerfield->get().toDouble();
+  ui->fldCur->setValue(field);
+  if (ui->fldLock->isChecked())
+    ui->fldPlot->setValue(field);
+  ui->fldPlot->setEnabled(!ui->fldLock->isChecked());
+}
+
+
+void FiltersGui::addFilter(){
+
+  ui->additionalFilters->insertRow(1);
+
+  QComboBox * mat = new QComboBox(ui->additionalFilters);
+  mat->setMaxCount(Absorber::knownMaterials.size());
+  foreach (Absorber::Material mt, Absorber::knownMaterials)
+    mat->addItem(materialName(mt), mt);
+  connect(mat, SIGNAL(currentIndexChanged(int)), SLOT(updatePlot()));
+  ui->additionalFilters->setCellWidget(1,0,mat);
+
+  QDoubleSpinBox * thick = new QDoubleSpinBox(ui->additionalFilters);
+  thick->setRange(0.0, 10000.0);
+  thick->setValue(0.0);
+  thick->setDecimals(1);
+  thick->setSingleStep(0.1);
+  thick->setSuffix("mm");
+  connect(thick, SIGNAL(editingFinished()), SLOT(updatePlot()));
+  ui->additionalFilters->setCellWidget(1,1,thick);
+
+  QToolButton * rmbut = new QToolButton(ui->additionalFilters);
+  rmbut->setText("-");
+  connect(rmbut, SIGNAL(clicked()), SLOT(remFilter())); // remFilter is used only here
+  ui->additionalFilters->setCellWidget(1,2,rmbut);
+
+}
+
+
+void FiltersGui::remFilter(){ // should be used only in one spot - search for it
+  int idx=0;
+  while ( idx < ui->additionalFilters->rowCount()  &&  sender() != ui->additionalFilters->cellWidget(idx, 2) )
+    idx++;
+  if(!idx)
+    return;
+  ui->additionalFilters->removeRow(idx);
 }
 
 
@@ -392,7 +455,7 @@ void FiltersGui::onGoPressed() {
     if( ! chooseMotorBoxes[paddles[pcur]->component()->motor()]->isChecked()  )
       selectedWindows[pcur]=-1; // prevents deselected motors from travelling
   component()->setWindows(selectedWindows);
-  updateSelection();
+  updatePlot();
 
 }
 
@@ -403,7 +466,7 @@ void FiltersGui::onResetPressed() {
     paddleUI->reset();
     paddleUI->blockSignals(false);
   }
-  updateSelection();
+  updatePlot();
 }
 
 void FiltersGui::onAdvancedControl() {

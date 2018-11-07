@@ -18,7 +18,8 @@ HEADERS += \
 
 FORMS += \
     filtersGui.ui \
-    paddle.ui
+    paddle.ui \
+    customFilters.ui
 
 RESOURCES += \
     filters.qrc

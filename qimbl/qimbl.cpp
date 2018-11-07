@@ -357,7 +357,7 @@ void Qimbl::update_wigglerfield() {
     set_nolink_style(ui->wigglerfield);
   } else {
     ui->wigglerfield->setStyleSheet("");
-    ui->wigglerfield->setText(QString::number(wigglerfield->get().toDouble(), 'f', 3) + "T");
+    ui->wigglerfield->setText(QString::number(wigglerfield->get().toDouble(), 'f', 2) + "T");
   }
 }
 
