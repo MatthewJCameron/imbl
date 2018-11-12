@@ -5,6 +5,7 @@
 #include "filters.h"
 #include <qmotorstack.h>
 #include <qwt_plot_curve.h>
+#include <QCheckBox>
 
 namespace Ui {
     class Filters;

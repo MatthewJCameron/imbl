@@ -3,7 +3,6 @@
 
 #include "component.h"
 #include <QtGui>
-#include <QWidget>
 #include <QDialog>
 #include <QLineEdit>
 #include <QDialogButtonBox>

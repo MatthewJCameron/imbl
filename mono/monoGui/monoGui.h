@@ -2,6 +2,7 @@
 #define MONOGUI_H
 
 #include <QWidget>
+#include <QCheckBox>
 #include <qmotorstack.h>
 #include "componentGui.h"
 #include "mono.h"

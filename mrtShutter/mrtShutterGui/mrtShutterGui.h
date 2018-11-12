@@ -1,7 +1,7 @@
 #ifndef MRTSHUTTERGUI_H
 #define MRTSHUTTERGUI_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include "mrtShutter.h"
 #include "componentGui.h"
 

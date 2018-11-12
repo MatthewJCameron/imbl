@@ -1,7 +1,7 @@
 #ifndef DEIMONOGUI_H
 #define DEIMONOGUI_H
 
-#include <QtGui/QWidget>
+#include <QWidget>
 #include <qmotorstack.h>
 #include "componentGui.h"
 #include "DEImono.h"

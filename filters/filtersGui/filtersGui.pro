@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui svg
+QT       += core gui svg widgets
 CONFIG += qwt
 
 TARGET = filtersGui
@@ -18,8 +18,7 @@ HEADERS += \
 
 FORMS += \
     filtersGui.ui \
-    paddle.ui \
-    customFilters.ui
+    paddle.ui
 
 RESOURCES += \
     filters.qrc

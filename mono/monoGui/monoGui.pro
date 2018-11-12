@@ -1,8 +1,7 @@
 # -------------------------------------------------
 # Project created by QtCreator 2011-08-26T11:38:30
 # -------------------------------------------------
-QT += core \
-    gui
+QT += core gui widgets
 TARGET = monoGui
 TEMPLATE = lib
 SOURCES += monoGui.cpp \

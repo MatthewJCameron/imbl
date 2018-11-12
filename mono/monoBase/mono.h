@@ -17,8 +17,8 @@ public:
   enum Diffraction { Si111, Si311 };
 
   static const QPair<double,double> energyRange;
-  static const double maxEnergy111 = 150.0; // keV
-  static const double minEnergy311 = 31.0; // keV
+  static const double maxEnergy111; // keV
+  static const double minEnergy311; // keV
   static const QString pvBaseName;
 
   enum Motors {
@@ -37,19 +37,19 @@ public:
 
   static const QHash<Motors,QCaMotor*> motors;
 
-  static const double standardZseparation = 20.0; // standard Z-separation of crystals;
-  static const double zOut = -45.0; // Z1 when the mono is out of the beam;
-  static const double alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
-  // OLD CRYSTALS // static const double alpha = -4.652; // asymmetry angle (deg)
-  static const double source2monoDistance = 16.307;//m
+  static const double standardZseparation;
+  static const double zOut;
+  static const double alpha; // asymmetry angle (deg) "+" for 111 "-" for 311
+  // OLD CRYSTALS // static const double alpha; // asymmetry angle (deg)
+  static const double source2monoDistance;//m
 
-  static const double benderGapH = 0.3; // halph bender gap
-  static const double bend1rt = 58.112;
-  static const double bend2rt = 62.2;
-  // static const double bend1BraggCorrection = 0.00373; // deg(correction) / mm(tip travel)
-  // static const double bend2BraggCorrection = 0.00326; // deg(correction) / mm(tip travel)
-  static const double bend1BraggCorrection = 0.0; // no correction
-  static const double bend2BraggCorrection = 0.0; // no correction
+  static const double benderGapH; // halph bender gap
+  static const double bend1rt;
+  static const double bend2rt;
+  // static const double bend1BraggCorrection; // deg(correction) / mm(tip travel)
+  // static const double bend2BraggCorrection; // deg(correction) / mm(tip travel)
+  static const double bend1BraggCorrection; // no correction
+  static const double bend2BraggCorrection; // no correction
 
 
 private:

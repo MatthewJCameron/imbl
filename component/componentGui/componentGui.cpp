@@ -2,6 +2,8 @@
 #include "componentGui.h"
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QMessageBox>
 
 
 ComponentGui::ComponentGui(Component * _comp, bool _deleteComponent, QWidget * parent) :

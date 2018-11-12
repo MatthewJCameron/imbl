@@ -1,7 +1,7 @@
 #ifndef QIMBL_H
 #define QIMBL_H
 
-#include <QtGui/QMainWindow>
+#include <QMainWindow>
 #include <QLabel>
 #include "shutterFE.h"
 #include "shutter1A.h"

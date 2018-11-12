@@ -16,6 +16,7 @@ double energy2bragg(double energy, Mono::Diffraction diff) {
       * 180.0 / M_PI ;
 }
 
+
 const QString Mono::pvBaseName = "SR08ID01DCM01:";
 
 const QHash<Mono::Motors,QCaMotor*> Mono::motors=Mono::init_motors();
@@ -28,6 +29,22 @@ QEpicsPv * Mono::Bragg2EncLoss = new QEpicsPv(Mono::pvBaseName + "BRAGG2:ELOSS")
 QEpicsPv * Mono::XdistEncLoss = new QEpicsPv(Mono::pvBaseName + "X:ELOSS");
 
 const QPair<double,double> Mono::energyRange = qMakePair<double,double>(16.0,195.0);
+const double Mono::maxEnergy111 = 150.0; // keV
+const double Mono::minEnergy311 = 31.0; // keV
+
+const double Mono::standardZseparation = 20.0; // standard Z-separation of crystals;
+const double Mono::zOut = -45.0; // Z1 when the mono is out of the beam;
+const double Mono::alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
+// OLD CRYSTALS // const double Mono::alpha = -4.652; // asymmetry angle (deg)
+const double Mono::source2monoDistance = 16.307;//m
+
+const double Mono::benderGapH = 0.3; // halph bender gap
+const double Mono::bend1rt = 58.112;
+const double Mono::bend2rt = 62.2;
+// const double Mono::bend1BraggCorrection = 0.00373; // deg(correction) / mm(tip travel)
+// const double Mono::bend2BraggCorrection = 0.00326; // deg(correction) / mm(tip travel)
+const double Mono::bend1BraggCorrection = 0.0; // no correction
+const double Mono::bend2BraggCorrection = 0.0; // no correction
 
 
 Mono::Mono(QObject *parent) :

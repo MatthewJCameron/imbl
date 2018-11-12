@@ -11,7 +11,6 @@ SUBDIRS = \
     DEImono \
     hutch \
     valve \
-    imblgui \
     qimbl
 
 

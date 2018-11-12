@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 CONFIG += qwt
-QT       += core gui
+QT       += core gui widgets
 
 TARGET = imblgui
 TEMPLATE = app

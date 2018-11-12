@@ -227,22 +227,39 @@ void FiltersGui::init() {
     calibrateLayout->addWidget(chbk);
   }
 
+  #if QWT_VERSION >= 0x060100
+  ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLogScaleEngine);
+  #else
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::xBottom, new QwtLog10ScaleEngine);
+  #endif
+
   ui->SpectrumPlot->setAxisMaxMinor(QwtPlot::xBottom, 10);
   ui->SpectrumPlot->setAxisScale(QwtPlot::xBottom, /*energies.first()*/ 10.0, energies.last());
   ui->SpectrumPlot->setAxisTitle(QwtPlot::xBottom, "Photon energy, keV");
 
+  #if QWT_VERSION >= 0x060100
+  ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLogScaleEngine);
+  #else
   ui->SpectrumPlot->setAxisScaleEngine(QwtPlot::yLeft, new QwtLog10ScaleEngine);
+  #endif
   ui->SpectrumPlot->setAxisScale(QwtPlot::yLeft, 1.0e-9, 1.0);
 
   QwtPlotGrid * SpectrumGrid = new QwtPlotGrid;
   SpectrumGrid->enableXMin(true);
   SpectrumGrid->enableYMin(true);
+
+  #if QWT_VERSION >= 0x060100
+  QPen pen=SpectrumGrid->majorPen();
+  pen.setStyle(Qt::DashLine);
+  SpectrumGrid->setMajorPen(pen);
+  pen=SpectrumGrid->minorPen();
+  pen.setStyle(Qt::DotLine);
+  SpectrumGrid->setMinorPen(pen);
+  #else
   SpectrumGrid->setMajPen(Qt::DashLine);
   SpectrumGrid->setMinPen(Qt::DotLine);
+  #endif
   SpectrumGrid->attach(ui->SpectrumPlot);
-
-  QPen pen;
 
   wb_curve = new QwtPlotCurve("White Beam");
   pen = QPen(QColor(0,0,0));
@@ -293,10 +310,16 @@ void FiltersGui::init() {
 
   updatePlot();
 
-  ui->additionalFilters->horizontalHeader()->setStretchLastSection(false);
-  ui->additionalFilters->horizontalHeader()->setResizeMode(0,QHeaderView::Stretch);
-  ui->additionalFilters->horizontalHeader()->setResizeMode(1,QHeaderView::Stretch);
-  ui->additionalFilters->horizontalHeader()->setResizeMode(2,QHeaderView::Fixed);
+  ui->additionalFilters->horizontalHeader()->setStretchLastSection(true);
+#if QT_VERSION >= 0x050000
+  ui->additionalFilters->horizontalHeader()->setSectionResizeMode(0,QHeaderView::ResizeToContents);
+  ui->additionalFilters->horizontalHeader()->setSectionResizeMode(1,QHeaderView::ResizeToContents);
+  ui->additionalFilters->horizontalHeader()->setSectionResizeMode(2,QHeaderView::ResizeToContents);
+#else
+  ui->additionalFilters->horizontalHeader()->setResizeMode(0,QHeaderView::ResizeToContents);
+  ui->additionalFilters->horizontalHeader()->setResizeMode(1,QHeaderView::ResizeToContents);
+  ui->additionalFilters->horizontalHeader()->setResizeMode(2,QHeaderView::ResizeToContents);
+#endif
   ui->additionalFilters->insertRow(0);
   QToolButton * addFilterBut = new QToolButton(ui->additionalFilters);
   addFilterBut->setText("add");

@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += gui
+QT       += gui widgets
 
 TARGET = componentGui
 TEMPLATE = lib
