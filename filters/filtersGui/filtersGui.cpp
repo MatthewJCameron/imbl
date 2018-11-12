@@ -248,8 +248,10 @@ void FiltersGui::init() {
   SpectrumGrid->enableXMin(true);
   SpectrumGrid->enableYMin(true);
 
+  QPen pen;
+
   #if QWT_VERSION >= 0x060100
-  QPen pen=SpectrumGrid->majorPen();
+  pen=SpectrumGrid->majorPen();
   pen.setStyle(Qt::DashLine);
   SpectrumGrid->setMajorPen(pen);
   pen=SpectrumGrid->minorPen();
