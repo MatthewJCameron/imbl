@@ -22,7 +22,7 @@ INCLUDEPATH += ./ \
                ../../component/componentGui \
                ../../shutterFE/shutterFEbase
 
-LIBS += -lmotorstack \
+LIBS += -lqmotorstack \
         -L../hhlSlitsBase -lhhlSlits \
         -L../../component/componentBase -lcomponent \
         -L../../component/componentGui -lcomponentGui \
