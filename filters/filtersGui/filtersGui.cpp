@@ -4,6 +4,7 @@
 #include "error.h"
 #include "shutterFE.h"
 #include <QtSvg/QtSvg>
+#include <QTextStream>
 
 #include <qwt_scale_draw.h>
 #include <qwt_scale_widget.h>
@@ -310,6 +311,8 @@ void FiltersGui::init() {
   connect(ui->fldPlot, SIGNAL(valueChanged(double)), SLOT(updatePlot()));
   connect(ui->fldLock, SIGNAL(toggled(bool)), SLOT(updateFields()));
 
+  connect(ui->savePlot, SIGNAL(clicked()), SLOT(onSavePlot()));
+
   updatePlot();
 
   ui->additionalFilters->horizontalHeader()->setStretchLastSection(true);
@@ -560,3 +563,24 @@ void FiltersGui::onAutoCalibration() {
   ShutterFE::setOpenedS(inst == ShutterFE::OPENED);
 
 }
+
+
+void FiltersGui::onSavePlot() {
+  QString fileName = QFileDialog::getSaveFileName(0, "Save plot data", QDir::currentPath());
+  QFile file(fileName);
+  if ( ! file.open(QIODevice::WriteOnly) )
+    return;
+  QTextStream stream(&file);
+  stream << "# [index] [energy, keV] [raw spectrum, normal] [filtered spectrum, normal]\n";
+
+  const int sz = energies.size();
+  for (int idx = 0 ; idx < sz ; idx++)
+    stream << idx << " " << energies[idx] << " "<< wb_curve->sample(idx).y() << " "<< new_curve->sample(idx).y() << "\n";
+
+  file.close();
+}
+
+
+
+
+

@@ -97,6 +97,7 @@ private slots:
   void onResetPressed();
   void onAdvancedControl();
   void onAutoCalibration();
+  void onSavePlot();
 
 };
 
