@@ -571,6 +571,19 @@ void FiltersGui::onSavePlot() {
   if ( ! file.open(QIODevice::WriteOnly) )
     return;
   QTextStream stream(&file);
+
+  stream << "# SCMW field: " << ui->fldPlot->value() << "T\n";
+  stream << "# Filter train: ";
+  foreach (PaddleGui* paddleUI, paddles)
+    stream << paddleUI->selectedAbsorber().description() << "  ";
+  for (int aidx=1 ; aidx < ui->additionalFilters->rowCount() ; aidx++) {
+    QComboBox * mat = dynamic_cast<QComboBox*>(ui->additionalFilters->cellWidget(aidx, 0));
+    Absorber::Material mt  =  mat ? Absorber::Material(mat->itemData(mat->currentIndex()).toInt()) : Absorber::Empty;
+    QDoubleSpinBox * thick = dynamic_cast<QDoubleSpinBox*>(ui->additionalFilters->cellWidget(aidx, 1));
+    stream << Absorber(mt, thick ? thick->value() : 0.0 ).description() << "  ";
+  }
+  stream << "\n";
+
   stream << "# [index] [energy, keV] [raw spectrum, normal] [filtered spectrum, normal]\n";
 
   const int sz = energies.size();
