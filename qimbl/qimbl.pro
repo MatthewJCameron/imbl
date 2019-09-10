@@ -64,9 +64,16 @@ LIBS += \
         -L../component/componentBase -lcomponent \
         -L../component/componentGui -lcomponentGui
 
+
+icon.path = $$[INSTALLBASE]/share/icons
+icon.files += imbl.png
+
+desktop.path = $$[INSTALLBASE]/share/applications
+desktop.files += IMBL.desktop
+
 target.files = $$[TARGET]
 target.path = $$INSTALLBASE/bin
-INSTALLS += target
+INSTALLS += target icon desktop
 
 RESOURCES += \
     qimbl.qrc

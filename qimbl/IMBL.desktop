@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=IMBL Control
+Exec=qimbl
+Icon=imbl
+Terminal=false
+Categories=Science;X-IMBL;
+StartupNotify=true
