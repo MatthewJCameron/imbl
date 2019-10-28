@@ -537,7 +537,7 @@ void FiltersGui::onAutoCalibration() {
   foreach(QCaMotor * mot, mlist) {
     positions[mot] = mot->get(); // get current positions
     mot->setUserLoLimit( -qAbs(mot->get()) - 500 ); // set software limits to something what is guaranteed to be beyond the real limit
-    mot->goLimit(-1,QCaMotor::STARTED); // go to find the hardware limits
+    mot->goLimit(QCaMotor::NEGATIVE, QCaMotor::STARTED); // go to find the hardware limits
   }
 
   //component()->wait_stop();

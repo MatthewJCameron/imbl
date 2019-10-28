@@ -67,7 +67,6 @@ Qimbl::Qimbl(QWidget *parent) :
   shfe(new ShutterFE(this)),
   sh1A(new Shutter1A(this)),
   valve1(new Valve(1, this)),
-  slits(new HhlSlitsGui(this)),
   filters(new FiltersGui(this)),
   mono(new MonoGui(this))
 {
@@ -135,12 +134,6 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(valve1, SIGNAL(stateChanged(Valve::State)), SLOT(update_valve_1()));
   connect(valve1, SIGNAL(connectionChanged(bool)), SLOT(update_valve_1()));
 
-  ui->control->addWidget(slits);
-  connect(slits->component(), SIGNAL(geometryChanged(double,double,double,double)), SLOT(update_slits()));
-  connect(slits->component(), SIGNAL(limitStateChanged(HhlSlits::Limits)), SLOT(update_slits()));
-  connect(slits->component(), SIGNAL(motionStateChanged(bool)), SLOT(update_slits()));
-  connect(slits->component(), SIGNAL(connectionChanged(bool)), SLOT(update_slits()));
-
   ui->control->addWidget(filters);
   if (filters->component()->paddles.size() != 5) // shoud never happen
     throw_error("Unexpected number of filter foils ("
@@ -172,7 +165,6 @@ Qimbl::Qimbl(QWidget *parent) :
   update_shfe();
   update_sh1A();
   update_shmrt();
-  update_slits();
   update_filters();
   update_mono();
   update_valve_1();
@@ -190,8 +182,6 @@ void Qimbl::chooseComponent(QAbstractButton* but) {
     ui->control->setCurrentWidget(filters);
   else if (but == ui->chooseMono)
     ui->control->setCurrentWidget(mono);
-  else if (but == ui->chooseSlits)
-    ui->control->setCurrentWidget(slits);
   else if (but == ui->chooseShutters)
     ui->control->setCurrentWidget(ui->shutters);
 }
@@ -592,38 +582,6 @@ void Qimbl::update_shmrt() {
   }
 }
 
-
-void Qimbl::update_slits() {
-  if ( ! slits->component()->isConnected() ) {
-    ui->slitsStW->show();
-    set_nolink_style(ui->slitsSt);
-    set_nolink_style(ui->slitsH);
-    set_nolink_style(ui->slitsW);
-    set_nolink_style(ui->slitsY);
-    set_nolink_style(ui->slitsZ);
-    return;
-  } else if ( slits->component()->isMoving() ) {
-    ui->slitsStW->show();
-    ui->slitsSt->setStyleSheet("");
-    ui->slitsSt->setText(inprogress_string);
-  } else if ( slits->component()->limits() ) {
-    ui->slitsStW->show();
-    ui->slitsSt->setStyleSheet("");
-    ui->slitsSt->setText("on limit(s)");
-  } else {
-    ui->slitsStW->hide();
-    ui->slitsSt->setStyleSheet("");
-    ui->slitsSt->setText("");
-  }
-  ui->slitsH->setStyleSheet("");
-  ui->slitsW->setStyleSheet("");
-  ui->slitsY->setStyleSheet("");
-  ui->slitsZ->setStyleSheet("");
-  ui->slitsH->setText(QString::number(slits->component()->height(), 'f', 3) + "mm");
-  ui->slitsW->setText(QString::number(slits->component()->width(), 'f', 3) + "mm");
-  ui->slitsY->setText(QString::number(slits->component()->hCenter(), 'f', 3) + "mm");
-  ui->slitsZ->setText(QString::number(slits->component()->vCenter(), 'f', 3) + "mm");
-}
 
 
 static void describePaddle(const Paddle * pad, QLabel * lab) {

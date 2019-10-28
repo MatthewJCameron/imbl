@@ -675,15 +675,15 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
 
   if ( motors2calibrate.contains(Bragg1) && Bragg1EncLoss->get().toBool() ) {
     connect(Bragg1EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg1], SLOT(stop()));
-    motors[Bragg1]->goLimit(1, QCaMotor::STARTED);
+    motors[Bragg1]->goLimit(QCaMotor::POSITIVE, QCaMotor::STARTED);
   }
   if ( motors2calibrate.contains(Bragg2) && Bragg2EncLoss->get().toBool() ) {
     connect(Bragg2EncLoss, SIGNAL(valueChanged(QVariant)), motors[Bragg2], SLOT(stop()));
-    motors[Bragg2]->goLimit(1, QCaMotor::STARTED);
+    motors[Bragg2]->goLimit(QCaMotor::POSITIVE, QCaMotor::STARTED);
   }
   if ( motors2calibrate.contains(Xdist) && XdistEncLoss->get().toBool() ) {
     connect(XdistEncLoss, SIGNAL(valueChanged(QVariant)), motors[Xdist], SLOT(stop()));
-    motors[Xdist]->goLimit(1, QCaMotor::STARTED);
+    motors[Xdist]->goLimit(QCaMotor::POSITIVE, QCaMotor::STARTED);
   }
   qtWait(200);
   if ( motors2calibrate.contains(Bragg1) ) {
@@ -700,7 +700,7 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
   }
 
   foreach(Motors motk, motors2calibrate)
-    motors[motk]->goLimit(-1, QCaMotor::STARTED);
+    motors[motk]->goLimit(QCaMotor::NEGATIVE, QCaMotor::STARTED);
   qtWait(200);
   foreach(Motors motk, motors2calibrate)
     motors[motk]->wait_stop();
@@ -716,9 +716,9 @@ void Mono::calibrate( const QList<Mono::Motors> & motors2calibrate ) {
 
   foreach(Motors motk, motors2calibrate)
     if (motk == Xdist)
-      motors[motk]->goHome(-1, QCaMotor::STARTED); // BUG in EPICS on inverted axis
+      motors[motk]->goHome(QCaMotor::NEGATIVE, QCaMotor::STARTED); // BUG in EPICS on inverted axis
     else
-      motors[motk]->goHome(1, QCaMotor::STARTED);
+      motors[motk]->goHome(QCaMotor::POSITIVE, QCaMotor::STARTED);
   qtWait(200);
   foreach(Motors motk, motors2calibrate)
     motors[motk]->wait_stop();
