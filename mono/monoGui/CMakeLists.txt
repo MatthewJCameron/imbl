@@ -24,7 +24,7 @@ install(TARGETS monoGui
     LIBRARY DESTINATION lib/imbl
 )
 
-install(FILES monoGui
+install(FILES monoGui.h
     DESTINATION include/imbl
 )
 

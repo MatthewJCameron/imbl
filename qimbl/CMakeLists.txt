@@ -31,6 +31,7 @@ target_include_directories(qimbl
 target_link_libraries(qimbl
   Qt5::Widgets  
   qtpv
+  qtpvwidgets
   TimeScanMX
   valve
   hutch
