@@ -30,6 +30,7 @@ target_include_directories(qimbl
 
 target_link_libraries(qimbl
   Qt5::Widgets  
+  Qt5::Svg
   qtpv
   qtpvwidgets
   valve

@@ -10,7 +10,7 @@ project(IMBLui
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
-find_package(Qt5 COMPONENTS Widgets REQUIRED)
+find_package(Qt5 COMPONENTS Widgets Svg REQUIRED)
 include_directories(${Qt5Widgets_INCLUDE_DIRS})
 
 find_package(QwtQt5 6.0 REQUIRED)
