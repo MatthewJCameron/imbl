@@ -260,9 +260,11 @@ bool Mono::isCalibrated() {
 double Mono::motorAngle(double enrg, int crystal, Diffraction diff) {
   switch (crystal) {
   case 1:
-    return energy2bragg(enrg, diff) + (diff == Si111 ? -15.156015866278 : alpha); //TODO
+    //return energy2bragg(enrg, diff) + (diff == Si111 ? -15.156015866278 : alpha); //TODO
+    return energy2bragg(enrg, diff) + (diff == Si111 ? -20 : alpha); //TODO
   case 2:
-    return energy2bragg(enrg, diff) + (diff == Si111 ? 15.367584133722 : -1.0*alpha); //TODO
+    //return energy2bragg(enrg, diff) + (diff == Si111 ? 15.367584133722 : -1.0*alpha); //TODO
+    return energy2bragg(enrg, diff) + (diff == Si111 ? 20 : -1.0*alpha); //TODO
   default:
     return 0;
   }
@@ -289,10 +291,10 @@ void Mono::updateEnergy() {
 
   const double mAngle = motors[Bragg2]->getUserPosition();
   double bAngle;
-  if ( mAngle >= alpha ) {
-  //if ( true ) { //DES//
+  //if ( mAngle >= alpha ) {
+  if ( true ) { //DES//
     _diff = Si111;
-    bAngle = mAngle - 15.367584133722;  // - alpha; //TODO
+    bAngle = mAngle - 20.0;  // - alpha; //TODO
   } else {
     _diff = Si311;
     bAngle = mAngle + alpha;
