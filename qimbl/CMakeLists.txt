@@ -24,6 +24,8 @@ target_include_directories(qimbl
   PRIVATE ../shutter1A/shutter1Abase
   PRIVATE ../mrtShutter/mrtShutterGui
   PRIVATE ../mrtShutter/mrtShutterBase
+  PRIVATE ../shutterIS/shutterISgui
+  PRIVATE ../shutterIS/shutterISbase
   PRIVATE ../component/componentBase
   PRIVATE ../component/componentGui
 )
@@ -43,6 +45,8 @@ target_link_libraries(qimbl
   monoGui
   shutter1A
   shutter1Agui
+  shutterIS
+  shutterISgui
   mrtShutter
   mrtShutterGui
   component

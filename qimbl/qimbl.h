@@ -5,6 +5,7 @@
 #include <QLabel>
 #include "shutterFE.h"
 #include "shutter1A.h"
+#include "shutterIS.h"
 #include "mrtShutter.h"
 #include "filtersGui.h"
 #include "monoGui.h"
@@ -40,7 +41,7 @@ private:
   ShutterFE * shfe;
   Shutter1A * sh1A;
   Valve * valve1;
-
+  ShutterIS * shIS;
   FiltersGui * filters;
   MonoGui * mono;
 
@@ -58,6 +59,7 @@ private slots:
   void update_hutches();
   void update_shfe();
   void update_sh1A();
+  void update_shIS();
   void update_shmrt();
   void update_filters();
   void update_mono();

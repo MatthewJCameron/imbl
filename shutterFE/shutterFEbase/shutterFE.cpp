@@ -14,7 +14,7 @@ QEpicsPv * ShutterFE::disabledSts = new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_
 
 
 ShutterFE::ShutterFE(QObject *parent) :
-  Component("Fron-end shutter", parent),
+  Component("Front-end shutter", parent),
   st(BETWEEN),
   enabled(false)
 {

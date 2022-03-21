@@ -51,5 +51,7 @@ add_subdirectory(mrtShutter/mrtShutterBase)
 add_subdirectory(mrtShutter/mrtShutterGui)
 add_subdirectory(hutch)
 add_subdirectory(valve)
+add_subdirectory(shutterIS/shutterISbase)
+add_subdirectory(shutterIS/shutterISgui)
 
 add_subdirectory(qimbl)
