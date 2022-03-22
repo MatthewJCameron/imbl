@@ -16,7 +16,7 @@ ShutterISgui::ShutterISgui(QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(ShutterIS::State)), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(stateChanged(ShutterIS::State)), SLOT(updateState()));
   updateConnection(false);
 }
 
@@ -27,9 +27,9 @@ ShutterISgui::ShutterISgui(ShutterIS * sht, QWidget *parent) :
   ui->setupUi(this);
   connect(ui->open, SIGNAL(clicked()), component(), SLOT(open()));
   connect(ui->close, SIGNAL(clicked()), component(), SLOT(close()));
-  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateStatuses()));
-  connect(component(), SIGNAL(relaxChanged()), SLOT(updateStatuses()));
-  connect(component(), SIGNAL(enabledChanged()), SLOT(updateStatuses()));
+  connect(component(), SIGNAL(stateChanged(State)), SLOT(updateState()));
+  connect(component(), SIGNAL(relaxChanged()), SLOT(updateState()));
+  connect(component(), SIGNAL(enabledChanged()), SLOT(updateState()));
   updateConnection(component()->isConnected());
 }
 
@@ -41,7 +41,7 @@ void ShutterISgui::updateConnection(bool con) {
   if ( !con ) {
     ui->isLabel->setText("Disconnected");
   } else
-    updateStatuses();
+    updateState();
 }
 
 void ShutterISgui::updateState() {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Shutter1Agui</class>
- <widget class="QWidget" name="Shutter1Agui">
+ <class>ShutterISgui</class>
+ <widget class="QWidget" name="ShutterISgui">
   <property name="geometry">
    <rect>
     <x>0</x>

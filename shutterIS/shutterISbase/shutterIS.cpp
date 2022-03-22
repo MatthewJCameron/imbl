@@ -10,6 +10,8 @@ QEpicsPv * ShutterIS::openStatus =
 QEpicsPv * ShutterIS::openCommand =
     new QEpicsPv("SR08ID0IS01:SHUTTEROPEN_CMD");
 
+QEpicsPv * ShutterIS::enabledStatus =
+    new QEpicsPv("SR08ID01IS01:SHUTTERENABLE_MONITOR");
 
 ShutterIS::ShutterIS(QObject *parent) :
   Component("Imaging shutter", parent),
@@ -23,13 +25,13 @@ ShutterIS::ShutterIS(QObject *parent) :
   connect(openCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   //connect(closeCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(enabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  connect(disabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
+  //connect(disabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(&timer, SIGNAL(timeout()), SIGNAL(relaxChanged()));
 
-  connect(isOpenStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
+  connect(openStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
   //connect(isCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
   connect(enabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
-  connect(disabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
+  //connect(disabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
 
   updateConnection();
 
@@ -40,9 +42,9 @@ ShutterIS::~ShutterIS() {
 
 void ShutterIS::updateConnection() {
   bool connection =
-      ssOpenStatus->isConnected() //&& ssCloseStatus->isConnected() &&
+      openStatus->isConnected() && //ssCloseStatus->isConnected() &&
       openCommand->isConnected() && //closeCommand->isConnected() &&
-      enabledStatus->isConnected() && disabledStatus->isConnected();
+      enabledStatus->isConnected();// && disabledStatus->isConnected();
   setConnected(connection);
   if (isConnected()) {
     updateState();
@@ -52,12 +54,12 @@ void ShutterIS::updateConnection() {
 }
 
 void ShutterIS::updateState() {
-if ( sender() == ssOpenStatus) {
+if ( sender() == openStatus) {
     timer.start();
     emit relaxChanged();
   }
 
-  if ( ssOpenStatus->get().toBool() ) {
+  if ( openStatus->get().toBool() ) {
     st = OPENED;
     setDescription("Opened");
     emit opened();
@@ -73,7 +75,7 @@ if ( sender() == ssOpenStatus) {
 void ShutterIS::updateEnabled() {
   if ( ! isConnected() )
     return;
-  bool newEnabled = enabledStatus->get().toBool() && ! disabledStatus->get().toBool();
+  bool newEnabled = enabledStatus->get().toBool();// && ! disabledStatus->get().toBool();
   emit enabledChanged(enabled = newEnabled);
 }
 

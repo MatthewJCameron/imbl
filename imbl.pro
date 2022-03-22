@@ -3,6 +3,7 @@ CONFIG += ordered
 SUBDIRS = \
     component \
     shutterFE \
+    shutterIS \
     hhlSlits \
     mono \
     filters \

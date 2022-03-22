@@ -24,24 +24,24 @@ protected:
   static const int relaxTime;
   QTimer timer;
 
-  State Isst;
+  State st;
   bool enabled;
 
-  static QEpicsPv * isOpenStatus;
+  static QEpicsPv * openStatus;
   //static QEpicsPv * isCloseStatus;
   
   static QEpicsPv * openCommand;
   //static QEpicsPv * closeCommand;
 
   static QEpicsPv * enabledStatus;
-  static QEpicsPv * disabledStatus;
+ // static QEpicsPv * disabledStatus;
 
 public:
 
   explicit ShutterIS(QObject *parent = 0);
   ~ShutterIS();
 
-  inline State state() const{return Isst};
+  inline State state() const{return st;};
   inline bool isRelaxing() const {return timer.isActive();}
   inline bool isEnabled() const {return enabled;}
 

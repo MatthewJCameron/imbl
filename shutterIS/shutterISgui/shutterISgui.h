@@ -31,7 +31,7 @@ private:
 
 protected slots:
 
-  void updateStatuses();
+  void updateState();
   void updateConnection(bool con);
 
 };

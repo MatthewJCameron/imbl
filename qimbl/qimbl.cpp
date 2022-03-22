@@ -68,7 +68,8 @@ Qimbl::Qimbl(QWidget *parent) :
   sh1A(new Shutter1A(this)),
   valve1(new Valve(1, this)),
   filters(new FiltersGui(this)),
-  mono(new MonoGui(this))
+  mono(new MonoGui(this)),
+  shIS(new ShutterIS(this))
 {
 
   //QEpicsPv::setDebugLevel(1);
@@ -134,6 +135,12 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(valve1, SIGNAL(stateChanged(Valve::State)), SLOT(update_valve_1()));
   connect(valve1, SIGNAL(connectionChanged(bool)), SLOT(update_valve_1()));
 
+  connect(shIS, SIGNAL(stateChanged(ShutterIS::State)), SLOT(update_shIS()));
+  connect(shIS, SIGNAL(connectionChanged(bool)), SLOT(update_shIS()));
+  connect(shIS, SIGNAL(enabledChanged(bool)), SLOT(update_shIS()));
+  connect(ui->shISControl, SIGNAL(clicked()), shIS, SLOT(toggle()));
+
+
   ui->control->addWidget(filters);
   if (filters->component()->paddles.size() != 5) // shoud never happen
     throw_error("Unexpected number of filter foils ("
@@ -168,6 +175,7 @@ Qimbl::Qimbl(QWidget *parent) :
   update_filters();
   update_mono();
   update_valve_1();
+  update_shIS();
 
 }
 
@@ -579,6 +587,47 @@ void Qimbl::update_shmrt() {
       ui->shIndMRT_o->setText("Exposing");
       break;
     }
+  }
+}
+
+void Qimbl::update_shIS() {
+  if ( ! shIS->isConnected() ) {
+    set_nolink_style(ui->shISSt);
+    set_nolink_style(ui->shIndIS_c);
+    set_nolink_style(ui->shIndIS_o);
+  } else {
+    switch (shIS->state()) {
+      case ShutterIS::CLOSED :
+        ui->shISSt->setStyleSheet(red_style);
+        ui->shISSt->setText(shutter_closed_string);
+        ui->shIndIS_c->setStyleSheet(shInd_c_style);
+        ui->shIndIS_c->setText(shutter_closed_string);
+        ui->shIndIS_o->setStyleSheet("");
+        ui->shIndIS_o->setText("");
+        ui->shISControl->setText("Open");
+        break;
+      case ShutterIS::OPENED :
+        ui->shISSt->setStyleSheet(green_style);
+        ui->shISSt->setText(shutter_open_string);
+        ui->shIndIS_c->setStyleSheet("");
+        ui->shIndIS_c->setText("");
+        ui->shIndIS_o->setStyleSheet(shInd_o_style);
+        ui->shIndIS_o->setText(shutter_open_string);
+        ui->shISControl->setText("Close");
+        break;
+      case ShutterIS::BETWEEN :
+        ui->shISSt->setStyleSheet(red_style);
+        ui->shISSt->setText(inprogress_string);
+        ui->shIndIS_c->setStyleSheet(shInd_c_style);
+        ui->shIndIS_c->setText(inprogress_string);
+        ui->shIndIS_o->setStyleSheet(shInd_c_style);
+        ui->shIndIS_o->setText(inprogress_string);
+        ui->shISControl->setText("Close");
+        break;
+    }
+    // ui->shfeControl->setEnabled(shfe->isEnabled());
+    // if ( ! shfe->isEnabled() )
+    //  ui->shfeControl->setText("Disabled");
   }
 }
 
