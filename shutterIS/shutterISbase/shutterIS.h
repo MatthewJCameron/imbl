@@ -28,13 +28,8 @@ protected:
   bool enabled;
 
   static QEpicsPv * openStatus;
-  //static QEpicsPv * isCloseStatus;
-  
   static QEpicsPv * openCommand;
-  //static QEpicsPv * closeCommand;
-
   static QEpicsPv * enabledStatus;
- // static QEpicsPv * disabledStatus;
 
 public:
 
@@ -49,6 +44,7 @@ public slots:
 
   bool open(bool wait=false);
   bool close(bool wait=false);
+  bool toggle(bool wait=false);
 
 signals:
 

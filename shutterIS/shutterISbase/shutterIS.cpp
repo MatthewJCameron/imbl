@@ -4,35 +4,27 @@
 
 const int ShutterIS::relaxTime = 1000; // msec
 
-QEpicsPv * ShutterIS::openStatus =
-    new QEpicsPv("SR08ID01IS01:SHUTTEROPEN_MONITOR");
-
-QEpicsPv * ShutterIS::openCommand =
-    new QEpicsPv("SR08ID0IS01:SHUTTEROPEN_CMD");
-
-QEpicsPv * ShutterIS::enabledStatus =
-    new QEpicsPv("SR08ID01IS01:SHUTTERENABLE_MONITOR");
+QEpicsPv * ShutterIS::openStatus = new QEpicsPv("SR08ID01IS01:SHUTTEROPEN_MONITOR");
+QEpicsPv * ShutterIS::openCommand = new QEpicsPv("SR08ID01IS01:SHUTTEROPEN_CMD");
+QEpicsPv * ShutterIS::enabledStatus =  new QEpicsPv("SR08ID01IS01:SHUTTERENABLE_MONITOR");
 
 ShutterIS::ShutterIS(QObject *parent) :
   Component("Imaging shutter", parent),
-  enabled(false)
+  enabled(false),
+  st(BETWEEN)
 {
 
 
   timer.setSingleShot(true);
   timer.setInterval(relaxTime);
 
+  connect(openStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(openCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  //connect(closeCommand, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(enabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
-  //connect(disabledStatus, SIGNAL(connectionChanged(bool)), SLOT(updateConnection()));
   connect(&timer, SIGNAL(timeout()), SIGNAL(relaxChanged()));
 
   connect(openStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
-  //connect(isCloseStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateState()));
   connect(enabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
-  //connect(disabledStatus, SIGNAL(valueChanged(QVariant)), SLOT(updateEnabled()));
-
   updateConnection();
 
 }
@@ -42,9 +34,7 @@ ShutterIS::~ShutterIS() {
 
 void ShutterIS::updateConnection() {
   bool connection =
-      openStatus->isConnected() && //ssCloseStatus->isConnected() &&
-      openCommand->isConnected() && //closeCommand->isConnected() &&
-      enabledStatus->isConnected();// && disabledStatus->isConnected();
+      openStatus->isConnected() && openCommand->isConnected() && enabledStatus->isConnected();
   setConnected(connection);
   if (isConnected()) {
     updateState();
@@ -102,4 +92,9 @@ bool ShutterIS::close(bool wait) {
   if ( state() != CLOSED && wait )
     qtWait(this, SIGNAL(closed()), transitionTime);
   return state() == CLOSED;
+}
+
+bool ShutterIS::toggle(bool wait) {
+  if (state()==CLOSED) return open(wait);
+  else                 return close(wait);
 }
