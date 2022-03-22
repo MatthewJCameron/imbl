@@ -644,7 +644,7 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QLabel" name="label_14">
+          <widget class="QLabel" name="shISSt">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -1418,7 +1418,15 @@
          </widget>
         </item>
         <item row="1" column="1" colspan="2">
-         <layout class="QHBoxLayout" name="isShutterControlPlacer"/>
+         <layout class="QHBoxLayout" name="isShutterControlPlacer">
+          <item>
+           <widget class="QPushButton" name="shISControl">
+            <property name="text">
+             <string>PushButton</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
