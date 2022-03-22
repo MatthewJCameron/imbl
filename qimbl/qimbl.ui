@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>2905</width>
-    <height>657</height>
+    <width>690</width>
+    <height>343</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -1420,10 +1420,29 @@
         <item row="1" column="1" colspan="2">
          <layout class="QHBoxLayout" name="isShutterControlPlacer">
           <item>
-           <widget class="QPushButton" name="shISControl">
-            <property name="text">
-             <string>PushButton</string>
-            </property>
+           <widget class="QWidget" name="shISControlWidget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_7">
+             <item>
+              <spacer name="verticalSpacer_4">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>3</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="shISControl">
+               <property name="text">
+                <string>PushButton</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
