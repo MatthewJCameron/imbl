@@ -69,7 +69,8 @@ Qimbl::Qimbl(QWidget *parent) :
   valve1(new Valve(1, this)),
   filters(new FiltersGui(this)),
   mono(new MonoGui(this)),
-  shIS(new ShutterIS(this))
+  shIS(new ShutterIS(this)),
+  slidePos(new QEpicsPv("SR08ID01SST21:YTrans"))
 {
 
   //QEpicsPv::setDebugLevel(1);
@@ -93,6 +94,9 @@ Qimbl::Qimbl(QWidget *parent) :
 
   connect(rfcurrent, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfcurrent()));
   connect(rfcurrent, SIGNAL(connectionChanged(bool)), SLOT(update_rfcurrent()));
+
+  connect(slidePos, SIGNAL(valueUpdated(QVariant)), SLOT(update_slidePos()));
+  connect(slidePos, SIGNAL(connectionChanged(bool)), SLOT(update_slidePos()));
 
   connect(rfenergy, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfenergy()));
   connect(rfenergy, SIGNAL(connectionChanged(bool)), SLOT(update_rfenergy()));
@@ -139,6 +143,9 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shIS, SIGNAL(connectionChanged(bool)), SLOT(update_shIS()));
   connect(shIS, SIGNAL(enabledChanged(bool)), SLOT(update_shIS()));
   connect(ui->shISControl, SIGNAL(clicked()), shIS, SLOT(toggle()));
+
+  connect(ui->shISInOutButton, SIGNAL(clicked()), SLOT(MoveSlideToImagingShutter()));
+  connect(ui->shMRTInOutButton, SIGNAL(clicked()), SLOT(MoveSlideToMRTShutter()));
 
 
   ui->control->addWidget(filters);
@@ -631,8 +638,6 @@ void Qimbl::update_shIS() {
   }
 }
 
-
-
 static void describePaddle(const Paddle * pad, QLabel * lab) {
   if ( ! pad->isConnected() ) {
     set_nolink_style(lab);
@@ -817,4 +822,62 @@ void LinkedMiddle::paintEvent( QPaintEvent * event ) {
   //painter.drawLine(0, height()/2, width(), height()/2);
   painter.drawLine(0, height()/2, width(), height()/2);
   QWidget::paintEvent(event);
+}
+
+void Qimbl::update_slidePos() {
+  if ( ! slidePos->isConnected() ) {
+    set_nolink_style(ui->ShutterSlidePos);
+    ui->shMRTInOutButton->disable();
+    ui->shISInOutButton->disable();
+  } else {
+    ui->ShutterSlidePos->setStyleSheet("");
+    double currentPos = slidePos->get().toDouble();
+    ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + "mm" );
+    ui->shMRTInOutButton->enable();
+    ui->shISInOutButton->enable();
+    if ( 299.0 < currentPos ){
+      ui->shMRTInOutButton->setText("Move IN");
+      ui->shISInOutButton ->setText("Move OUT");
+    }
+    if (currentPos < -299.0){
+      ui->shMRTInOutButton->setText("Move OUT");
+      ui->shISInOutButton ->setText("Move IN");
+    }
+    if ( -0.1 < currentPos < 0.1){
+      ui->shMRTInOutButton->setText("Move IN");
+      ui->shISInOutButton ->setText("Move IN");
+    }
+  }
+}
+
+void MoveSlideToMRTShutter(){
+  if ( ! slidePos->isConnected()){
+    return;
+  } 
+  else {
+    double currentPos = slidePos->get().toDouble();
+    if (currentPos > -299.0){
+      slidePos->set(-300.0);
+      ui->shMRTInOutButton->setText("Move OUT");
+    }
+    else {
+      slidePos->set(0.0);
+      ui->shMRTInOutButton->setText("Move IN");
+    }
+}
+
+void MoveSlideToImagingShutter(){
+  if ( ! slidePos->isConnected()){
+    return;
+  } 
+  else {
+    double currentPos = slidePos->get().toDouble();
+    if (currentPos < 299.0){
+      slidePos->set(300.0);
+      ui->shISInOutButton->setText("Move OUT");
+    }
+    else {
+      slidePos->set(0.0);
+      ui->shISInOutButton->setText("Move IN");
+    }
 }

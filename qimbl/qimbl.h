@@ -35,6 +35,7 @@ private:
   QEpicsPv * bl_disabled;
   QEpicsPv * eps_enabled;
   QEpicsPv * eps_disabled;
+  QEpicsPv * slidePos;
 
   QHash < Hutch*, QLabel* > hutches;
 
@@ -64,6 +65,10 @@ private slots:
   void update_filters();
   void update_mono();
   void update_valve_1();
+  void update_slidePos();
+  void MoveSlideToMRTShutter();
+  void MoveSlideToImagingShutter();
+  
 
 };
 
