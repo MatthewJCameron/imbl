@@ -36,6 +36,7 @@ private:
   QEpicsPv * eps_enabled;
   QEpicsPv * eps_disabled;
   QEpicsPv * slidePos;
+  QEpicsPv * slidePosRBV;
 
   QHash < Hutch*, QLabel* > hutches;
 

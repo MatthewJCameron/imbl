@@ -70,7 +70,8 @@ Qimbl::Qimbl(QWidget *parent) :
   filters(new FiltersGui(this)),
   mono(new MonoGui(this)),
   shIS(new ShutterIS(this)),
-  slidePos(new QEpicsPv("SR08ID01SST21:YTrans"))
+  slidePos(new QEpicsPv("SR08ID01SST21:YTrans")),
+  slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV"))
 {
 
   //QEpicsPv::setDebugLevel(1);
@@ -827,57 +828,68 @@ void LinkedMiddle::paintEvent( QPaintEvent * event ) {
 void Qimbl::update_slidePos() {
   if ( ! slidePos->isConnected() ) {
     set_nolink_style(ui->ShutterSlidePos);
-    ui->shMRTInOutButton->disable();
-    ui->shISInOutButton->disable();
-  } else {
+    ui->shMRTInOutButton->setDisabled(true);
+    ui->shISInOutButton-> setDisabled(true);
+    } 
+  else {
     ui->ShutterSlidePos->setStyleSheet("");
-    double currentPos = slidePos->get().toDouble();
+    double currentPos = slidePosRBV->get().toDouble();
     ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + "mm" );
-    ui->shMRTInOutButton->enable();
-    ui->shISInOutButton->enable();
     if ( 299.0 < currentPos ){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move OUT");
-    }
-    if (currentPos < -299.0){
+      ui->shMRTInOutButton->setEnabled(true);
+      ui->shISInOutButton->setEnabled(true);
+      }
+    else if (currentPos < -299.0){
       ui->shMRTInOutButton->setText("Move OUT");
       ui->shISInOutButton ->setText("Move IN");
-    }
-    if ( -0.1 < currentPos < 0.1){
+      ui->shMRTInOutButton->setEnabled(true);
+      ui->shISInOutButton->setEnabled(true);
+      }
+    else if ( -0.1 < currentPos < 0.1){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move IN");
+      ui->shMRTInOutButton->setEnabled(true);
+      ui->shISInOutButton->setEnabled(true);
+      }
+    else {
+      ui->shMRTInOutButton->setDisabled(true);
+      ui->shISInOutButton-> setDisabled(true);
+      }
     }
-  }
 }
 
-void MoveSlideToMRTShutter(){
+void Qimbl::MoveSlideToMRTShutter(){
   if ( ! slidePos->isConnected()){
     return;
-  } 
+    } 
   else {
-    double currentPos = slidePos->get().toDouble();
+    double currentPos = slidePosRBV->get().toDouble();
     if (currentPos > -299.0){
       slidePos->set(-300.0);
       ui->shMRTInOutButton->setText("Move OUT");
-    }
+      }
     else {
       slidePos->set(0.0);
       ui->shMRTInOutButton->setText("Move IN");
+      }
     }
 }
 
-void MoveSlideToImagingShutter(){
+void Qimbl::MoveSlideToImagingShutter(){
   if ( ! slidePos->isConnected()){
     return;
-  } 
+    } 
   else {
     double currentPos = slidePos->get().toDouble();
     if (currentPos < 299.0){
       slidePos->set(300.0);
       ui->shISInOutButton->setText("Move OUT");
-    }
+      }
     else {
       slidePos->set(0.0);
       ui->shISInOutButton->setText("Move IN");
+      }
     }
 }
