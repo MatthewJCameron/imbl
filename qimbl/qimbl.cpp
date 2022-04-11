@@ -2,7 +2,7 @@
 #include "ui_qimbl.h"
 #include "error.h"
 #include "columnresizer.h"
-
+#include <stdio.h>
 
 
 
@@ -98,6 +98,10 @@ Qimbl::Qimbl(QWidget *parent) :
 
   connect(slidePos, SIGNAL(valueUpdated(QVariant)), SLOT(update_slidePos()));
   connect(slidePos, SIGNAL(connectionChanged(bool)), SLOT(update_slidePos()));
+
+  connect(slidePosRBV, SIGNAL(valueUpdated(QVariant)), SLOT(update_slidePos()));
+  connect(slidePosRBV, SIGNAL(connectionChanged(bool)), SLOT(update_slidePos()));
+
 
   connect(rfenergy, SIGNAL(valueUpdated(QVariant)), SLOT(update_rfenergy()));
   connect(rfenergy, SIGNAL(connectionChanged(bool)), SLOT(update_rfenergy()));
@@ -834,7 +838,8 @@ void Qimbl::update_slidePos() {
   else {
     ui->ShutterSlidePos->setStyleSheet("");
     double currentPos = slidePosRBV->get().toDouble();
-    ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + "mm" );
+    ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + " mm" );
+    //std::cout << "currentPos is " << currentPos << std::endl;
     if ( 299.0 < currentPos ){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move OUT");
@@ -847,13 +852,15 @@ void Qimbl::update_slidePos() {
       ui->shMRTInOutButton->setEnabled(true);
       ui->shISInOutButton->setEnabled(true);
       }
-    else if ( -0.1 < currentPos < 0.1){
+    else if ( (-0.1 < currentPos) && (currentPos < 0.1) ){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move IN");
       ui->shMRTInOutButton->setEnabled(true);
       ui->shISInOutButton->setEnabled(true);
       }
     else {
+      ui->shMRTInOutButton->setText("Between");
+      ui->shISInOutButton ->setText("Between");
       ui->shMRTInOutButton->setDisabled(true);
       ui->shISInOutButton-> setDisabled(true);
       }
@@ -874,6 +881,7 @@ void Qimbl::MoveSlideToMRTShutter(){
       slidePos->set(0.0);
       ui->shMRTInOutButton->setText("Move IN");
       }
+    Qimbl::update_slidePos();
     }
 }
 
@@ -882,7 +890,7 @@ void Qimbl::MoveSlideToImagingShutter(){
     return;
     } 
   else {
-    double currentPos = slidePos->get().toDouble();
+    double currentPos = slidePosRBV->get().toDouble();
     if (currentPos < 299.0){
       slidePos->set(300.0);
       ui->shISInOutButton->setText("Move OUT");
@@ -891,5 +899,6 @@ void Qimbl::MoveSlideToImagingShutter(){
       slidePos->set(0.0);
       ui->shISInOutButton->setText("Move IN");
       }
+    Qimbl::update_slidePos();
     }
 }
