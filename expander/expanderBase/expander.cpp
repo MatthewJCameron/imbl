@@ -28,8 +28,8 @@ QHash<Expander::Motors,QCaMotor*> Expander::init_motors() {
   motret[slide] = new QCaMotor(Expander::pvBaseName + "MOT4");
   motret[gonio] = new QCaMotor(Expander::pvBaseName + "MOT5");
   motret[inOut] = new QCaMotor(Expander::pvBaseName + "MOT6");
-  motret[inOut] = new QCaMotor(Expander::pvTableBaseName + "Y");
-  motret[inOut] = new QCaMotor(Expander::pvTableBaseName + "Z");
+  motret[tbly] = new QCaMotor(Expander::pvTableBaseName + "Y");
+  motret[tblz] = new QCaMotor(Expander::pvTableBaseName + "Z");
   return motret;
 }
 
@@ -45,7 +45,10 @@ void Expander::updateConnection() {
     con &= mot->isConnected();*/
   con &= motors[tilt]->isConnected() &&
          motors[slide]->isConnected() &&
-         motors[gonio]->isConnected();
+         motors[gonio]->isConnected() &&
+         motors[inOut]->isConnected() &&
+         motors[tbly]->isConnected() &&
+         motors[tblz]->isConnected();
   //if(con) printf("con is true at some point\n");
   setConnected(con);
   if(isConnected()) UpdateInOutStatus();

@@ -17,7 +17,9 @@ public:
     tilt,
     slide,
     gonio,
-    inOut
+    inOut,
+    tbly,
+    tblz
   };
 
   static const QHash<Motors,QCaMotor*> motors;

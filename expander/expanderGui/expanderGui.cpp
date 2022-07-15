@@ -26,6 +26,8 @@ void ExpanderGui::init() {
   ui->motors_1->addMotor(component()->motors[Expander::slide], true,true);
   ui->motors_1->addMotor(component()->motors[Expander::gonio], true,true);
   ui->motors_1->addMotor(component()->motors[Expander::inOut], true,true);
+  ui->motors_1->addMotor(component()->motors[Expander::tbly], true,true);
+  ui->motors_1->addMotor(component()->motors[Expander::tblz], true,true);
   
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
