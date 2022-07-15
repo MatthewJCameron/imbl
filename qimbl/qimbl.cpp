@@ -71,14 +71,14 @@ Qimbl::Qimbl(QWidget *parent) :
   mono(new MonoGui(this)),
   shIS(new ShutterIS(this)),
   slidePos(new QEpicsPv("SR08ID01SST21:YTrans")),
-  slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV"))
+  slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV")),
+  expander(new ExpanderGui(this))
 {
 
   //QEpicsPv::setDebugLevel(1);
 
   ui->setupUi(this);
-  connect(ui->chooseComponent, SIGNAL(buttonClicked(QAbstractButton*)),
-          SLOT(chooseComponent(QAbstractButton*)));
+  connect(ui->chooseComponent, SIGNAL(buttonClicked(QAbstractButton*)),SLOT(chooseComponent(QAbstractButton*)));
 
   connect(bl_enabled, SIGNAL(valueUpdated(QVariant)), SLOT(update_bl_status()));
   connect(bl_enabled, SIGNAL(connectionChanged(bool)), SLOT(update_bl_status()));
@@ -173,6 +173,10 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(mono->component(), SIGNAL(inBeamChanged(Mono::InOutPosition)), SLOT(update_mono()));
   connect(mono->component(), SIGNAL(connectionChanged(bool)), SLOT(update_mono()));
 
+  ui->control->addWidget(expander);
+  connect(expander->component(), SIGNAL(connectionChanged(bool)), SLOT(update_expander()));
+  connect(expander->component(), SIGNAL(inBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
+  
   update_rfstat();
   update_rfcurrent();
   update_rfenergy();
@@ -188,6 +192,7 @@ Qimbl::Qimbl(QWidget *parent) :
   update_mono();
   update_valve_1();
   update_shIS();
+  update_expander();
 
 }
 
@@ -204,6 +209,8 @@ void Qimbl::chooseComponent(QAbstractButton* but) {
     ui->control->setCurrentWidget(mono);
   else if (but == ui->chooseShutters)
     ui->control->setCurrentWidget(ui->shutters);
+  else if (but == ui->chooseExpander)
+    ui->control->setCurrentWidget(expander);
 }
 
 
@@ -750,7 +757,55 @@ void Qimbl::update_mono() {
                      QString::number(mono->component()->bend2ib(),'f',2));
 }
 
-
+void Qimbl::update_expander() {
+  if ( ! expander->component()->isConnected() ) {
+    set_nolink_style(ui->ExpInOut);
+    set_nolink_style(ui->ExpSlide);
+    set_nolink_style(ui->ExpTilt);
+    set_nolink_style(ui->ExpGonio);
+    return;
+  }
+  ui->ExpInOut->setStyleSheet("");
+  ui->ExpSlide->setStyleSheet("");
+  ui->ExpTilt->setStyleSheet("");
+  ui->ExpGonio->setStyleSheet("");
+  switch ( expander->component()->inBeam() ) {
+    case Expander::INBEAM :
+      ui->ExpInOut->setStyleSheet("");
+      ui->ExpInOut->setText("In beam");
+      break;
+    case Expander::OUTBEAM :
+      ui->ExpInOut->setStyleSheet("");
+      ui->ExpInOut->setText("Out of the beam");
+      break;
+    case Expander::BETWEEN :
+      ui->ExpInOut->setStyleSheet(red_style);
+      ui->ExpInOut->setText("Between");
+      break;
+    case Expander::MOVING :
+      ui->ExpInOut->setStyleSheet("");
+      ui->ExpInOut->setText("Moving");
+      break;
+  }
+  if (expander->component()->motors[Expander::tilt]->isMoving()) {
+    ui->ExpTilt->setText("Moving");
+  } 
+  else {
+    ui->ExpTilt->setText(QString::number(expander->component()->motors[Expander::tilt]->getUserPosition(),'f',3) + "mm");
+  }
+  if (expander->component()->motors[Expander::slide]->isMoving()) {
+    ui->ExpSlide->setText("Moving");
+  } 
+  else {
+    ui->ExpSlide->setText(QString::number(expander->component()->motors[Expander::slide]->getUserPosition(),'f',3) + "mm");
+  }
+  if (expander->component()->motors[Expander::gonio]->isMoving()) {
+    ui->ExpGonio->setText("Moving");
+  } 
+  else {
+    ui->ExpGonio->setText(QString::number(expander->component()->motors[Expander::gonio]->getUserPosition(),'f',3) + "mm");
+  }
+}
 
 void QLabelLine::paintEvent( QPaintEvent * event ) {
   QLabel::paintEvent(event);

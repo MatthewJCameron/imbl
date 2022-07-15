@@ -20,6 +20,8 @@ target_include_directories(qimbl
   PRIVATE ../filters/filtersGui
   PRIVATE ../mono/monoGui
   PRIVATE ../mono/monoBase
+  PRIVATE ../expander/expanderGui
+  PRIVATE ../expander/expanderBase
   PRIVATE ../shutter1A/shutter1Agui
   PRIVATE ../shutter1A/shutter1Abase
   PRIVATE ../mrtShutter/mrtShutterGui
@@ -43,6 +45,8 @@ target_link_libraries(qimbl
   filtersGui
   mono
   monoGui
+  expander
+  expanderGui
   shutter1A
   shutter1Agui
   shutterIS

@@ -43,195 +43,27 @@
        <property name="spacing">
         <number>1</number>
        </property>
-       <item row="0" column="10">
-        <widget class="QPushButton" name="pushButton">
-         <property name="text">
-          <string>General</string>
-         </property>
-         <property name="flat">
-          <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="3">
-        <widget class="QPushButton" name="chooseFilters">
-         <property name="text">
-          <string>Filters</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">chooseComponent</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="0" column="8">
-        <widget class="QPushButton" name="chooseShutters">
-         <property name="text">
-          <string>Shutters</string>
-         </property>
-         <property name="checkable">
-          <bool>true</bool>
-         </property>
-         <property name="autoExclusive">
-          <bool>true</bool>
-         </property>
-         <attribute name="buttonGroup">
-          <string notr="true">chooseComponent</string>
-         </attribute>
-        </widget>
-       </item>
-       <item row="2" column="3">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item row="2" column="7">
+        <layout class="QGridLayout" name="gridLayout_3">
          <property name="spacing">
           <number>1</number>
          </property>
-         <item>
-          <widget class="QLabel" name="label_19">
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_T">
            <property name="text">
-            <string>All at 45°</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
+            <string>Tunnel</string>
            </property>
           </widget>
          </item>
-         <item>
-          <widget class="Line" name="line_12">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="filter1">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="filter2">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="filter3">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="filter4">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="filter5">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QWidget" name="filtersStW" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="spacing">
-             <number>1</number>
-            </property>
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="Line" name="line_10">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="filtersSt">
-              <property name="text">
-               <string>status</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="2" column="7">
-        <widget class="Line" name="line_5">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="5">
-        <widget class="Line" name="line_4">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="4">
-        <widget class="Line" name="line_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="10">
-        <layout class="QGridLayout" name="gridLayout">
-         <property name="horizontalSpacing">
-          <number>5</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>1</number>
-         </property>
          <item row="3" column="0">
-          <widget class="QLabel" name="label_2">
+          <widget class="QLabel" name="label_2B">
            <property name="text">
-            <string>SCMW field</string>
+            <string>2B</string>
            </property>
           </widget>
          </item>
-         <item row="9" column="0">
-          <spacer name="verticalSpacer">
+         <item row="7" column="0">
+          <spacer name="verticalSpacer_3">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
@@ -243,67 +75,35 @@
            </property>
           </spacer>
          </item>
-         <item row="3" column="1">
-          <widget class="QLabel" name="wigglerfield">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="rfcurrent">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_20">
-           <property name="text">
-            <string>Electron energy</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="rfenergy">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_22">
-           <property name="text">
-            <string>EPS</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLabel" name="rfSt">
+         <item row="5" column="1">
+          <widget class="QLabel" name="st3A">
            <property name="text">
             <string>TextLabel</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Current</string>
            </property>
           </widget>
          </item>
          <item row="5" column="0">
-          <widget class="QLabel" name="label_21">
+          <widget class="QLabel" name="label_3A">
            <property name="text">
-            <string>Beamline</string>
+            <string>3A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QLabel" name="st1A">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
          <item row="6" column="1">
-          <widget class="QLabel" name="epsSt">
+          <widget class="QLabel" name="st3B">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -312,8 +112,8 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="blSt">
+         <item row="1" column="1">
+          <widget class="QLabel" name="st1B">
            <property name="text">
             <string>TextLabel</string>
            </property>
@@ -322,19 +122,70 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_10">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_1A">
            <property name="text">
-            <string>Storage ring</string>
+            <string>1A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_1B">
+           <property name="text">
+            <string>1B</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_3B">
+           <property name="text">
+            <string>3B</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_2A">
+           <property name="text">
+            <string>2A</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="st2B">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="stT">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="st2A">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
            </property>
           </widget>
          </item>
         </layout>
        </item>
-       <item row="1" column="0" colspan="11">
-        <widget class="Line" name="line_8">
+       <item row="2" column="2">
+        <widget class="Line" name="line_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
@@ -469,10 +320,10 @@
          </item>
         </layout>
        </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="chooseMono">
+       <item row="0" column="9">
+        <widget class="QPushButton" name="chooseShutters">
          <property name="text">
-          <string>Mono</string>
+          <string>Shutters</string>
          </property>
          <property name="checkable">
           <bool>true</bool>
@@ -485,21 +336,140 @@
          </attribute>
         </widget>
        </item>
-       <item row="2" column="2">
-        <widget class="Line" name="line_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="0" column="11">
+        <widget class="QPushButton" name="pushButton">
+         <property name="text">
+          <string>General</string>
+         </property>
+         <property name="flat">
+          <bool>true</bool>
          </property>
         </widget>
        </item>
-       <item row="2" column="9">
+       <item row="2" column="11">
+        <layout class="QGridLayout" name="gridLayout">
+         <property name="horizontalSpacing">
+          <number>5</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>1</number>
+         </property>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>SCMW field</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>0</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLabel" name="wigglerfield">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="rfcurrent">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>Electron energy</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLabel" name="rfenergy">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_22">
+           <property name="text">
+            <string>EPS</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QLabel" name="rfSt">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Current</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_21">
+           <property name="text">
+            <string>Beamline</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="epsSt">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="blSt">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Storage ring</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="10">
         <widget class="Line" name="line_6">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
-       <item row="0" column="6">
+       <item row="0" column="7">
         <widget class="QPushButton" name="pushButton_3">
          <property name="text">
           <string>Enclosures</string>
@@ -509,14 +479,37 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="0">
-        <widget class="Line" name="line">
+       <item row="0" column="3">
+        <widget class="QPushButton" name="chooseFilters">
+         <property name="text">
+          <string>Filters</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">chooseComponent</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="2" column="8">
+        <widget class="Line" name="line_5">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
         </widget>
        </item>
-       <item row="2" column="8">
+       <item row="2" column="4">
+        <widget class="Line" name="line_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="9">
         <layout class="QGridLayout" name="gridLayout_2">
          <property name="horizontalSpacing">
           <number>5</number>
@@ -666,143 +659,239 @@
         </layout>
        </item>
        <item row="2" column="6">
-        <layout class="QGridLayout" name="gridLayout_3">
+        <widget class="Line" name="line_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="chooseMono">
+         <property name="text">
+          <string>Mono</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">chooseComponent</string>
+         </attribute>
+        </widget>
+       </item>
+       <item row="1" column="0" colspan="12">
+        <widget class="Line" name="line_8">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="3">
+        <layout class="QVBoxLayout" name="verticalLayout_2">
          <property name="spacing">
           <number>1</number>
          </property>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_T">
+         <item>
+          <widget class="QLabel" name="label_19">
            <property name="text">
-            <string>Tunnel</string>
+            <string>All at 45°</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="Line" name="line_12">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="filter1">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="filter2">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="filter3">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="filter4">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="filter5">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QWidget" name="filtersStW" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>1</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="Line" name="line_10">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="filtersSt">
+              <property name="text">
+               <string>status</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="2" column="5">
+        <layout class="QGridLayout" name="gridLayout_4">
+         <item row="2" column="2">
+          <widget class="QLabel" name="ExpTilt">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_35">
+           <property name="text">
+            <string>Big Gonio</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_36">
+           <property name="text">
+            <string>In/Out</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="2">
+          <widget class="QLabel" name="ExpGonio">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_25">
+           <property name="text">
+            <string>Tilt</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="2">
+          <widget class="QLabel" name="ExpSlide">
+           <property name="text">
+            <string>TextLabel</string>
            </property>
           </widget>
          </item>
          <item row="3" column="0">
-          <widget class="QLabel" name="label_2B">
+          <widget class="QLabel" name="label_34">
            <property name="text">
-            <string>2B</string>
+            <string>Slide</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <spacer name="verticalSpacer_3">
+         <item row="0" column="2">
+          <widget class="QLabel" name="ExpInOut">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <spacer name="verticalSpacer_4">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>0</height>
+             <height>40</height>
             </size>
            </property>
           </spacer>
          </item>
-         <item row="5" column="1">
-          <widget class="QLabel" name="st3A">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_3A">
-           <property name="text">
-            <string>3A</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QLabel" name="st1A">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QLabel" name="st3B">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QLabel" name="st1B">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_1A">
-           <property name="text">
-            <string>1A</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label_1B">
-           <property name="text">
-            <string>1B</string>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_3B">
-           <property name="text">
-            <string>3B</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_2A">
-           <property name="text">
-            <string>2A</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLabel" name="st2B">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QLabel" name="stT">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QLabel" name="st2A">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-          </widget>
-         </item>
         </layout>
+       </item>
+       <item row="0" column="5">
+        <widget class="QPushButton" name="chooseExpander">
+         <property name="text">
+          <string>Beam Expander</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
+         </property>
+         <property name="autoExclusive">
+          <bool>true</bool>
+         </property>
+         <attribute name="buttonGroup">
+          <string notr="true">chooseComponent</string>
+         </attribute>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -833,49 +922,6 @@
         <property name="spacing">
          <number>0</number>
         </property>
-        <item row="1" column="5">
-         <layout class="QHBoxLayout" name="ssShutterControlPlacer">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-         </layout>
-        </item>
-        <item row="3" column="2">
-         <widget class="QLabelLine" name="label_11">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="7">
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>Photon stop</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabelLine" name="label_12">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="13">
          <widget class="QLabelLine" name="shIndFE_c">
           <property name="text">
@@ -886,17 +932,33 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="6">
-         <widget class="QLabelLine" name="beam_20">
+        <item row="3" column="9" rowspan="2">
+         <widget class="QLabelLineMono" name="beam_mono">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="4" column="11">
-         <widget class="QLabelLine" name="shIndV1A_c">
+        <item row="3" column="13">
+         <widget class="QLabel" name="shIndFE_o">
           <property name="text">
-           <string>Closed</string>
+           <string>Open</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QLabel" name="label_17">
+          <property name="layoutDirection">
+           <enum>Qt::RightToLeft</enum>
+          </property>
+          <property name="text">
+           <string>Clilnical Beam Stop</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -922,6 +984,264 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="10">
+         <widget class="QLabelLine" name="beam_27">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QLabel" name="label_48">
+          <property name="text">
+           <string>Safety shutter</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="13">
+         <widget class="QWidget" name="verticalWidget_3" native="true">
+          <layout class="QVBoxLayout" name="verticalLayout_10">
+           <item>
+            <spacer name="verticalSpacer_12">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="shfeControl">
+             <property name="text">
+              <string>PushButton</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="4" column="4">
+         <widget class="QLabelLine" name="beam_24">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="14">
+         <widget class="QLabelLine" name="beam_29">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="7">
+         <widget class="LinkedRight" name="linkedRight" native="true"/>
+        </item>
+        <item row="7" column="3">
+         <widget class="QPushButton" name="shMRTInOutButton">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="5">
+         <widget class="LinkedLeft" name="linkedLeft" native="true"/>
+        </item>
+        <item row="3" column="6">
+         <widget class="QLabelLine" name="beam_20">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="MrtShutterGui" name="shmrt" native="true"/>
+        </item>
+        <item row="0" column="11">
+         <widget class="QLabel" name="label_33">
+          <property name="text">
+           <string>Valve</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="15">
+         <widget class="QLabel" name="label_15">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">color: rgb(255, 0, 0);</string>
+          </property>
+          <property name="text">
+           <string>← X-ray</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="3" rowspan="2">
+         <widget class="QLabelLineTwo" name="shIndMRT_c">
+          <property name="text">
+           <string>Closed</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="4">
+         <widget class="QLabelLine" name="beam_19">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="5">
+         <layout class="QHBoxLayout" name="ssShutterControlPlacer">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="shIndMRT_o">
+          <property name="text">
+           <string>Open</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7">
+         <widget class="QLabel" name="label_26">
+          <property name="text">
+           <string>Photon stop</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="8">
+         <widget class="QLabelLine" name="beam_21">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1" rowspan="2">
+         <widget class="QLabelLineTwo" name="shIndIS_c">
+          <property name="text">
+           <string>Closed</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="shIndIS_o">
+          <property name="text">
+           <string>Open</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="6">
+         <spacer name="verticalSpacer_13">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="5" column="7">
+         <widget class="QLabel" name="shIndPS_o">
+          <property name="text">
+           <string>Open</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="7">
+         <widget class="QLabelLine" name="shIndPS_c">
+          <property name="text">
+           <string>Closed</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
         <item row="3" column="0">
          <widget class="QLabelLine" name="label_13">
           <property name="maximumSize">
@@ -935,17 +1255,106 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="4">
-         <widget class="QLabelLine" name="beam_19">
+        <item row="0" column="13">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>Front end</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QPushButton" name="shISInOutButton">
+          <property name="text">
+           <string>PushButton</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="5" rowspan="2">
+         <widget class="QLabelLineTwo" name="shIndSS_c">
+          <property name="text">
+           <string>Closed</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="11">
+         <widget class="QLabelLine" name="shIndV1A_c">
+          <property name="text">
+           <string>Closed</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_44">
+          <property name="text">
+           <string>MRT fast shutter</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QLabelLine" name="label_8">
+          <property name="maximumSize">
+           <size>
+            <width>20</width>
+            <height>16777215</height>
+           </size>
+          </property>
           <property name="text">
            <string/>
           </property>
          </widget>
         </item>
-        <item row="5" column="7">
-         <widget class="QLabel" name="shIndPS_o">
+        <item row="1" column="6">
+         <widget class="QComboBox" name="comboBox">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="maxVisibleItems">
+           <number>2</number>
+          </property>
+          <item>
+           <property name="text">
+            <string>Out</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>In</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="11">
+         <widget class="QLabel" name="shIndV1A_o">
           <property name="text">
            <string>Open</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="9">
+         <widget class="QLabel" name="label_32">
+          <property name="text">
+           <string>Mono</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
@@ -992,16 +1401,20 @@
           </layout>
          </widget>
         </item>
-        <item row="4" column="2">
-         <widget class="QLabelLine" name="label_8">
-          <property name="maximumSize">
-           <size>
-            <width>20</width>
-            <height>16777215</height>
-           </size>
-          </property>
+        <item row="4" column="0">
+         <widget class="QLabelLine" name="label_12">
           <property name="text">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_9">
+          <property name="text">
+           <string>Imaging shutter</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -1015,226 +1428,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="13">
-         <widget class="QLabel" name="shIndFE_o">
-          <property name="text">
-           <string>Open</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="6">
-         <spacer name="verticalSpacer_13">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="7" column="7">
-         <widget class="LinkedRight" name="linkedRight" native="true"/>
-        </item>
-        <item row="3" column="3" rowspan="2">
-         <widget class="QLabelLineTwo" name="shIndMRT_c">
-          <property name="text">
-           <string>Closed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="4">
-         <widget class="QLabelLine" name="beam_24">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLabel" name="shIndIS_o">
-          <property name="text">
-           <string>Open</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" rowspan="2">
-         <widget class="QLabelLineTwo" name="shIndIS_c">
-          <property name="text">
-           <string>Closed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="11">
-         <widget class="QLabel" name="shIndV1A_o">
-          <property name="text">
-           <string>Open</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="3">
-         <widget class="QLabel" name="shIndMRT_o">
-          <property name="text">
-           <string>Open</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="5">
-         <widget class="LinkedLeft" name="linkedLeft" native="true"/>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="isShutterControlPlacer">
-          <property name="spacing">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QWidget" name="shISControlWidget" native="true">
-            <layout class="QVBoxLayout" name="verticalLayout_8">
-             <item>
-              <spacer name="verticalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Vertical</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>20</width>
-                 <height>40</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QPushButton" name="shISControl">
-               <property name="text">
-                <string>PushButton</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLabel" name="label_9">
-          <property name="text">
-           <string>Imaging shutter</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="8">
-         <widget class="QLabelLine" name="beam_26">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="15">
-         <widget class="QLabel" name="label_15">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">color: rgb(255, 0, 0);</string>
-          </property>
-          <property name="text">
-           <string>← X-ray</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="6">
-         <widget class="QLabelLine" name="beam_22">
+        <item row="3" column="2">
+         <widget class="QLabelLine" name="label_11">
           <property name="text">
            <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="8">
-         <widget class="QLabelLine" name="beam_21">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QLabel" name="label_48">
-          <property name="text">
-           <string>Safety shutter</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="MrtShutterGui" name="shmrt" native="true"/>
-        </item>
-        <item row="4" column="7">
-         <widget class="QLabelLine" name="shIndPS_c">
-          <property name="text">
-           <string>Closed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="5" rowspan="2">
-         <widget class="QLabelLineTwo" name="shIndSS_c">
-          <property name="text">
-           <string>Closed</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
           </property>
          </widget>
         </item>
@@ -1283,30 +1480,30 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="13">
-         <widget class="QWidget" name="verticalWidget_3" native="true">
-          <layout class="QVBoxLayout" name="verticalLayout_10">
-           <item>
-            <spacer name="verticalSpacer_12">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-           <item>
-            <widget class="QPushButton" name="shfeControl">
-             <property name="text">
-              <string>PushButton</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+        <item row="4" column="6">
+         <widget class="QLabelLine" name="beam_22">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="8">
+         <widget class="QLabelLine" name="beam_26">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
          </widget>
         </item>
         <item row="3" column="7">
@@ -1316,146 +1513,38 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="9" rowspan="2">
-         <widget class="QLabelLineMono" name="beam_mono">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="9">
-         <widget class="QLabel" name="label_32">
-          <property name="text">
-           <string>Mono</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="13">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>Front end</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="14">
-         <widget class="QLabelLine" name="beam_29">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="10">
-         <widget class="QLabelLine" name="beam_27">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3">
-         <widget class="QLabel" name="label_44">
-          <property name="text">
-           <string>MRT fast shutter</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="11">
-         <widget class="QLabel" name="label_33">
-          <property name="text">
-           <string>Valve</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="6">
-         <widget class="QLabel" name="label_17">
-          <property name="layoutDirection">
-           <enum>Qt::RightToLeft</enum>
-          </property>
-          <property name="text">
-           <string>Clilnical Beam Stop</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="6">
-         <widget class="QComboBox" name="comboBox">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="maxVisibleItems">
-           <number>2</number>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="isShutterControlPlacer">
+          <property name="spacing">
+           <number>0</number>
           </property>
           <item>
-           <property name="text">
-            <string>Out</string>
-           </property>
+           <widget class="QWidget" name="shISControlWidget" native="true">
+            <layout class="QVBoxLayout" name="verticalLayout_8">
+             <item>
+              <spacer name="verticalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>40</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <widget class="QPushButton" name="shISControl">
+               <property name="text">
+                <string>PushButton</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
           </item>
-          <item>
-           <property name="text">
-            <string>In</string>
-           </property>
-          </item>
-         </widget>
-        </item>
-        <item row="7" column="1">
-         <widget class="QPushButton" name="shISInOutButton">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="3">
-         <widget class="QPushButton" name="shMRTInOutButton">
-          <property name="text">
-           <string>PushButton</string>
-          </property>
-         </widget>
+         </layout>
         </item>
        </layout>
       </widget>

@@ -12,6 +12,7 @@
 #include "hutch.h"
 #include "valve.h"
 #include <qtpv.h>
+#include "expanderGui.h"
 
 namespace Ui {
 class Qimbl;
@@ -37,6 +38,9 @@ private:
   QEpicsPv * eps_disabled;
   QEpicsPv * slidePos;
   QEpicsPv * slidePosRBV;
+  QEpicsPv * expanderTilt;
+  QEpicsPv * expanderSlide;
+  QEpicsPv * expanderGonio;
 
   QHash < Hutch*, QLabel* > hutches;
 
@@ -46,6 +50,7 @@ private:
   ShutterIS * shIS;
   FiltersGui * filters;
   MonoGui * mono;
+  ExpanderGui * expander;
 
 private slots:
 
@@ -65,6 +70,7 @@ private slots:
   void update_shmrt();
   void update_filters();
   void update_mono();
+  void update_expander();
   void update_valve_1();
   void update_slidePos();
   void MoveSlideToMRTShutter();
