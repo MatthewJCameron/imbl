@@ -2,6 +2,7 @@
 #include "error.h"
 #include <qtpv.h>
 #include "shutterFE.h"
+#include "shutter1A.h"
 
 const QString Expander::pvBaseName = "SR08ID01EXP01:";
 const QString Expander::pvTableBaseName = "SR08ID01TBL13:";
@@ -11,17 +12,21 @@ Expander::Expander(QObject *parent) :
   Component("Expander", parent),
   iAmMoving(false),
   _inBeam(BETWEEN),
-  _tblInBeam(BETWEEN)
+  _tblInBeam(BETWEEN),
+  _expInBeam(BETWEEN)
 {
   foreach(QCaMotor * mot, motors) {
     connect(mot, SIGNAL(changedConnected(bool)), SLOT(updateConnection()));
     connect(mot, SIGNAL(changedMoving(bool)), SLOT(updateMotion()));
   }
-  connect(motors[inOut], SIGNAL(changedMoving(bool)), SLOT(UpdateInOutStatus()));
-  connect(motors[inOut], SIGNAL(changedUserPosition(double)), SLOT(UpdateInOutStatus()));
+  connect(motors[inOut], SIGNAL(changedMoving(bool)), SLOT(UpdateExpInOutStatus()));
+  connect(motors[inOut], SIGNAL(changedUserPosition(double)), SLOT(UpdateExpInOutStatus()));
 
   connect(motors[tblz], SIGNAL(changedMoving(bool)), SLOT(UpdateTblInOutStatus()));
   connect(motors[tblz], SIGNAL(changedUserPosition(double)), SLOT(UpdateTblInOutStatus()));
+
+  connect(this, SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
+  connect(this, SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
 
   updateConnection();
 
@@ -56,7 +61,10 @@ void Expander::updateConnection() {
          motors[tblz]->isConnected();
   //if(con) printf("con is true at some point\n");
   setConnected(con);
-  if(isConnected()) UpdateInOutStatus();
+  if(isConnected()) {
+    UpdateExpInOutStatus();
+    UpdateTblInOutStatus();
+  }
 }
 
 void Expander::updateMotion() {
@@ -68,9 +76,16 @@ void Expander::updateMotion() {
   emit motionChanged(iAmMoving=newMov);
 }
 
-void Expander::setInBeam(bool val) {
+void Expander::setExpInBeam(bool val) {
   if ( ! isConnected() || isMoving() )
     return;
+  Shutter1A sht1A;
+  if (! sht1A.mode() != Shutter1A::MONO ) {
+    warn("Mode is not Mono."
+         " Switching Expander mode failed."
+         " Try to repeat or do it manually.", this);
+    return;
+  }
   if ( ! ShutterFE::setOpenedS(false,true) ) {
     warn("Can't close the FE shutter."
          " Switching Expander mode failed."
@@ -83,6 +98,13 @@ void Expander::setInBeam(bool val) {
 void Expander::setTblInBeam(bool val) {
   if ( ! isConnected() || isMoving() )
     return;
+  Shutter1A sht1A;
+  if (! sht1A.mode() != Shutter1A::MONO ) {
+    warn("Mode is not Mono."
+         " Switching Expander mode failed."
+         " Try to repeat or do it manually.", this);
+    return;
+  }
   if ( ! ShutterFE::setOpenedS(false,true) ) {
     warn("Can't close the FE shutter."
          " Switching Expander mode failed."
@@ -101,18 +123,13 @@ void Expander::UpdateInOutStatus() {
   if ( ! motors[inOut]->isConnected() )
     return;
 
-  double newInOut = motors[inOut]->getUserPosition();
-  if (motors[inOut]->isMoving())
-    _inBeam = MOVING;
-  else if ( qAbs(newInOut) <= 178.1 && qAbs(newInOut) >= 177.9 ) // 1 micron - unsertanty in Z
-    _inBeam = INBEAM;
-  else if ( qAbs(newInOut) <= 18.1 && qAbs(newInOut) >= 17.9)
-    _inBeam = OUTBEAM;
-  else {
-    _inBeam = BETWEEN;
-    warn("Z position of the expander (" + QString::number(newInOut) +
-         ") is between \"in\" and \"out\" destinations.",
-         objectName());
+  if (_tblInBeam==OUTBEAM && _expInBeam==OUTBEAM ){
+    _inBeam=OUTBEAM;
+  //  warn("_totalInBeam is OUTBEAM", objectName());
+  }
+  else{
+   _inBeam=INBEAM;
+   //warn("_totalInBeam is INBEAM", objectName());
   }
   emit inBeamChanged(_inBeam);
 }
@@ -124,10 +141,12 @@ void Expander::UpdateTblInOutStatus() {
   double newInOut = motors[tblz]->getUserPosition();
   if (motors[inOut]->isMoving())
     _tblInBeam = MOVING;
-  else if ( qAbs(newInOut) <= 178.1 && qAbs(newInOut) >= 177.9 ) // 1 micron - unsertanty in Z
+  else if ( qAbs(newInOut -178.723) <= 0.1) // 1 micron - unsertanty in Z
     _tblInBeam = INBEAM;
-  else if ( qAbs(newInOut) <= 0.1)
+  else if ( qAbs(newInOut) <= 0.1){
     _tblInBeam = OUTBEAM;
+  //  warn("_tblInBeam is OUTBEAM", objectName());
+  }
   else {
     _tblInBeam = BETWEEN;
     warn("Z position of the BCT Table Z (" + QString::number(newInOut) +
@@ -135,4 +154,32 @@ void Expander::UpdateTblInOutStatus() {
          objectName());
   }
   emit tblInBeamChanged(_tblInBeam);
+}
+
+void Expander::UpdateExpInOutStatus(){
+  if ( ! motors[inOut]->isConnected() )
+    return;
+
+  double newInOut = motors[inOut]->getUserPosition();
+  //warn("newInOut is "+ QString::number(newInOut), objectName());
+  if (motors[inOut]->isMoving()){
+    _expInBeam = MOVING;
+  //  warn("_expInBeam is MOVING", objectName());
+  }
+  else if ( qAbs(newInOut - 176.0) <= 0.1 ){ // 1 micron - unsertanty in Z
+    _expInBeam = INBEAM;
+  //  warn("_expInBeam is INBEAM", objectName());
+  }
+  else if ( qAbs(newInOut - 18.0 ) <= 0.1 ){
+    _expInBeam = OUTBEAM;
+  //  warn("_expInBeam is OUTBEAM", objectName());
+  }
+  else {
+    _expInBeam = BETWEEN;
+    warn("Z position of the expander (" + QString::number(newInOut) +
+         ") is between \"in\" and \"out\" destinations.",
+         objectName());
+  }
+
+  emit expInBeamChanged(_expInBeam);
 }

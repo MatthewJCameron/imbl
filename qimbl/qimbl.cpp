@@ -175,7 +175,10 @@ Qimbl::Qimbl(QWidget *parent) :
 
   ui->control->addWidget(expander);
   connect(expander->component(), SIGNAL(connectionChanged(bool)), SLOT(update_expander()));
+  connect(expander->component(), SIGNAL(motionChanged(bool)), SLOT(update_expander()));
   connect(expander->component(), SIGNAL(inBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
+  connect(expander->component(), SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
+  connect(expander->component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
   
   update_rfstat();
   update_rfcurrent();
@@ -763,59 +766,51 @@ void Qimbl::update_expander() {
     set_nolink_style(ui->ExpSlide);
     set_nolink_style(ui->ExpTilt);
     set_nolink_style(ui->ExpGonio);
+    set_nolink_style(ui->BCTZ);
+    set_nolink_style(ui->BCTY);
     return;
   }
   ui->ExpInOut->setStyleSheet("");
   ui->ExpSlide->setStyleSheet("");
   ui->ExpTilt->setStyleSheet("");
   ui->ExpGonio->setStyleSheet("");
-  switch ( expander->component()->inBeam() ) {
-    case Expander::INBEAM :
-      ui->ExpInOut->setStyleSheet("");
-      ui->ExpInOut->setText("In beam");
-      break;
-    case Expander::OUTBEAM :
-      ui->ExpInOut->setStyleSheet("");
-      ui->ExpInOut->setText("Out of the beam");
-      break;
-    case Expander::BETWEEN :
-      ui->ExpInOut->setStyleSheet(red_style);
-      ui->ExpInOut->setText("Between");
-      break;
-    case Expander::MOVING :
-      ui->ExpInOut->setStyleSheet("");
-      ui->ExpInOut->setText("Moving");
-      break;
+  ui->BCTY->setStyleSheet("");
+  ui->BCTZ->setStyleSheet("");
+  if (expander->component()->motors[Expander::inOut]->isMoving()) {
+    ui->ExpInOut->setText("Moving");
+  } 
+  else {
+    ui->ExpInOut->setText(QString::number(expander->component()->motors[Expander::inOut]->getUserPosition(),'f',3) + " mm");
   }
   if (expander->component()->motors[Expander::tilt]->isMoving()) {
     ui->ExpTilt->setText("Moving");
   } 
   else {
-    ui->ExpTilt->setText(QString::number(expander->component()->motors[Expander::tilt]->getUserPosition(),'f',3) + "mm");
+    ui->ExpTilt->setText(QString::number(expander->component()->motors[Expander::tilt]->getUserPosition(),'f',3) + " mm");
   }
   if (expander->component()->motors[Expander::slide]->isMoving()) {
     ui->ExpSlide->setText("Moving");
   } 
   else {
-    ui->ExpSlide->setText(QString::number(expander->component()->motors[Expander::slide]->getUserPosition(),'f',3) + "mm");
+    ui->ExpSlide->setText(QString::number(expander->component()->motors[Expander::slide]->getUserPosition(),'f',3) + " mm");
   }
   if (expander->component()->motors[Expander::gonio]->isMoving()) {
     ui->ExpGonio->setText("Moving");
   } 
   else {
-    ui->ExpGonio->setText(QString::number(expander->component()->motors[Expander::gonio]->getUserPosition(),'f',3) + "mm");
+    ui->ExpGonio->setText(QString::number(expander->component()->motors[Expander::gonio]->getUserPosition(),'f',3) + " mm");
   }
   if (expander->component()->motors[Expander::tblz]->isMoving()) {
     ui->BCTZ->setText("Moving");
   } 
   else {
-    ui->BCTZ->setText(QString::number(expander->component()->motors[Expander::tblz]->getUserPosition(),'f',3) + "mm");
+    ui->BCTZ->setText(QString::number(expander->component()->motors[Expander::tblz]->getUserPosition(),'f',3) + " mm");
   }
   if (expander->component()->motors[Expander::tbly]->isMoving()) {
     ui->BCTY->setText("Moving");
   } 
   else {
-    ui->BCTY->setText(QString::number(expander->component()->motors[Expander::tbly]->getUserPosition(),'f',3) + "mm");
+    ui->BCTY->setText(QString::number(expander->component()->motors[Expander::tbly]->getUserPosition(),'f',3) + " mm");
   }
 }
 
@@ -907,7 +902,7 @@ void Qimbl::update_slidePos() {
     double currentPos = slidePosRBV->get().toDouble();
     ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + " mm" );
     //std::cout << "currentPos is " << currentPos << std::endl;
-    if ( 299.0 < currentPos ){
+    if ( 159.0 < currentPos ){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move OUT");
       ui->shMRTInOutButton->setEnabled(true);
@@ -959,7 +954,7 @@ void Qimbl::MoveSlideToImagingShutter(){
   else {
     double currentPos = slidePosRBV->get().toDouble();
     if (currentPos < 299.0){
-      slidePos->set(300.0);
+      slidePos->set(160.0);
       ui->shISInOutButton->setText("Move OUT");
       }
     else {

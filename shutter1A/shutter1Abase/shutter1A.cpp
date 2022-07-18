@@ -1,6 +1,7 @@
 #include "error.h"
 #include "shutter1A.h"
 #include <QDebug>
+#include "expander.h"
 
 const int Shutter1A::relaxTime = 2500; // msec
 
@@ -187,7 +188,6 @@ void Shutter1A::updateMode() {
 
   if ( ! isConnected() )
     return;
-
   if ( 1 !=
        whiteMode->get().toInt() +
        monoMode->get().toInt() +
@@ -216,6 +216,11 @@ void Shutter1A::updateEnabled() {
 bool Shutter1A::open(bool wait) {
   if ( ! isConnected() || ! isEnabled() )
     return false;
+  Expander exp;
+  if (exp.inBeam() != Expander::OUTBEAM) {
+    if(md != MONO)
+      return false; 
+  }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   emit toggleRequested(1);

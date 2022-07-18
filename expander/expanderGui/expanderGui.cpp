@@ -31,15 +31,21 @@ void ExpanderGui::init() {
   
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
-  connect(component(), SIGNAL(inBeamChanged(Expander::InOutPosition)), SLOT(updateInOut(Expander::InOutPosition)));
+  connect(component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)),
+       SLOT(updateExpInOut(Expander::InOutPosition)));
+  connect(component(), SIGNAL(tblInBeamChanged(Expander::InOutPosition)),
+       SLOT(updateTblInOut(Expander::InOutPosition)));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
-  connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
-  connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
+  connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(expIn()));
+  connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(expOut()));
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
   
-  connect(ui->tblIn, SIGNAL(clicked()), component(), SLOT(moveTblIn()));
-  connect(ui->tblOut, SIGNAL(clicked()), component(), SLOT(moveTblOut()));
+  connect(ui->tblIn, SIGNAL(clicked()), component(), SLOT(tblIn()));
+  connect(ui->tblOut, SIGNAL(clicked()), component(), SLOT(tblOut()));
+
+  connect(component()->motors[Expander::inOut], SIGNAL(changedMoving(bool)), ui->modeSetEnable, SLOT(setDisabled(bool)));
+  connect(component()->motors[Expander::tblz], SIGNAL(changedMoving(bool)), ui->modeTblSetEnable, SLOT(setDisabled(bool)));
 
   updateConnection(component()->isConnected());
   onAdvancedControl();
@@ -61,7 +67,7 @@ void ExpanderGui::updateConnection(bool con) {
 }
 
 
-void ExpanderGui::updateInOut(Expander::InOutPosition iopos) {
+void ExpanderGui::updateExpInOut(Expander::InOutPosition iopos) {
   ui->currentInOut->setStyleSheet("");
   ui->moveIn->setFlat(false);
   ui->moveOut->setFlat(false);
@@ -88,7 +94,7 @@ void ExpanderGui::updateInOut(Expander::InOutPosition iopos) {
   //updateStatus();
 }
 
-void ExpanderGui::updateTblInOut(Expander::TblInOutPosition iopos) {
+void ExpanderGui::updateTblInOut(Expander::InOutPosition iopos) {
   ui->currentTblInOut->setStyleSheet("");
   ui->tblIn->setFlat(false);
   ui->tblOut->setFlat(false);

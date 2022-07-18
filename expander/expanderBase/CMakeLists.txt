@@ -5,12 +5,11 @@ add_library(expander SHARED
 )
 
 target_include_directories(expander
-    PRIVATE ../../shutterFE/shutterFEbase
+    PRIVATE ../../shutterFE/shutterFEbase ../../shutter1A/shutter1Abase
 )
 
 target_link_libraries(expander
     component
-    shutterFE
     qcamotor
 )
 

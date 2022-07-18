@@ -34,8 +34,8 @@ private slots:
   void onAdvancedControl();
   //void updateStatus();
   void updateConnection(bool con);
-  void updateInOut(Expander::InOutPosition iopos);
-  void updateTblInOut(Expander::TblInOutPosition iopos);
+  void updateExpInOut(Expander::InOutPosition iopos);
+  void updateTblInOut(Expander::InOutPosition iopos);
 
 };
 

@@ -4,6 +4,10 @@ add_library(shutter1A SHARED
   shutter1A.cpp
 )
 
+target_include_directories(shutter1A
+    PRIVATE ../../expander/expanderBase 
+)
+
 target_link_libraries(shutter1A
     component
 )
