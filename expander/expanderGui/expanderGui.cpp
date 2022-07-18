@@ -31,13 +31,16 @@ void ExpanderGui::init() {
   
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
-  connect(component(), SIGNAL(inBeamChanged(Expander::InOutPosition)),       SLOT(updateInOut(Expander::InOutPosition)));
+  connect(component(), SIGNAL(inBeamChanged(Expander::InOutPosition)), SLOT(updateInOut(Expander::InOutPosition)));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(moveIn()));
   connect(ui->moveOut, SIGNAL(clicked()), component(), SLOT(moveOut()));
   connect(ui->stop, SIGNAL(clicked()), component(), SLOT(stop()));
   
+  connect(ui->tblIn, SIGNAL(clicked()), component(), SLOT(moveTblIn()));
+  connect(ui->tblOut, SIGNAL(clicked()), component(), SLOT(moveTblOut()));
+
   updateConnection(component()->isConnected());
   onAdvancedControl();
 
@@ -85,6 +88,32 @@ void ExpanderGui::updateInOut(Expander::InOutPosition iopos) {
   //updateStatus();
 }
 
+void ExpanderGui::updateTblInOut(Expander::TblInOutPosition iopos) {
+  ui->currentTblInOut->setStyleSheet("");
+  ui->tblIn->setFlat(false);
+  ui->tblOut->setFlat(false);
+  ui->tblIn->setStyleSheet("");
+  ui->tblOut->setStyleSheet("");
+  ui->currentTblInOut->setText(QString::number(component()->motors[Expander::tblz]->getUserPosition(),'f', 2));
+  switch (iopos) {
+  case Expander::INBEAM :
+      ui->currentTblInOut->setText("IN beam");
+      ui->tblIn->setFlat(true);
+      ui->tblIn->setStyleSheet("font: bold;");
+      break;
+  case Expander::OUTBEAM :
+      ui->currentInOut->setText("OUT of the beam");
+      ui->tblOut->setFlat(true);
+      ui->tblOut->setStyleSheet("font: bold;");
+      break;
+  case Expander::BETWEEN :
+    //ui->currentInOut->setStyleSheet(ui->status->styleSheet());
+    break;
+  case Expander::MOVING :
+    break;
+  }
+  //updateStatus();
+}
 
 //void ExpanderGui::updateStatus() {
 //  ui->status->setVisible( component()->inBeam() == expander::BETWEEN);
@@ -95,9 +124,13 @@ void ExpanderGui::onAdvancedControl() {
     ui->advancedWidget->setVisible(false);
     ui->advanced_pb->setText("Show advanced control");
     ui->advanced_pb->setStyleSheet("");
+    ui->modeSet->setEnabled(false);
+    ui->tblSet->setEnabled(false);
   } else if ( PsswDial::ask(this) ) {
     ui->advancedWidget->setVisible(true);
     ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
+    //ui->modeSet->setEnabled(true);
+    //ui->tblSet->setEnabled(true);
   }
 }

@@ -10,7 +10,8 @@ const QHash<Expander::Motors,QCaMotor*> Expander::motors=Expander::init_motors()
 Expander::Expander(QObject *parent) :
   Component("Expander", parent),
   iAmMoving(false),
-  _inBeam(BETWEEN)
+  _inBeam(BETWEEN),
+  _tblInBeam(BETWEEN)
 {
   foreach(QCaMotor * mot, motors) {
     connect(mot, SIGNAL(changedConnected(bool)), SLOT(updateConnection()));
@@ -18,6 +19,10 @@ Expander::Expander(QObject *parent) :
   }
   connect(motors[inOut], SIGNAL(changedMoving(bool)), SLOT(UpdateInOutStatus()));
   connect(motors[inOut], SIGNAL(changedUserPosition(double)), SLOT(UpdateInOutStatus()));
+
+  connect(motors[tblz], SIGNAL(changedMoving(bool)), SLOT(UpdateTblInOutStatus()));
+  connect(motors[tblz], SIGNAL(changedUserPosition(double)), SLOT(UpdateTblInOutStatus()));
+
   updateConnection();
 
 }
@@ -75,6 +80,18 @@ void Expander::setInBeam(bool val) {
   motors[inOut]->goUserPosition( val ? 178 : 18); // In=178 , out =18
 }
 
+void Expander::setTblInBeam(bool val) {
+  if ( ! isConnected() || isMoving() )
+    return;
+  if ( ! ShutterFE::setOpenedS(false,true) ) {
+    warn("Can't close the FE shutter."
+         " Switching Expander mode failed."
+         " Try to repeat or do it manually.", this);
+    return;
+  }
+  motors[tblz]->goUserPosition( val ? 178 : 0); // In=178 , out =0
+}
+
 void Expander::stop() {
   foreach(QCaMotor * mot, motors)
     mot->stop();
@@ -98,5 +115,24 @@ void Expander::UpdateInOutStatus() {
          objectName());
   }
   emit inBeamChanged(_inBeam);
+}
 
+void Expander::UpdateTblInOutStatus() {
+  if ( ! motors[tblz]->isConnected() )
+    return;
+
+  double newInOut = motors[tblz]->getUserPosition();
+  if (motors[inOut]->isMoving())
+    _tblInBeam = MOVING;
+  else if ( qAbs(newInOut) <= 178.1 && qAbs(newInOut) >= 177.9 ) // 1 micron - unsertanty in Z
+    _tblInBeam = INBEAM;
+  else if ( qAbs(newInOut) <= 0.1)
+    _tblInBeam = OUTBEAM;
+  else {
+    _tblInBeam = BETWEEN;
+    warn("Z position of the BCT Table Z (" + QString::number(newInOut) +
+         ") is between \"in\" and \"out\" destinations.",
+         objectName());
+  }
+  emit tblInBeamChanged(_tblInBeam);
 }

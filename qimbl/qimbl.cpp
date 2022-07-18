@@ -805,6 +805,18 @@ void Qimbl::update_expander() {
   else {
     ui->ExpGonio->setText(QString::number(expander->component()->motors[Expander::gonio]->getUserPosition(),'f',3) + "mm");
   }
+  if (expander->component()->motors[Expander::tblz]->isMoving()) {
+    ui->BCTZ->setText("Moving");
+  } 
+  else {
+    ui->BCTZ->setText(QString::number(expander->component()->motors[Expander::tblz]->getUserPosition(),'f',3) + "mm");
+  }
+  if (expander->component()->motors[Expander::tbly]->isMoving()) {
+    ui->BCTY->setText("Moving");
+  } 
+  else {
+    ui->BCTY->setText(QString::number(expander->component()->motors[Expander::tbly]->getUserPosition(),'f',3) + "mm");
+  }
 }
 
 void QLabelLine::paintEvent( QPaintEvent * event ) {
