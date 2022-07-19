@@ -1,6 +1,8 @@
 #include "error.h"
 #include "shutterFE.h"
+#include "expander.h"
 #include <QDebug>
+#include "shutter1A.h"
 
 const int ShutterFE::relaxTime = 5000; // msec
 const QString ShutterFE::pvBaseName = "SR08ID01PSS01:FE_SHUTTER";
@@ -101,6 +103,14 @@ bool ShutterFE::open(bool wait) {
     return false;
   if ( ! isEnabled() )
     return state() == OPENED;
+  Expander theExp;
+  if (theExp.inBeam() != Expander::OUTBEAM){
+    Shutter1A sht1A;
+    if (sht1A.mode() != Shutter1A::MONO ) {
+      warn("Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.", this);
+      return false;
+    }
+  }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
   clsCmd->set(0);

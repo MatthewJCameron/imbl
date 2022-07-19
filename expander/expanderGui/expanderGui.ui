@@ -50,26 +50,28 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <item row="2" column="3">
-       <widget class="QWidget" name="modeSetEnable" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
-         <property name="spacing">
-          <number>0</number>
-         </property>
-         <property name="leftMargin">
-          <number>0</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>0</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item>
-          <widget class="QLabel" name="currentInOut">
+      <item row="2" column="4">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>IPASS Table</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="7">
+       <widget class="QPushButton" name="stop">
+        <property name="toolTip">
+         <string>Stop any motion.</string>
+        </property>
+        <property name="text">
+         <string>Stop All</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="6">
+       <widget class="QWidget" name="modeTblSetEnable" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QLabel" name="currentTblInOut">
            <property name="text">
             <string>No link</string>
            </property>
@@ -116,49 +118,6 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="0" colspan="7">
-       <widget class="QWidget" name="scheme" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-          <horstretch>0</horstretch>
-          <verstretch>1</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>100</height>
-         </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">image: url(:/ExpanderSide-1.png);</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="7">
-       <widget class="QPushButton" name="stop">
-        <property name="toolTip">
-         <string>Stop any motion.</string>
-        </property>
-        <property name="text">
-         <string>Stop All</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="4">
-       <widget class="QLabel" name="label">
-        <property name="text">
-         <string>IPASS Table</string>
-        </property>
-       </widget>
-      </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="label_14">
-        <property name="text">
-         <string>Expander Position</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="5">
        <widget class="QWidget" name="tblSet" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -185,17 +144,58 @@
         </layout>
        </widget>
       </item>
-      <item row="2" column="6">
-       <widget class="QWidget" name="modeTblSetEnable" native="true">
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="currentTblInOut">
+      <item row="0" column="0" colspan="7">
+       <widget class="QWidget" name="scheme" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>1</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image: url(:/ExpanderSide-1.png);</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QWidget" name="modeSetEnable" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item alignment="Qt::AlignHCenter">
+          <widget class="QLabel" name="currentInOut">
            <property name="text">
             <string>No link</string>
            </property>
           </widget>
          </item>
         </layout>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="label_14">
+        <property name="text">
+         <string>Expander Position</string>
+        </property>
        </widget>
       </item>
      </layout>

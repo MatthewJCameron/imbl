@@ -4,6 +4,10 @@ add_library(shutterFE SHARED
   shutterFE.cpp
 )
 
+target_include_directories(shutterFE
+    PRIVATE ../../expander/expanderBase ../../shutter1A/shutter1Abase 
+)
+
 target_link_libraries(shutterFE
     component
 )

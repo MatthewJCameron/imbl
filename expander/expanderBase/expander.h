@@ -42,11 +42,11 @@ public:
 
 public slots:
 	void setExpInBeam(bool val);
+	void setTblInBeam(bool val);
 	inline void expIn()  { setExpInBeam(true); }
 	inline void expOut() { setExpInBeam(false); }
 	void UpdateTblInOutStatus();
 	void UpdateExpInOutStatus();
-	void setTblInBeam(bool val);
 	inline void tblIn() { setTblInBeam(true); }
 	inline void tblOut() { setTblInBeam(false); }
 

@@ -92,7 +92,7 @@ void Expander::setExpInBeam(bool val) {
          " Try to repeat or do it manually.", this);
     return;
   }
-  motors[inOut]->goUserPosition( val ? 178 : 18); // In=178 , out =18
+  motors[inOut]->goUserPosition( val ? 176 : 18); // In=178 , out =18
 }
 
 void Expander::setTblInBeam(bool val) {
@@ -111,7 +111,7 @@ void Expander::setTblInBeam(bool val) {
          " Try to repeat or do it manually.", this);
     return;
   }
-  motors[tblz]->goUserPosition( val ? 178 : 0); // In=178 , out =0
+  motors[tblz]->goUserPosition( val ? 178.723 : 0); // In=178 , out =0
 }
 
 void Expander::stop() {

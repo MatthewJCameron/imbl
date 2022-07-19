@@ -103,19 +103,23 @@ void ExpanderGui::updateTblInOut(Expander::InOutPosition iopos) {
   ui->currentTblInOut->setText(QString::number(component()->motors[Expander::tblz]->getUserPosition(),'f', 2));
   switch (iopos) {
   case Expander::INBEAM :
+      //warn("Z INBEAM", objectName());
       ui->currentTblInOut->setText("IN beam");
       ui->tblIn->setFlat(true);
       ui->tblIn->setStyleSheet("font: bold;");
       break;
   case Expander::OUTBEAM :
+      //warn("Z OUTBEAM", objectName());
       ui->currentInOut->setText("OUT of the beam");
       ui->tblOut->setFlat(true);
       ui->tblOut->setStyleSheet("font: bold;");
       break;
   case Expander::BETWEEN :
+    //warn("Z BETWEEN", objectName());
     //ui->currentInOut->setStyleSheet(ui->status->styleSheet());
     break;
   case Expander::MOVING :
+    //warn("Z MOVING", objectName());
     break;
   }
   //updateStatus();
@@ -136,7 +140,7 @@ void ExpanderGui::onAdvancedControl() {
     ui->advancedWidget->setVisible(true);
     ui->advanced_pb->setText("CLICK here to hide advanced control");
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
-    //ui->modeSet->setEnabled(true);
-    //ui->tblSet->setEnabled(true);
+    ui->modeSet->setEnabled(true);
+    ui->tblSet->setEnabled(true);
   }
 }
