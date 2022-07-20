@@ -120,12 +120,12 @@
       </item>
       <item row="2" column="5">
        <widget class="QWidget" name="tblSet" native="true">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QPushButton" name="tblIn">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
            <property name="text">
             <string>IN</string>
            </property>
@@ -133,9 +133,6 @@
          </item>
          <item>
           <widget class="QPushButton" name="tblOut">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
            <property name="text">
             <string>OUT</string>
            </property>

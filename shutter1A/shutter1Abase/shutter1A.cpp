@@ -218,8 +218,10 @@ bool Shutter1A::open(bool wait) {
     return false;
   Expander exp;
   if (exp.inBeam() != Expander::OUTBEAM) {
-    if(md != MONO)
+    if(md != MONO){
+      warn("Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.", this);
       return false; 
+    }
   }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));

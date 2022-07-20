@@ -80,14 +80,8 @@ void Expander::setExpInBeam(bool val) {
   if ( ! isConnected() || isMoving() )
     return;
   Shutter1A sht1A;
-  if (! sht1A.mode() != Shutter1A::MONO ) {
+  if (sht1A.mode() != Shutter1A::MONO ) {
     warn("Mode is not Mono."
-         " Switching Expander mode failed."
-         " Try to repeat or do it manually.", this);
-    return;
-  }
-  if ( ! ShutterFE::setOpenedS(false,true) ) {
-    warn("Can't close the FE shutter."
          " Switching Expander mode failed."
          " Try to repeat or do it manually.", this);
     return;
@@ -99,14 +93,8 @@ void Expander::setTblInBeam(bool val) {
   if ( ! isConnected() || isMoving() )
     return;
   Shutter1A sht1A;
-  if (! sht1A.mode() != Shutter1A::MONO ) {
+  if (sht1A.mode() != Shutter1A::MONO ) {
     warn("Mode is not Mono."
-         " Switching Expander mode failed."
-         " Try to repeat or do it manually.", this);
-    return;
-  }
-  if ( ! ShutterFE::setOpenedS(false,true) ) {
-    warn("Can't close the FE shutter."
          " Switching Expander mode failed."
          " Try to repeat or do it manually.", this);
     return;
@@ -149,9 +137,6 @@ void Expander::UpdateTblInOutStatus() {
   }
   else {
     _tblInBeam = BETWEEN;
-    warn("Z position of the BCT Table Z (" + QString::number(newInOut) +
-         ") is between \"in\" and \"out\" destinations.",
-         objectName());
   }
   emit tblInBeamChanged(_tblInBeam);
 }
@@ -176,9 +161,6 @@ void Expander::UpdateExpInOutStatus(){
   }
   else {
     _expInBeam = BETWEEN;
-    warn("Z position of the expander (" + QString::number(newInOut) +
-         ") is between \"in\" and \"out\" destinations.",
-         objectName());
   }
 
   emit expInBeamChanged(_expInBeam);
