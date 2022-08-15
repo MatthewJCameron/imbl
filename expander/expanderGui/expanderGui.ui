@@ -70,6 +70,21 @@
       <item row="2" column="6">
        <widget class="QWidget" name="modeTblSetEnable" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>            
          <item alignment="Qt::AlignHCenter">
           <widget class="QLabel" name="currentTblInOut">
            <property name="text">
@@ -124,6 +139,21 @@
          <bool>false</bool>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>        
          <item>
           <widget class="QPushButton" name="tblIn">
            <property name="text">

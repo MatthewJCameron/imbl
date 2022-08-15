@@ -31,10 +31,8 @@ void ExpanderGui::init() {
   
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
-  connect(component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)),
-       SLOT(updateExpInOut(Expander::InOutPosition)));
-  connect(component(), SIGNAL(tblInBeamChanged(Expander::InOutPosition)),
-       SLOT(updateTblInOut(Expander::InOutPosition)));
+  connect(component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(updateExpInOut(Expander::InOutPosition)));
+  connect(component(), SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(updateTblInOut(Expander::InOutPosition)));
 
   connect(ui->advanced_pb, SIGNAL(clicked()), SLOT(onAdvancedControl()));
   connect(ui->moveIn, SIGNAL(clicked()), component(), SLOT(expIn()));
@@ -110,13 +108,13 @@ void ExpanderGui::updateTblInOut(Expander::InOutPosition iopos) {
       break;
   case Expander::OUTBEAM :
       //warn("Z OUTBEAM", objectName());
-      ui->currentInOut->setText("OUT of the beam");
+      ui->currentTblInOut->setText("OUT of the beam");
       ui->tblOut->setFlat(true);
       ui->tblOut->setStyleSheet("font: bold;");
       break;
   case Expander::BETWEEN :
     //warn("Z BETWEEN", objectName());
-    //ui->currentInOut->setStyleSheet(ui->status->styleSheet());
+    //ui->currentTblInOut->setStyleSheet(ui->status->styleSheet());
     break;
   case Expander::MOVING :
     //warn("Z MOVING", objectName());
