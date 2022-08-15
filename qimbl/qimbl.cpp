@@ -953,7 +953,7 @@ void Qimbl::MoveSlideToImagingShutter(){
     } 
   else {
     double currentPos = slidePosRBV->get().toDouble();
-    if (currentPos < 299.0){
+    if (currentPos < 159.0){
       slidePos->set(160.0);
       ui->shISInOutButton->setText("Move OUT");
       }
