@@ -13,7 +13,7 @@ QEpicsPv * ShutterFE::opnCmd = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_CMD")
 QEpicsPv * ShutterFE::clsCmd = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSE_CMD");
 QEpicsPv * ShutterFE::enabledSts  = new QEpicsPv("SR08ID01PSS01:FES_EPS_ENABLE_STS");
 QEpicsPv * ShutterFE::disabledSts = new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_STS");
-QEpicsPv * mono1ZRBV = new QEpicsPv("SR08ID01DCM01:Z1.RBV");
+QEpicsPv * ShutterFE::mono1ZRBV = new QEpicsPv("SR08ID01DCM01:Z1.RBV");
 
 
 ShutterFE::ShutterFE(QObject *parent) :

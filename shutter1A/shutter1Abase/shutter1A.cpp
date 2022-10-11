@@ -17,7 +17,7 @@ QEpicsPv * Shutter1A::closeCommand = new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTE
 QEpicsPv * Shutter1A::enabledStatus  = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
 QEpicsPv * Shutter1A::disabledStatus = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
 
-QEpicsPv * slidePosRBV = new QEpicsPv("SR08ID01SST21:YTrans.RBV");
+QEpicsPv * Shutter1A::slidePosRBV = new QEpicsPv("SR08ID01SST21:YTrans.RBV");
 
 QEpicsPv * Shutter1A::whiteMode = new QEpicsPv("SR08ID01PSS01:HU01A_NOM_SHT_MOD_PERM_STS");
 QEpicsPv * Shutter1A::monoMode = new QEpicsPv("SR08ID01PSS01:HU01A_MON_SHT_MOD_PERM_STS");
