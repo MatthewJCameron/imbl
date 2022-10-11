@@ -2,6 +2,7 @@
 #include "shutterFE.h"
 #include "expander.h"
 #include <QDebug>
+#include <QMessageBox>
 #include "shutter1A.h"
 
 const int ShutterFE::relaxTime = 5000; // msec
@@ -107,7 +108,7 @@ bool ShutterFE::open(bool wait) {
   if (theExp.inBeam() != Expander::OUTBEAM){
     Shutter1A sht1A;
     if (sht1A.mode() != Shutter1A::MONO ) {
-      warn("Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.", this);
+      QMessageBox::warning(0, "Exapnder is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
       return false;
     }
   }
