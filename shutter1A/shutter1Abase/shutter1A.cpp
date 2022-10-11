@@ -5,26 +5,19 @@
 
 const int Shutter1A::relaxTime = 2500; // msec
 
-QEpicsPv * Shutter1A::psOpenStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
-QEpicsPv * Shutter1A::psCloseStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
+QEpicsPv * Shutter1A::psOpenStatus = new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_OPEN_STS");
+QEpicsPv * Shutter1A::psCloseStatus = new QEpicsPv("SR08ID01PSS01:HU01A_PH_SHUTTER_CLOSE_STS");
 
-QEpicsPv * Shutter1A::ssOpenStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
-QEpicsPv * Shutter1A::ssCloseStatus =
-    new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
+QEpicsPv * Shutter1A::ssOpenStatus = new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_OPEN_STS");
+QEpicsPv * Shutter1A::ssCloseStatus = new QEpicsPv("SR08ID01PSS01:HU01A_SF_SHUTTER_CLOSE_STS");
 
-QEpicsPv * Shutter1A::openCommand =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_CMD");
-QEpicsPv * Shutter1A::closeCommand =
-    new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_CMD");
+QEpicsPv * Shutter1A::openCommand = new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_OPEN_CMD");
+QEpicsPv * Shutter1A::closeCommand = new QEpicsPv("SR08ID01PSS01:HU01A_BL_SHUTTER_CLOSE_CMD");
 
-QEpicsPv * Shutter1A::enabledStatus  =
-    new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
-QEpicsPv * Shutter1A::disabledStatus =
-    new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
+QEpicsPv * Shutter1A::enabledStatus  = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_ENABLE_STS");
+QEpicsPv * Shutter1A::disabledStatus = new QEpicsPv("SR08ID01PSS01:BL_EPS_BL_SHUT_DISABLE_STS");
 
+QEpicsPv * slidePosRBV = new QEpicsPv("SR08ID01SST21:YTrans.RBV");
 
 QEpicsPv * Shutter1A::whiteMode = new QEpicsPv("SR08ID01PSS01:HU01A_NOM_SHT_MOD_PERM_STS");
 QEpicsPv * Shutter1A::monoMode = new QEpicsPv("SR08ID01PSS01:HU01A_MON_SHT_MOD_PERM_STS");
@@ -216,12 +209,16 @@ void Shutter1A::updateEnabled() {
 bool Shutter1A::open(bool wait) {
   if ( ! isConnected() || ! isEnabled() )
     return false;
-  Expander exp;
-  if (exp.inBeam() != Expander::OUTBEAM) {
-    if(md != MONO){
-      QMessageBox::warning(0, "Exapnder is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
+  if(md != MONO){
+    Expander exp;
+    if (exp.inBeam() != Expander::OUTBEAM) {
+      QMessageBox::warning(0, "Expander is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
       return false; 
-    }
+      }
+    if(slidePosRBV->get().toDouble() > 10){
+      QMessageBox::warning(0, "Imaging Shutter is in place while mode is white","Mode is not Mono and Imaging Shutter is NOT OUT OF BEAM. REMOVE IMAGING SHUTTER.");
+      return false;  
+      }
   }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));

@@ -954,8 +954,14 @@ void Qimbl::MoveSlideToImagingShutter(){
   else {
     double currentPos = slidePosRBV->get().toDouble();
     if (currentPos < 159.0){
-      slidePos->set(160.0);
-      ui->shISInOutButton->setText("Move OUT");
+      if ( sh1A->mode() != Shutter1A::MONO ) {
+        QMessageBox::warning(0,"Cannot move ImagingShutter into position unless in mono", "To prevent you from moving imaging shutter into white or mrt beams, this function will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
+        return;
+        }
+      else{
+        slidePos->set(160.0);
+        ui->shISInOutButton->setText("Move OUT");
+        }
       }
     else {
       slidePos->set(0.0);

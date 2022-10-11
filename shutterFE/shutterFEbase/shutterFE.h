@@ -33,6 +33,7 @@ protected:
   static QEpicsPv * clsCmd;
   static QEpicsPv * enabledSts;
   static QEpicsPv * disabledSts;
+  static QEpicsPv * mono1ZRBV;
 
 public:
 

@@ -13,7 +13,7 @@ QEpicsPv * ShutterFE::opnCmd = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_CMD")
 QEpicsPv * ShutterFE::clsCmd = new QEpicsPv(ShutterFE::pvBaseName + "_CLOSE_CMD");
 QEpicsPv * ShutterFE::enabledSts  = new QEpicsPv("SR08ID01PSS01:FES_EPS_ENABLE_STS");
 QEpicsPv * ShutterFE::disabledSts = new QEpicsPv("SR08ID01PSS01:FES_EPS_DISABLE_STS");
-
+QEpicsPv * mono1ZRBV = new QEpicsPv("SR08ID01DCM01:Z1.RBV");
 
 
 ShutterFE::ShutterFE(QObject *parent) :
@@ -104,13 +104,17 @@ bool ShutterFE::open(bool wait) {
     return false;
   if ( ! isEnabled() )
     return state() == OPENED;
-  Expander theExp;
-  if (theExp.inBeam() != Expander::OUTBEAM){
-    Shutter1A sht1A;
-    if (sht1A.mode() != Shutter1A::MONO ) {
+  Shutter1A sht1A;
+  if (sht1A.mode() != Shutter1A::MONO ) {
+    Expander theExp;
+    if (theExp.inBeam() != Expander::OUTBEAM){
       QMessageBox::warning(0, "Exapnder is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
       return false;
-    }
+      }
+    if(mono1ZRBV->get().toDouble() >0.001){
+      QMessageBox::warning(0, "Mono crystal 1 is IN while mode is white","Mode is not Mono and Crystal 1 is NOT OUT OF BEAM. REMOVE MONOCHROMATOR FROM BEAM.");
+      return false;  
+      }
   }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));

@@ -39,7 +39,8 @@ protected:
   static QEpicsPv * whiteMode;
   static QEpicsPv * monoMode;
   static QEpicsPv * mrtMode;
-
+  static QEpicsPv * slidePosRBV;
+  
   static QEpicsPv * psOpenStatus;
   static QEpicsPv * psCloseStatus;
   static QEpicsPv * ssOpenStatus;

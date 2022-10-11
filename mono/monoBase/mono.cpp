@@ -32,7 +32,8 @@ const QPair<double,double> Mono::energyRange = qMakePair<double,double>(16.0,195
 const double Mono::maxEnergy111 = 150.0; // keV
 const double Mono::minEnergy311 = 31.0; // keV
 
-const double Mono::standardZseparation = 20.0; // standard Z-separation of crystals;
+const double Mono::standardZseparation = 25.0; // standard Z-separation of crystals; 
+//the above was updated to 25 from 20 by Matthew on 11/10/2022 to reflect more common 25mm heights due to BCT
 const double Mono::zOut = -45.0; // Z1 when the mono is out of the beam;
 const double Mono::alpha = 14.75; // asymmetry angle (deg) "+" for 111 "-" for 311
 // OLD CRYSTALS // const double Mono::alpha = -4.652; // asymmetry angle (deg)

@@ -81,9 +81,7 @@ void Expander::setExpInBeam(bool val) {
     return;
   Shutter1A sht1A;
   if (sht1A.mode() != Shutter1A::MONO ) {
-    warn("Mode is not Mono."
-         " Switching Expander mode failed."
-         " Try to repeat or do it manually.", this);
+    QMessageBox::warning(0,"Cannot move expander unless in mono", "To prevent you from moving the expander into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 18.)");
     return;
   }
   motors[inOut]->goUserPosition( val ? 176 : 18); // In=178 , out =18
@@ -94,9 +92,7 @@ void Expander::setTblInBeam(bool val) {
     return;
   Shutter1A sht1A;
   if (sht1A.mode() != Shutter1A::MONO ) {
-    warn("Mode is not Mono."
-         " Switching Expander mode failed."
-         " Try to repeat or do it manually.", this);
+    QMessageBox::warning(0,"Cannot move TableZ unless in mono", "To prevent you from moving the IPASS table into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
     return;
   }
   motors[tblz]->goUserPosition( val ? 178.723 : 0); // In=178 , out =0
