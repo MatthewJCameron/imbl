@@ -3,6 +3,7 @@
 #include <qtpv.h>
 #include "shutterFE.h"
 #include "shutter1A.h"
+#include <QMessageBox>
 
 const QString Expander::pvBaseName = "SR08ID01EXP01:";
 const QString Expander::pvTableBaseName = "SR08ID01TBL13:";
