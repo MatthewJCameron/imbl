@@ -113,7 +113,7 @@ bool ShutterFE::open(bool wait) {
       QMessageBox::warning(0, "Expander is in place while shutter mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE EXPANDER.");
       return false;
       }
-    if (bctTableInBool){
+    if (bctTableisInBool){
       QMessageBox::warning(0, "BCT table is in place while shutter mode is white","Mode is not Mono and bct table is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE BCT TABLE.");
       return false;
       }
@@ -187,7 +187,7 @@ void ShutterFE::expanderisIn(bool newValue){
 }
 
 void ShutterFE::bctTableisIn(bool newValue){
-  bctTableInBool=newValue;
+  bctTableisInBool=newValue;
 }
 
 void ShutterFE::shutterisMono(bool newValue){
