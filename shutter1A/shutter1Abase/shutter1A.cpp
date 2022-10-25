@@ -264,5 +264,5 @@ void Shutter1A::expanderisIn(bool newValue){
 }
 
 void Shutter1A::bctTableisIn(bool newValue){
-  bctTableInBool=newValue;
+  bctTableisInBool=newValue;
 }

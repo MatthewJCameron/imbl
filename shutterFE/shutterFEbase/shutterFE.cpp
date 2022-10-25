@@ -170,11 +170,11 @@ bool ShutterFE::toggle(bool wait) {
   else                 return close(wait);
 }
 
-void ShutterFE::Paddle4isNone(bool newValue){
+void ShutterFE::paddle4isNone(bool newValue){
   paddle4isNoneBool=newValue;
 }
 
-void ShutterFE::Paddle5isNone(bool newValue){
+void ShutterFE::paddle5isNone(bool newValue){
   paddle5isNoneBool=newValue;
 }
 
