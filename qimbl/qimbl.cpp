@@ -187,8 +187,8 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shfe,SIGNAL(_bctTableisIn(bool)), SLOT(bctTableisIn(bool)));
   connect(shfe,SIGNAL(_shutterisMono(bool)), SLOT(shutterisMono(bool)));
   //safety for sh1A
-  connect(sh1A->component(),SIGNAL(_expanderisIn(bool)), SLOT(expanderisIn(bool)));
-  connect(sh1A->component(),SIGNAL(_bctTableisIn(bool)), SLOT(bctTableisIn(bool)));
+  connect(sh1A,SIGNAL(_expanderisIn(bool)), SLOT(expanderisIn(bool)));
+  connect(sh1A,SIGNAL(_bctTableisIn(bool)), SLOT(bctTableisIn(bool)));
 
 
   update_rfstat();
@@ -740,12 +740,12 @@ void Qimbl::update_mono() {
     case Mono::INBEAM :
       ui->monoPos->setStyleSheet("");
       ui->monoPos->setText("In beam");
-      emit _mono1isIn(true)
+      emit _mono1isIn(true);
       break;
     case Mono::OUTBEAM :
       ui->monoPos->setStyleSheet("");
       ui->monoPos->setText("Out of the beam");
-      emit _mono1isIn(false)
+      emit _mono1isIn(false);
       break;
     case Mono::BETWEEN :
       ui->monoPos->setStyleSheet(red_style);
@@ -802,13 +802,13 @@ void Qimbl::update_expander() {
   } 
   else {
     ui->ExpInOut->setText(QString::number(expander->component()->motors[Expander::inOut]->getUserPosition(),'f',3) + " mm");
-    if(expander->component()->expInBeam() == InOutPosition::INBEAM) {
+    if(expander->component()->expInBeam() == Expander::InOutPosition::INBEAM) {
       ui->ExpInOrOut->setText("In Beam");
-      emit _expanderisIn(true)
+      emit _expanderisIn(true);
       }
     else {
       ui->ExpInOrOut->setText("Out of Beam");
-      emit _expanderisIn(false)
+      emit _expanderisIn(false);
       }
   }
   if (expander->component()->motors[Expander::tilt]->isMoving()) {
@@ -841,13 +841,13 @@ void Qimbl::update_expander() {
   } 
   else {
     ui->BCTY->setText(QString::number(expander->component()->motors[Expander::tbly]->getUserPosition(),'f',3) + " mm");
-    if(expander->component()->tblInBeam() == InOutPosition::INBEAM) {
+    if(expander->component()->tblInBeam() == Expander::InOutPosition::INBEAM) {
       ui->ExpInOrOut->setText("In Beam");
-      emit _bctTableisIn(true)
+      emit _bctTableisIn(true);
     }
     else {
       ui->ExpInOrOut->setText("Out of Beam");
-      emit _bctTableisIn(false)
+      emit _bctTableisIn(false);
     }
   }
 }
