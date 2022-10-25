@@ -180,15 +180,15 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(expander->component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
   
   //Safety for FE 
-  connect(shfe,SIGNAL(_paddle4isNone(bool)),SLOT(paddle4isNone(bool)));
-  connect(shfe,SIGNAL(_paddle5isNone(bool)),SLOT(paddle5isNone(bool)));
-  connect(shfe,SIGNAL(_mono1isIn(bool)),    SLOT(mono1isIn(bool)));
-  connect(shfe,SIGNAL(_expanderisIn(bool)), SLOT(expanderisIn(bool)));
-  connect(shfe,SIGNAL(_bctTableisIn(bool)), SLOT(bctTableisIn(bool)));
-  connect(shfe,SIGNAL(_shutterisMono(bool)), SLOT(shutterisMono(bool)));
+  connect(this,SIGNAL(_paddle4isNone(bool)),shfe,SLOT(paddle4isNone(bool)));
+  connect(this,SIGNAL(_paddle5isNone(bool)),shfe,SLOT(paddle5isNone(bool)));
+  connect(this,SIGNAL(_mono1isIn(bool)),    shfe,SLOT(mono1isIn(bool)));
+  connect(this,SIGNAL(_expanderisIn(bool)), shfe,SLOT(expanderisIn(bool)));
+  connect(this,SIGNAL(_bctTableisIn(bool)), shfe,SLOT(bctTableisIn(bool)));
+  connect(this,SIGNAL(_shutterisMono(bool)), shfe,SLOT(shutterisMono(bool)));
   //safety for sh1A
-  connect(sh1A,SIGNAL(_expanderisIn(bool)), SLOT(expanderisIn(bool)));
-  connect(sh1A,SIGNAL(_bctTableisIn(bool)), SLOT(bctTableisIn(bool)));
+  connect(this,SIGNAL(_expanderisIn(bool)), sh1A, SLOT(expanderisIn(bool)));
+  connect(this,SIGNAL(_bctTableisIn(bool)), sh1A, SLOT(bctTableisIn(bool)));
 
 
   update_rfstat();
