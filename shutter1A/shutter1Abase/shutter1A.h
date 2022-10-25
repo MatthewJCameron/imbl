@@ -73,6 +73,8 @@ public slots:
   bool close(bool wait=false);
   bool setOpened(bool opn, bool wait=false);
   bool toggle(bool wait=false);
+  void expanderisIn(bool newValue);
+  void bctTableisIn(bool newValue);
 
 signals:
 
@@ -95,6 +97,9 @@ protected slots:
   void updateConnection();
   void updateEnabled();
 
+private:
+  bool expanderisInBool;
+  bool bctTableisInBool;
 };
 
 #endif // SHUTTER1A_H

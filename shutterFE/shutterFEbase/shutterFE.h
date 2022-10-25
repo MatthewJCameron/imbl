@@ -53,6 +53,12 @@ public slots:
   bool close(bool wait=false);
   bool setOpened(bool opn, bool wait=false);
   bool toggle(bool wait=false);
+  void paddle4isNone(bool newValue);
+  void paddle5isNone(bool newValue);
+  void mono1isIn(bool newValue);
+  void expanderisIn(bool newValue);
+  void bctTableisIn(bool newValue);
+  void shutterisMono(bool newValue);
 
 signals:
 
@@ -68,7 +74,13 @@ protected slots:
   void updateConnection();
   void updateEnabled();
 
-
+private:
+  bool paddle4isNoneBool;
+  bool paddle5isNoneBool;
+  bool mono1isInBool;
+  bool expanderisInBool;
+  bool bctTableisInBool;
+  bool shutterisMonoBool;
 };
 
 #endif // SHUTTERFE_H

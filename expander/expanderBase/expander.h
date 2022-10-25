@@ -26,14 +26,14 @@ public:
 
 private:
 	bool iAmMoving;
-	InOutPosition _inBeam;
+	//InOutPosition _inBeam;
 	InOutPosition _tblInBeam;
 	InOutPosition _expInBeam;
 	static QHash<Motors,QCaMotor*> init_motors();
 
 public:
 	explicit Expander(QObject *parent = 0);
-	inline InOutPosition inBeam() const {return _inBeam;}
+	//inline InOutPosition inBeam() const {return _inBeam;}
 	inline InOutPosition tblInBeam() const {return _tblInBeam;}
 	inline InOutPosition expInBeam() const {return _expInBeam;}
 	inline bool isMoving() const {return iAmMoving;}
@@ -55,10 +55,10 @@ public slots:
 private slots:
 	void updateMotion();
 	void updateConnection();
-	void UpdateInOutStatus();
+	//void UpdateInOutStatus();
 
 signals:
-	void inBeamChanged(Expander::InOutPosition);
+	//void inBeamChanged(Expander::InOutPosition);
 	void tblInBeamChanged(Expander::InOutPosition);
 	void expInBeamChanged(Expander::InOutPosition);
 	void motionChanged(bool);

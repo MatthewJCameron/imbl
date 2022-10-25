@@ -1,7 +1,6 @@
 #include "error.h"
 #include "shutter1A.h"
 #include <QMessageBox>
-#include "expander.h"
 
 const int Shutter1A::relaxTime = 2500; // msec
 
@@ -28,7 +27,9 @@ Shutter1A::Shutter1A(QObject *parent) :
   psst(BETWEEN),
   ssst(BETWEEN),
   md(INVALID),
-  enabled(false)
+  enabled(false),
+  expanderisInBool(true),
+  bctTableisInBool(true)
 {
 
 
@@ -210,13 +211,16 @@ bool Shutter1A::open(bool wait) {
   if ( ! isConnected() || ! isEnabled() )
     return false;
   if(md != MONO){
-    Expander exp;
-    if (exp.inBeam() != Expander::OUTBEAM) {
-      QMessageBox::warning(0, "Expander is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
+    if (expanderisInBool) {
+      QMessageBox::warning(0, "Expander is in place while mode is not mono","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
       return false; 
       }
+    if (bctTableInBool){
+      QMessageBox::warning(0, "BCT table is in place while shutter mode is not mono","Mode is not Mono and bct table is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE BCT TABLE.");
+      return false;
+      }
     if(slidePosRBV->get().toDouble() > 10){
-      QMessageBox::warning(0, "Imaging Shutter is in place while mode is white","Mode is not Mono and Imaging Shutter is NOT OUT OF BEAM. REMOVE IMAGING SHUTTER.");
+      QMessageBox::warning(0, "Imaging Shutter is in place while mode is not mono","Mode is not Mono and Imaging Shutter is NOT OUT OF BEAM. REMOVE IMAGING SHUTTER.");
       return false;  
       }
   }
@@ -255,3 +259,10 @@ bool Shutter1A::toggle(bool wait) {
   else                 return close(wait);
 }
 
+void expanderisIn(bool newValue){
+  expanderisInBool=newValue;
+}
+
+void bctTableisIn(bool newValue){
+  bctTableInBool=newValue;
+}

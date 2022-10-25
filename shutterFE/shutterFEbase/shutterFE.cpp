@@ -1,9 +1,7 @@
 #include "error.h"
 #include "shutterFE.h"
-#include "expander.h"
 #include <QDebug>
 #include <QMessageBox>
-#include "shutter1A.h"
 
 const int ShutterFE::relaxTime = 5000; // msec
 const QString ShutterFE::pvBaseName = "SR08ID01PSS01:FE_SHUTTER";
@@ -19,7 +17,13 @@ QEpicsPv * ShutterFE::mono1ZRBV = new QEpicsPv("SR08ID01DCM01:Z1.RBV");
 ShutterFE::ShutterFE(QObject *parent) :
   Component("Front-end shutter", parent),
   st(BETWEEN),
-  enabled(false)
+  enabled(false),
+  paddle4isNoneBool(true),
+  paddle5isNoneBool(true),
+  mono1isInBool(true),
+  expanderisInBool(true),
+  bctTableisInBool(true),
+  shutterisMonoBool(false)
 {
 
   timer.setSingleShot(true);
@@ -104,17 +108,23 @@ bool ShutterFE::open(bool wait) {
     return false;
   if ( ! isEnabled() )
     return state() == OPENED;
-  Shutter1A sht1A;
-  if (sht1A.mode() != Shutter1A::MONO ) {
-    Expander theExp;
-    if (theExp.inBeam() != Expander::OUTBEAM){
-      QMessageBox::warning(0, "Exapnder is in place while mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO MODE AND REMOVE EXPANDER.");
+  if not (shutterisMonoBool) {
+    if (expanderisInBool){
+      QMessageBox::warning(0, "Expander is in place while shutter mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE EXPANDER.");
       return false;
       }
-    if(mono1ZRBV->get().toDouble() >0.001){
-      QMessageBox::warning(0, "Mono crystal 1 is IN while mode is white","Mode is not Mono and Crystal 1 is NOT OUT OF BEAM. REMOVE MONOCHROMATOR FROM BEAM.");
+    if (bctTableInBool){
+      QMessageBox::warning(0, "BCT table is in place while shutter mode is white","Mode is not Mono and bct table is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE BCT TABLE.");
+      return false;
+      }
+    if(mono1isInBool){
+      QMessageBox::warning(0, "Mono crystal 1 is IN while shutter mode is white","Mode is not Mono and Crystal 1 is NOT OUT OF BEAM. REMOVE MONOCHROMATOR FROM BEAM.");
       return false;  
       }
+  }
+  if ((mono1isInBool) && (paddle4isNoneBool) && (paddle5isNoneBool) ){
+    QMessageBox::warning(0, "Mono crystal 1 is IN while Paddle 4 and 5 are None","Crystal 1 is NOT OUT OF BEAM while Paddle 4 and 5 are NONE. REMOVE MONOCHROMATOR FROM BEAM OR REINTRODUCE FILTRATION PRIOR TO MONO CRYSTAL.");
+    return false;
   }
   if (timer.isActive())
     qtWait(&timer, SIGNAL(timeout()));
@@ -158,4 +168,28 @@ bool ShutterFE::setOpened(bool opn, bool wait) {
 bool ShutterFE::toggle(bool wait) {
   if (state()==CLOSED) return open(wait);
   else                 return close(wait);
+}
+
+void Paddle4isNone(bool newValue){
+  paddle4isNoneBool=newValue;
+}
+
+void Paddle5isNone(bool newValue){
+  paddle5isNoneBool=newValue;
+}
+
+void mono1isIn(bool newValue){
+  mono1isInBool=newValue;
+}
+
+void expanderisIn(bool newValue){
+  expanderisInBool=newValue;
+}
+
+void bctTableisIn(bool newValue){
+  bctTableInBool=newValue;
+}
+
+void shutterisMono(bool newValue){
+  shutterisMonoBool=newValue;
 }

@@ -25,6 +25,14 @@ public:
   explicit Qimbl(QWidget *parent = 0);
   ~Qimbl();
 
+signals:
+  void _paddle4IsNone(bool avalue);
+  void _paddle5IsNone(bool avalue);
+  void _mono1isIn(bool avalue);
+  void _expanderisIn(bool avalue);
+  void _bctTableisIn(bool avalue);
+  void _shutterisMono(bool avalue);
+
 private:
   Ui::Qimbl *ui;
 

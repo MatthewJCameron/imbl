@@ -12,7 +12,7 @@ const QHash<Expander::Motors,QCaMotor*> Expander::motors=Expander::init_motors()
 Expander::Expander(QObject *parent) :
   Component("Expander", parent),
   iAmMoving(false),
-  _inBeam(BETWEEN),
+  //_inBeam(BETWEEN),
   _tblInBeam(BETWEEN),
   _expInBeam(BETWEEN)
 {
@@ -26,8 +26,8 @@ Expander::Expander(QObject *parent) :
   connect(motors[tblz], SIGNAL(changedMoving(bool)), SLOT(UpdateTblInOutStatus()));
   connect(motors[tblz], SIGNAL(changedUserPosition(double)), SLOT(UpdateTblInOutStatus()));
 
-  connect(this, SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
-  connect(this, SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
+  //connect(this, SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
+  //connect(this, SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(UpdateInOutStatus()));
 
   updateConnection();
 
@@ -104,7 +104,7 @@ void Expander::stop() {
     mot->stop();
 }
 
-void Expander::UpdateInOutStatus() {
+/*void Expander::UpdateInOutStatus() {
   if ( ! motors[inOut]->isConnected() )
     return;
 
@@ -117,7 +117,7 @@ void Expander::UpdateInOutStatus() {
    //warn("_totalInBeam is INBEAM", objectName());
   }
   emit inBeamChanged(_inBeam);
-}
+}*/
 
 void Expander::UpdateTblInOutStatus() {
   if ( ! motors[tblz]->isConnected() )
