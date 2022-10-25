@@ -108,7 +108,7 @@ bool ShutterFE::open(bool wait) {
     return false;
   if ( ! isEnabled() )
     return state() == OPENED;
-  if not (shutterisMonoBool) {
+  if (not shutterisMonoBool) {
     if (expanderisInBool){
       QMessageBox::warning(0, "Expander is in place while shutter mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE EXPANDER.");
       return false;
@@ -170,26 +170,26 @@ bool ShutterFE::toggle(bool wait) {
   else                 return close(wait);
 }
 
-void Paddle4isNone(bool newValue){
+void ShutterFE::Paddle4isNone(bool newValue){
   paddle4isNoneBool=newValue;
 }
 
-void Paddle5isNone(bool newValue){
+void ShutterFE::Paddle5isNone(bool newValue){
   paddle5isNoneBool=newValue;
 }
 
-void mono1isIn(bool newValue){
+void ShutterFE::mono1isIn(bool newValue){
   mono1isInBool=newValue;
 }
 
-void expanderisIn(bool newValue){
+void ShutterFE::expanderisIn(bool newValue){
   expanderisInBool=newValue;
 }
 
-void bctTableisIn(bool newValue){
+void ShutterFE::bctTableisIn(bool newValue){
   bctTableInBool=newValue;
 }
 
-void shutterisMono(bool newValue){
+void ShutterFE::shutterisMono(bool newValue){
   shutterisMonoBool=newValue;
 }

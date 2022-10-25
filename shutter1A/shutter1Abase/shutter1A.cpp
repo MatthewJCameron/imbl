@@ -259,10 +259,10 @@ bool Shutter1A::toggle(bool wait) {
   else                 return close(wait);
 }
 
-void expanderisIn(bool newValue){
+void Shutter1A::expanderisIn(bool newValue){
   expanderisInBool=newValue;
 }
 
-void bctTableisIn(bool newValue){
+void Shutter1A::bctTableisIn(bool newValue){
   bctTableInBool=newValue;
 }
