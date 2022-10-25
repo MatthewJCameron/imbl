@@ -842,11 +842,11 @@ void Qimbl::update_expander() {
   else {
     ui->BCTY->setText(QString::number(expander->component()->motors[Expander::tbly]->getUserPosition(),'f',3) + " mm");
     if(expander->component()->tblInBeam() == Expander::InOutPosition::INBEAM) {
-      ui->ExpInOrOut->setText("In Beam");
+      ui->TblInOrOut->setText("In Beam");
       emit _bctTableisIn(true);
     }
     else {
-      ui->ExpInOrOut->setText("Out of Beam");
+      ui->TblInOrOut->setText("Out of Beam");
       emit _bctTableisIn(false);
     }
   }
