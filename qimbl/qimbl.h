@@ -26,8 +26,8 @@ public:
   ~Qimbl();
 
 signals:
-  void _paddle4IsNone(bool avalue);
-  void _paddle5IsNone(bool avalue);
+  void _paddle4isNone(bool avalue);
+  void _paddle5isNone(bool avalue);
   void _mono1isIn(bool avalue);
   void _expanderisIn(bool avalue);
   void _bctTableisIn(bool avalue);
