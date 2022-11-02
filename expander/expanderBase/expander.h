@@ -57,7 +57,7 @@ public slots:
 	inline void tblIn() { setTblInBeam(true); }
 	inline void tblOut() { setTblInBeam(false); }
 	void setEnergy(double enrg, bool keepDBragg=true);
-  void setDBragg(double val);
+  	void setDBragg(double val);
 
 	void stop();
 

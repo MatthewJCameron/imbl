@@ -13,10 +13,10 @@ class EnergySetter;
 
 class Tuner;
 
-class EnergySetRevert : public QWidget {
+class EnergySetRevertGonio : public QWidget {
   Q_OBJECT;
 public:
-  EnergySetRevert(QWidget * master);
+  EnergySetRevertGonio(QWidget * master);
 signals:
   void revert();
   void set();
@@ -33,7 +33,7 @@ private:
   Ui::ExpanderGui *ui;
 
   explicit ExpanderGui(Expander * expander, QWidget *parent = 0);
-  
+
   void init();
 
 public:
@@ -59,15 +59,15 @@ private slots:
   void updateEnergyMotion();
 
 private:
-  EnergySetRevert * energySetter;
-  bool eventFilter(QObject *obj, QEvent *event);
+  EnergySetRevertGonio * energySetter;
+  //bool eventFilter(QObject *obj, QEvent *event);
 
 };
 
-class EnterEscapePressEater : public QObject {
+class EnterEscapePressEaterGonio : public QObject {
   Q_OBJECT;
 public:
-  inline explicit EnterEscapePressEater (QWidget * parent = 0) : QObject(parent) {};
+  inline explicit EnterEscapePressEaterGonio (QWidget * parent = 0) : QObject(parent) {};
 protected:
   virtual bool eventFilter(QObject * obj, QEvent * event);
 signals:

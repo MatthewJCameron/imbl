@@ -1,9 +1,10 @@
 #include "expanderGui.h"
 #include "error.h"
 #include "ui_expanderGui.h"
-#include "../../mono/monoGui/ui_energysetter.h"
+#include "mono/monoGui/ui_energysetter.h"
+#include "tuner.h"
 
-EnergySetRevert::EnergySetRevert(QWidget * master) :
+EnergySetRevertGonio::EnergySetRevertGonio(QWidget * master) :
   QWidget(static_cast<QWidget*>(master->parent())),
   ui(new Ui::EnergySetter)
 {
@@ -13,7 +14,7 @@ EnergySetRevert::EnergySetRevert(QWidget * master) :
   master->installEventFilter(this);
 }
 
-bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
+bool EnergySetRevertGonio::eventFilter(QObject *obj, QEvent *event) {
   QWidget * objW = static_cast<QWidget*>(obj);
   if (objW) {
     if ( event->type() == QEvent::Resize ) {
@@ -29,7 +30,7 @@ bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
   return QObject::eventFilter(obj, event);
 }
 
-bool EnterEscapePressEater::eventFilter(QObject * obj, QEvent * event) {
+bool EnterEscapePressEaterGonio::eventFilter(QObject * obj, QEvent * event) {
   bool ret = QObject::eventFilter(obj, event);
   if ( event->type() == QEvent::KeyPress ) {
     int key = static_cast<QKeyEvent*>(event)->key();
@@ -68,14 +69,12 @@ void ExpanderGui::init() {
   ui->motors_1->addMotor(component()->motors[Expander::inOut], true,true);
   ui->motors_1->addMotor(component()->motors[Expander::tbly], true,true);
   ui->motors_1->addMotor(component()->motors[Expander::tblz], true,true);
-  
-  energySetter = new EnergySetRevert(ui->energy);
+
+  energySetter = new EnergySetRevertGonio(ui->energy);
   ui->energy->setRange(Expander::energyRange.first, Expander::energyRange.second);
 
-  EnterEscapePressEater * eePress = new EnterEscapePressEater(this);
+  EnterEscapePressEaterGonio * eePress = new EnterEscapePressEaterGonio(this);
   ui->energy->installEventFilter(eePress);
-  ui->si111->installEventFilter(eePress);
-  ui->si311->installEventFilter(eePress);
 
 
 
@@ -206,7 +205,7 @@ void ExpanderGui::onAdvancedControl() {
 }
 
 void ExpanderGui::updateEnergyMotion() {
-  bool mov = component()->motors[Expander::gonio]->isMoving() 
+  bool mov = component()->motors[Expander::gonio]->isMoving(); 
   ui->energy->setDisabled(mov);
   ui->lockBragg->setDisabled(mov);
   ui->tuneBragg->onMotionChange(mov);

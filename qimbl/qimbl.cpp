@@ -448,6 +448,7 @@ void Qimbl::update_bl_mode() {
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);
+	emit _shutterisMono(false);
         break;
       case Shutter1A::MONO :
         ui->blMode->setStyleSheet("");
@@ -457,6 +458,7 @@ void Qimbl::update_bl_mode() {
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
         ui->linkedRight->setVisible(false);
+	emit _shutterisMono(true);
         break;
       case Shutter1A::WHITE :
         ui->blMode->setStyleSheet("");
@@ -466,6 +468,7 @@ void Qimbl::update_bl_mode() {
         ui->linked->setVisible(true);
         ui->linkedLeft->setVisible(true);
         ui->linkedRight->setVisible(true);
+	emit _shutterisMono(false);
         break;
       case Shutter1A::MRT :
         ui->blMode->setStyleSheet("");
@@ -475,6 +478,7 @@ void Qimbl::update_bl_mode() {
         ui->linked->setVisible(false);
         ui->linkedLeft->setVisible(false);
         ui->linkedRight->setVisible(false);
+	emit _shutterisMono(false);
         break;
     }
   update_sh1A();

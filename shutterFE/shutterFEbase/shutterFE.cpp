@@ -2,7 +2,7 @@
 #include "shutterFE.h"
 #include <QDebug>
 #include <QMessageBox>
-
+//#include <stdio.h>
 const int ShutterFE::relaxTime = 5000; // msec
 const QString ShutterFE::pvBaseName = "SR08ID01PSS01:FE_SHUTTER";
 QEpicsPv * ShutterFE::opnSts = new QEpicsPv(ShutterFE::pvBaseName + "_OPEN_STS");
@@ -108,7 +108,7 @@ bool ShutterFE::open(bool wait) {
     return false;
   if ( ! isEnabled() )
     return state() == OPENED;
-  if (not shutterisMonoBool) {
+  if (! shutterisMonoBool) {
     if (expanderisInBool){
       QMessageBox::warning(0, "Expander is in place while shutter mode is white","Mode is not Mono and expander is NOT OUT OF BEAM. SWAP TO MONO SHUTTER MODE AND REMOVE EXPANDER.");
       return false;

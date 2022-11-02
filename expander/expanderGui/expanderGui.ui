@@ -89,7 +89,7 @@
          </layout>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="tuneBragg">
+         <widget class="Tuner" name="tuneBragg">
           <property name="suffix">
            <string>deg</string>
           </property>
@@ -318,6 +318,12 @@
   <zorder>stop</zorder>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>Tuner</class>
+   <extends>QDoubleSpinBox</extends>
+   <header>tuner.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>QMotorStack</class>
    <extends>QWidget</extends>

@@ -4,6 +4,11 @@ add_library(expanderGui SHARED
   expanderGui.cpp
   expanderGui.ui
   expanderGui.qrc
+  tuner.h
+  tuner.cpp
+  tuner.ui
+  energysetter.ui
+
 )
 
 target_include_directories(expanderGui

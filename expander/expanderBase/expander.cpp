@@ -194,13 +194,13 @@ void Expander::setEnergy(double enrg, bool keepDBragg) {
     warn("Requested energy (" + QString::number(enrg) + "keV) is out of the allowed range (" + QString::number(energyRange.first) + "," + QString::number(energyRange.second) + ")kEv. Ignoring the request.", objectName() );
     return;
   }
-  
+
   const double ddbragg = keepDBragg ? dBragg() : 0;
-  
+
   motors[gonio]->goUserPosition( Expander::theGradient*enrg+Expander::theIntercept +ddbragg , QCaMotor::STARTED);
   QTimer::singleShot(0, this, SLOT(updateDBragg()));
   QTimer::singleShot(0, this, SLOT(updateEnergy()));
-  
+
 }
 
 void Expander::updateDBragg() {
@@ -209,4 +209,11 @@ void Expander::updateDBragg() {
   _dBragg = motors[gonio]->getUserPosition()
       - (Expander::theGradient*energy()+Expander::theIntercept);
     emit dBraggChanged(_dBragg);
+}
+
+void Expander::setDBragg(double val) {
+  if ( ! isConnected() || isMoving() )
+    return;
+  motors[gonio]->goUserPosition(val+Expander::theGradient*energy()+Expander::theIntercept, QCaMotor::STARTED);
+;
 }
