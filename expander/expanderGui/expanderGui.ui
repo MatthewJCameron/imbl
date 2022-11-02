@@ -55,7 +55,10 @@
          </widget>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox">
+         <widget class="QDoubleSpinBox" name="energy">
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
           <property name="suffix">
            <string>keV</string>
           </property>
@@ -69,7 +72,7 @@
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>∆θ</string>
+             <string>∆θ (</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -77,23 +80,23 @@
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox">
+           <widget class="QCheckBox" name="lockBragg">
             <property name="text">
-             <string>Lock</string>
+             <string>Lock )</string>
             </property>
            </widget>
           </item>
          </layout>
         </item>
         <item>
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+         <widget class="QDoubleSpinBox" name="tuneBragg">
           <property name="suffix">
            <string>deg</string>
           </property>
          </widget>
         </item>
         <item>
-         <widget class="QLabel" name="label_4">
+         <widget class="QLabel" name="readDBragg">
           <property name="text">
            <string>No link</string>
           </property>
@@ -265,16 +268,6 @@
        </layout>
       </item>
      </layout>
-     <zorder>doubleSpinBox_2</zorder>
-     <zorder>label_4</zorder>
-     <zorder>doubleSpinBox</zorder>
-     <zorder>modeTblSetEnable</zorder>
-     <zorder>label_14</zorder>
-     <zorder>label</zorder>
-     <zorder>tblSet</zorder>
-     <zorder>label_2</zorder>
-     <zorder>modeSet</zorder>
-     <zorder>modeSetEnable</zorder>
      <zorder>scheme</zorder>
      <zorder></zorder>
      <zorder></zorder>

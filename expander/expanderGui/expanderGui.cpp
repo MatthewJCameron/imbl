@@ -1,6 +1,46 @@
 #include "expanderGui.h"
 #include "error.h"
 #include "ui_expanderGui.h"
+#include "../../mono/monoGui/ui_energysetter.h"
+
+EnergySetRevert::EnergySetRevert(QWidget * master) :
+  QWidget(static_cast<QWidget*>(master->parent())),
+  ui(new Ui::EnergySetter)
+{
+  ui->setupUi(this);
+  connect(ui->set, SIGNAL(clicked()), SIGNAL(set()));
+  connect(ui->revert, SIGNAL(clicked()), SIGNAL(revert()));
+  master->installEventFilter(this);
+}
+
+bool EnergySetRevert::eventFilter(QObject *obj, QEvent *event) {
+  QWidget * objW = static_cast<QWidget*>(obj);
+  if (objW) {
+    if ( event->type() == QEvent::Resize ) {
+      setMinimumWidth(objW->width());
+      setMaximumWidth(objW->width());
+    } else if ( event->type() == QEvent::Move ||
+                event->type() == QEvent::Show ) {
+      QRect geom = geometry();
+      geom.moveTopLeft(objW->geometry().topLeft()-QPoint(0, height()));
+      setGeometry(geom);
+    }
+  }
+  return QObject::eventFilter(obj, event);
+}
+
+bool EnterEscapePressEater::eventFilter(QObject * obj, QEvent * event) {
+  bool ret = QObject::eventFilter(obj, event);
+  if ( event->type() == QEvent::KeyPress ) {
+    int key = static_cast<QKeyEvent*>(event)->key();
+    if ( key == Qt::Key_Enter || key == Qt::Key_Return )
+      emit enterPressed();
+    else if ( key == Qt::Key_Escape )
+      emit escapePressed();
+  }
+  return ret;
+};
+
 
 ExpanderGui::ExpanderGui(QWidget *parent) :
   ComponentGui(new Expander(parent), true, parent),
@@ -29,6 +69,16 @@ void ExpanderGui::init() {
   ui->motors_1->addMotor(component()->motors[Expander::tbly], true,true);
   ui->motors_1->addMotor(component()->motors[Expander::tblz], true,true);
   
+  energySetter = new EnergySetRevert(ui->energy);
+  ui->energy->setRange(Expander::energyRange.first, Expander::energyRange.second);
+
+  EnterEscapePressEater * eePress = new EnterEscapePressEater(this);
+  ui->energy->installEventFilter(eePress);
+  ui->si111->installEventFilter(eePress);
+  ui->si311->installEventFilter(eePress);
+
+
+
   connect(component(), SIGNAL(connectionChanged(bool)), SLOT(updateConnection(bool)));
   connect(component(), SIGNAL(motionChanged(bool)), ui->stop, SLOT(setEnabled(bool)));
   connect(component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(updateExpInOut(Expander::InOutPosition)));
@@ -44,6 +94,18 @@ void ExpanderGui::init() {
 
   connect(component()->motors[Expander::inOut], SIGNAL(changedMoving(bool)), ui->modeSetEnable, SLOT(setDisabled(bool)));
   connect(component()->motors[Expander::tblz], SIGNAL(changedMoving(bool)), ui->modeTblSetEnable, SLOT(setDisabled(bool)));
+
+
+  connect(component(), SIGNAL(energyChanged(double)), SLOT(updateEnergy()));
+  connect(component(), SIGNAL(dBraggChanged(double)), SLOT(updateDBragg()));
+  connect(ui->energy, SIGNAL(valueChanged(double)),  SLOT(onEnergyTune()));
+  connect(energySetter, SIGNAL(set()),  SLOT(onEnergySet()));
+  connect(energySetter, SIGNAL(revert()),  SLOT(revertEnergy()));
+  connect(eePress, SIGNAL(enterPressed()),  SLOT(onEnergySet()));
+  connect(eePress, SIGNAL(escapePressed()),  SLOT(revertEnergy()));
+  connect(ui->tuneBragg, SIGNAL(valueEdited(double)), component(), SLOT(setDBragg(double)));
+  connect(component()->motors[Expander::gonio], SIGNAL(changedMoving(bool)), SLOT(updateDBragg()));
+  connect(component()->motors[Expander::gonio], SIGNAL(changedMoving(bool)), SLOT(updateEnergyMotion()));
 
   updateConnection(component()->isConnected());
   onAdvancedControl();
@@ -141,4 +203,44 @@ void ExpanderGui::onAdvancedControl() {
     ui->modeSet->setEnabled(true);
     ui->tblSet->setEnabled(true);
   }
+}
+
+void ExpanderGui::updateEnergyMotion() {
+  bool mov = component()->motors[Expander::gonio]->isMoving() 
+  ui->energy->setDisabled(mov);
+  ui->lockBragg->setDisabled(mov);
+  ui->tuneBragg->onMotionChange(mov);
+}
+
+void ExpanderGui::onEnergyTune() {
+  const double enrg = ui->energy->value();
+  bool setrevert =
+      ! component()->motors[Expander::gonio]->isMoving() &&
+      ( qAbs(enrg - component()->energy()) >= 0.001 ) ;
+  energySetter->setVisible(setrevert);
+}
+
+void ExpanderGui::onEnergySet() {
+  energySetter->hide();
+  component()->setEnergy(ui->energy->value(),ui->lockBragg->isChecked());
+  revertEnergy();
+}
+
+void ExpanderGui::revertEnergy() {
+  if ( qAbs(ui->energy->value() - component()->energy()) >= 1.0e-03 )
+    ui->energy->setValue(component()->energy());
+  energySetter->hide();
+}
+
+void ExpanderGui::updateDBragg() {
+  ui->readDBragg->setText(QString::number(component()->dBragg(), 'f', ui->tuneBragg->decimals()));
+  if ( ! component()->motors[Expander::gonio]->isMoving() )
+    ui->tuneBragg->setValue(component()->dBragg());
+}
+
+void ExpanderGui::updateEnergy() {
+  if ( ui->energy->hasFocus() )
+    return;
+  else
+    revertEnergy();
 }
