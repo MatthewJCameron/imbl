@@ -106,6 +106,8 @@ void ExpanderGui::init() {
   connect(component()->motors[Expander::gonio], SIGNAL(changedMoving(bool)), SLOT(updateDBragg()));
   connect(component()->motors[Expander::gonio], SIGNAL(changedMoving(bool)), SLOT(updateEnergyMotion()));
 
+connect(ui->lockBragg,SIGNAL(stateChanged(int)),component(),SLOT(setUseDBragg(int)));
+
   updateConnection(component()->isConnected());
   onAdvancedControl();
 

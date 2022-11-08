@@ -93,6 +93,15 @@
           <property name="suffix">
            <string>deg</string>
           </property>
+          <property name="decimals">
+           <number>5</number>
+          </property>          
+          <property name="minimum">
+           <double>-2147483647.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>2147483647.000000000000000</double>
+          </property>
          </widget>
         </item>
         <item>

@@ -35,7 +35,8 @@ private:
 	static QHash<Motors,QCaMotor*> init_motors();
 	double _dBragg; // delta of the gonio
 	double _energy; // kev
-
+	void initEnergy();
+	bool _useDBragg;
 public:
 	explicit Expander(QObject *parent = 0);
 	//inline InOutPosition inBeam() const {return _inBeam;}
@@ -58,7 +59,7 @@ public slots:
 	inline void tblOut() { setTblInBeam(false); }
 	void setEnergy(double enrg, bool keepDBragg=true);
   	void setDBragg(double val);
-
+	void setUseDBragg(int val);
 	void stop();
 
 private slots:
