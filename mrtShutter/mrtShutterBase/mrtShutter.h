@@ -83,6 +83,8 @@ public slots:
   void setRepeats(int val);
   void resetPower();
   void resetLimitErrors();
+  void expanderisIn(bool newValue);
+  void bctTableisIn(bool newValue);
 
 private slots:
   void actual_start(); // needed to avoid a buggy situation: see more desc in the implementation of start().
@@ -119,6 +121,8 @@ signals:
   void powerStatusChanged(bool pwr);
   void limitErrorsChanged(int closeErr, int openErr, int restingErr);
   void tempFlagsChanged(bool warn1, bool warn2, bool err1, bool err2);
+  void _expanderisIn(bool avalue);
+  void _bctTableisIn(bool avalue);
 
 };
 

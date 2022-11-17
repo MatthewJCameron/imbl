@@ -189,7 +189,8 @@ Qimbl::Qimbl(QWidget *parent) :
   //safety for sh1A
   connect(this,SIGNAL(_expanderisIn(bool)), sh1A, SLOT(expanderisIn(bool)));
   connect(this,SIGNAL(_bctTableisIn(bool)), sh1A, SLOT(bctTableisIn(bool)));
-
+  connect(this,SIGNAL(_expanderisIn(bool)), ui->shmrt->component(), SLOT(expanderisIn(bool)));
+  connect(this,SIGNAL(_bctTableisIn(bool)), ui->shmrt->component(), SLOT(bctTableisIn(bool)));
 
   update_rfstat();
   update_rfcurrent();

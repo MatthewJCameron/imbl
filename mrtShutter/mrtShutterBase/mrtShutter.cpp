@@ -48,6 +48,9 @@ MrtShutter::MrtShutter(QObject * parent) :
   //connect(&dwellTimer, SIGNAL(timeout()), SLOT(updateCanStart()));
 
   connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)));
+  connect(this,SIGNAL(_expanderisIn(bool)), shut1A, SLOT(expanderisIn(bool)));
+  connect(this,SIGNAL(_bctTableisIn(bool)), shut1A, SLOT(bctTableisIn(bool)));
+  
 
   updateConnection();
 
@@ -349,7 +352,12 @@ void MrtShutter::resetLimitErrors() {
   pvs["CLEARLIMITERRORS_CMD"]->set(1);
 }
 
-
+void MrtShutter::expanderisIn(bool newValue){
+  emit _expanderisIn(newValue);
+}
+void MrtShutter::bctTableisIn(bool newValue){
+  emit _expanderisIn(newValue);
+}
 
 
 
