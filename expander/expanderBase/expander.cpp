@@ -9,9 +9,11 @@ const QString Expander::pvBaseName = "SR08ID01EXP01:";
 const QString Expander::pvTableBaseName = "SR08ID01TBL13:";
 const QHash<Expander::Motors,QCaMotor*> Expander::motors=Expander::init_motors();
 const QPair<double,double> Expander::energyRange = qMakePair<double,double>(30.0,39.0);
-const double Expander::theGradient = -0.285912891; 
+const double Expander::theGradient = 0.791; 
+//const double Expander::theGradient = -0.285912891; 
 //const double Expander::theIntercept = 19.90119386;
-const double Expander::theIntercept = 11.46519;
+//const double Expander::theIntercept = 11.46519;
+const double Expander::theIntercept = -14.562;
 
 Expander::Expander(QObject *parent) :
   Component("Expander", parent),
@@ -108,7 +110,7 @@ void Expander::setTblInBeam(bool val) {
     QMessageBox::warning(0,"Cannot move TableZ unless in mono", "To prevent you from moving the IPASS table into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
     return;
   }
-  motors[tblz]->goUserPosition( val ? 178.723 : 0); // In=178 , out =0
+  motors[tblz]->goUserPosition( val ? 200.0 : 0); // former In=178 , out =0
 }
 
 void Expander::stop() {

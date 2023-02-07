@@ -178,8 +178,8 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(expander->component(), SIGNAL(motionChanged(bool)), SLOT(update_expander()));
   connect(expander->component(), SIGNAL(tblInBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
   connect(expander->component(), SIGNAL(expInBeamChanged(Expander::InOutPosition)), SLOT(update_expander()));
-  
-  //Safety for FE 
+
+  //Safety for FE
   connect(this,SIGNAL(_paddle4isNone(bool)),shfe,SLOT(paddle4isNone(bool)));
   connect(this,SIGNAL(_paddle5isNone(bool)),shfe,SLOT(paddle5isNone(bool)));
   connect(this,SIGNAL(_mono1isIn(bool)),    shfe,SLOT(mono1isIn(bool)));
@@ -945,7 +945,7 @@ void Qimbl::update_slidePos() {
     double currentPos = slidePosRBV->get().toDouble();
     ui->ShutterSlidePos->setText( QString::number(currentPos, 'f', 1) + " mm" );
     //std::cout << "currentPos is " << currentPos << std::endl;
-    if ( 159.0 < currentPos ){
+    if ( 299.0 < currentPos ){
       ui->shMRTInOutButton->setText("Move IN");
       ui->shISInOutButton ->setText("Move OUT");
       ui->shMRTInOutButton->setEnabled(true);
@@ -996,13 +996,13 @@ void Qimbl::MoveSlideToImagingShutter(){
     } 
   else {
     double currentPos = slidePosRBV->get().toDouble();
-    if (currentPos < 159.0){
+    if (currentPos < 299.0){
       if ( sh1A->mode() != Shutter1A::MONO ) {
         QMessageBox::warning(0,"Cannot move ImagingShutter into position unless in mono", "To prevent you from moving imaging shutter into white or mrt beams, this function will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
         return;
         }
       else{
-        slidePos->set(160.0);
+        slidePos->set(300.0);
         ui->shISInOutButton->setText("Move OUT");
         }
       }

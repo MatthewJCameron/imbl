@@ -50,7 +50,6 @@ MrtShutter::MrtShutter(QObject * parent) :
   connect(shut1A, SIGNAL(toggleRequested(bool)), SLOT(acknowledgeSS(bool)));
   connect(this,SIGNAL(_expanderisIn(bool)), shut1A, SLOT(expanderisIn(bool)));
   connect(this,SIGNAL(_bctTableisIn(bool)), shut1A, SLOT(bctTableisIn(bool)));
-  
 
   updateConnection();
 
@@ -356,7 +355,7 @@ void MrtShutter::expanderisIn(bool newValue){
   emit _expanderisIn(newValue);
 }
 void MrtShutter::bctTableisIn(bool newValue){
-  emit _expanderisIn(newValue);
+  emit _bctTableisIn(newValue);
 }
 
 
