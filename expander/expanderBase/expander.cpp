@@ -14,6 +14,10 @@ const double Expander::theGradient = 0.791;
 //const double Expander::theIntercept = 19.90119386;
 //const double Expander::theIntercept = 11.46519;
 const double Expander::theIntercept = -14.562;
+const double expanderInPosition = 176.0;
+const double expanderOutPosition = 18.0;
+const double tableInPosition = 200.0;
+const double tableOutPosition = 0.0;
 
 Expander::Expander(QObject *parent) :
   Component("Expander", parent),
@@ -99,7 +103,7 @@ void Expander::setExpInBeam(bool val) {
     QMessageBox::warning(0,"Cannot move expander unless in mono", "To prevent you from moving the expander into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 18.)");
     return;
   }
-  motors[inOut]->goUserPosition( val ? 176 : 18); // In=178 , out =18
+  motors[inOut]->goUserPosition( val ? expanderInPosition : expanderOutPosition); // In=178 , out =18
 }
 
 void Expander::setTblInBeam(bool val) {
@@ -110,7 +114,7 @@ void Expander::setTblInBeam(bool val) {
     QMessageBox::warning(0,"Cannot move TableZ unless in mono", "To prevent you from moving the IPASS table into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
     return;
   }
-  motors[tblz]->goUserPosition( val ? 200.0 : 0); // former In=178 , out =0
+  motors[tblz]->goUserPosition( val ? expanderInPosition : tableOutPosition); // former In=178 , out =0
 }
 
 void Expander::stop() {
@@ -140,9 +144,9 @@ void Expander::UpdateTblInOutStatus() {
   double newInOut = motors[tblz]->getUserPosition();
   if (motors[inOut]->isMoving())
     _tblInBeam = MOVING;
-  else if ( qAbs(newInOut -178.723) <= 0.1) // 1 micron - unsertanty in Z
+  else if ( qAbs(newInOut - tableInPosition) <= 0.1) // 1 micron - unsertanty in Z
     _tblInBeam = INBEAM;
-  else if ( qAbs(newInOut) <= 0.1){
+  else if ( qAbs(newInOut)- tableOutPosition <= 0.1){
     _tblInBeam = OUTBEAM;
   //  warn("_tblInBeam is OUTBEAM", objectName());
   }
@@ -162,11 +166,11 @@ void Expander::UpdateExpInOutStatus(){
     _expInBeam = MOVING;
   //  warn("_expInBeam is MOVING", objectName());
   }
-  else if ( qAbs(newInOut - 176.0) <= 0.1 ){ // 1 micron - unsertanty in Z
+  else if ( qAbs(newInOut - expanderInPosition) <= 0.1 ){ // 1 micron - unsertanty in Z
     _expInBeam = INBEAM;
   //  warn("_expInBeam is INBEAM", objectName());
   }
-  else if ( qAbs(newInOut - 18.0 ) <= 0.1 ){
+  else if ( qAbs(newInOut - expanderOutPosition ) <= 0.1 ){
     _expInBeam = OUTBEAM;
   //  warn("_expInBeam is OUTBEAM", objectName());
   }
