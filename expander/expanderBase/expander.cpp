@@ -114,7 +114,7 @@ void Expander::setTblInBeam(bool val) {
     QMessageBox::warning(0,"Cannot move TableZ unless in mono", "To prevent you from moving the IPASS table into white or mrt beams, this button will not work unless shutter mode is mono. Change mode and repeat or move it manually at your peril. (OUT is 0.)");
     return;
   }
-  motors[tblz]->goUserPosition( val ? expanderInPosition : tableOutPosition); // former In=178 , out =0
+  motors[tblz]->goUserPosition( val ? tableInPosition : tableOutPosition); // former In=178 , out =0
 }
 
 void Expander::stop() {
