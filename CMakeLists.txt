@@ -55,5 +55,8 @@ add_subdirectory(hutch)
 add_subdirectory(valve)
 add_subdirectory(shutterIS/shutterISbase)
 add_subdirectory(shutterIS/shutterISgui)
+add_subdirectory(shutterIAP/shutterIAPbase)
+add_subdirectory(shutterIAP/shutterIAPgui)
+
 
 add_subdirectory(qimbl)

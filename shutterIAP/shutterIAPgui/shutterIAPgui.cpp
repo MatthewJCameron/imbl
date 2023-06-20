@@ -62,7 +62,7 @@ void ShutterIAPgui::updateState() {
   }
   ui->open->setEnabled(true);
   ui->close->setEnabled(true);
-  ui->isLabel->setText( component()->objectName() + ":\n" + component()->description() );
+  //ui->isLabel->setText( component()->objectName() + ":\n" + component()->description() );
 }
 
 

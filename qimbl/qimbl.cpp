@@ -70,6 +70,7 @@ Qimbl::Qimbl(QWidget *parent) :
   filters(new FiltersGui(this)),
   mono(new MonoGui(this)),
   shIS(new ShutterIS(this)),
+  shIAP(new ShutterIAP(this)),
   slidePos(new QEpicsPv("SR08ID01SST21:YTrans")),
   slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV")),
   expander(new ExpanderGui(this))
@@ -148,6 +149,11 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(shIS, SIGNAL(connectionChanged(bool)), SLOT(update_shIS()));
   connect(shIS, SIGNAL(enabledChanged(bool)), SLOT(update_shIS()));
   connect(ui->shISControl, SIGNAL(clicked()), shIS, SLOT(toggle()));
+
+  connect(shIAP, SIGNAL(stateChanged(ShutterIAP::State)), SLOT(update_shIAP()));
+  connect(shIAP, SIGNAL(connectionChanged(bool)), SLOT(update_shIAP()));
+  connect(ui->iapShutterOpenButton, SIGNAL(clicked()), shIAP, SLOT(open()));
+  connect(ui->iapShutterCloseButton, SIGNAL(clicked()), shIAP, SLOT(close()));
 
   connect(ui->shISInOutButton, SIGNAL(clicked()), SLOT(MoveSlideToImagingShutter()));
   connect(ui->shMRTInOutButton, SIGNAL(clicked()), SLOT(MoveSlideToMRTShutter()));
@@ -666,6 +672,34 @@ void Qimbl::update_shIS() {
     // ui->shfeControl->setEnabled(shfe->isEnabled());
     // if ( ! shfe->isEnabled() )
     //  ui->shfeControl->setText("Disabled");
+  }
+}
+
+void Qimbl::update_shIAP() {
+  if ( ! shIAP->isConnected() ) {
+    set_nolink_style(ui->shIndIAP_c);
+    set_nolink_style(ui->shIndIAP_o);
+  } else {
+    switch (shIAP->state()) {
+      case ShutterIAP::CLOSED :
+        ui->shIndIAP_c->setStyleSheet(shInd_c_style);
+        ui->shIndIAP_c->setText(shutter_closed_string);
+        ui->shIndIAP_o->setStyleSheet("");
+        ui->shIndIAP_o->setText("");
+        break;
+      case ShutterIAP::OPENED :
+        ui->shIndIAP_c->setStyleSheet("");
+        ui->shIndIAP_c->setText("");
+        ui->shIndIAP_o->setStyleSheet(shInd_o_style);
+        ui->shIndIAP_o->setText(shutter_open_string);
+        break;
+      case ShutterIAP::BETWEEN :
+        ui->shIndIAP_c->setStyleSheet(shInd_c_style);
+        ui->shIndIAP_c->setText(inprogress_string);
+        ui->shIndIAP_o->setStyleSheet(shInd_c_style);
+        ui->shIndIAP_o->setText(inprogress_string);
+        break;
+    }
   }
 }
 

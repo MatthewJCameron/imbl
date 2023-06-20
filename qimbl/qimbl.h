@@ -6,6 +6,7 @@
 #include "shutterFE.h"
 #include "shutter1A.h"
 #include "shutterIS.h"
+#include "shutterIAP.h"
 #include "mrtShutter.h"
 #include "filtersGui.h"
 #include "monoGui.h"
@@ -56,6 +57,7 @@ private:
   Shutter1A * sh1A;
   Valve * valve1;
   ShutterIS * shIS;
+  ShutterIAP * shIAP;
   FiltersGui * filters;
   MonoGui * mono;
   ExpanderGui * expander;
@@ -75,6 +77,7 @@ private slots:
   void update_shfe();
   void update_sh1A();
   void update_shIS();
+  void update_shIAP();
   void update_shmrt();
   void update_filters();
   void update_mono();

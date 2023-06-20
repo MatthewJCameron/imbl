@@ -3,7 +3,6 @@
 
 #include "component.h"
 #include <qtpv.h>
-#include <QTimer>
 
 class ShutterIAP : public Component {
   Q_OBJECT;
@@ -17,10 +16,6 @@ public:
   };
 
 protected:
-
-  static const int relaxTime;
-  QTimer timer;
-
   State st;
   bool enabled;
 
@@ -42,9 +37,6 @@ public slots:
 signals:
 
   void stateChanged(ShutterIAP::State);
-  void opened();
-  void closed();
-  void between();
 
 protected slots:
 
