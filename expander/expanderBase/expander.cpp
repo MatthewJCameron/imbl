@@ -8,12 +8,12 @@
 const QString Expander::pvBaseName = "SR08ID01EXP01:";
 const QString Expander::pvTableBaseName = "SR08ID01TBL13:";
 const QHash<Expander::Motors,QCaMotor*> Expander::motors=Expander::init_motors();
-const QPair<double,double> Expander::energyRange = qMakePair<double,double>(30.0,39.0);
-const double Expander::theGradient = 0.791; 
-//const double Expander::theGradient = -0.285912891; 
-//const double Expander::theIntercept = 19.90119386;
+const QPair<double,double> Expander::energyRange = qMakePair<double,double>(28.0,39.0);
+//const double Expander::theGradient = 0.791; 
+const double Expander::theGradient = -0.285912891; 
+const double Expander::theIntercept = 19.90119386;
 //const double Expander::theIntercept = 11.46519;
-const double Expander::theIntercept = -14.562;
+//const double Expander::theIntercept = -14.562;
 const double expanderInPosition = 176.0;
 const double expanderOutPosition = 18.0;
 const double tableInPosition = 200.0;

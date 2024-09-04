@@ -985,7 +985,7 @@ void Qimbl::update_slidePos() {
       ui->shMRTInOutButton->setEnabled(true);
       ui->shISInOutButton->setEnabled(true);
       }
-    else if (currentPos < -299.0){
+    else if (currentPos < -273.0){
       ui->shMRTInOutButton->setText("Move OUT");
       ui->shISInOutButton ->setText("Move IN");
       ui->shMRTInOutButton->setEnabled(true);
@@ -1012,8 +1012,8 @@ void Qimbl::MoveSlideToMRTShutter(){
     } 
   else {
     double currentPos = slidePosRBV->get().toDouble();
-    if (currentPos > -299.0){
-      slidePos->set(-300.0);
+    if (currentPos > -273.0){
+      slidePos->set(-274.0);
       ui->shMRTInOutButton->setText("Move OUT");
       }
     else {
