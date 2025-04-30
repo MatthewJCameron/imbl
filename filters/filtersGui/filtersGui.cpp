@@ -467,7 +467,7 @@ void FiltersGui::onGoPressed() {
     return;
     }
 
-  foreach(Paddle* paddle, component()->paddles)    chooseMotorBoxes[paddle->motor()]->setText( paddle->motor()->getDescription() );
+  foreach(Paddle* paddle, component()->paddles) chooseMotorBoxes[paddle->motor()]->setText( paddle->motor()->getDescription() );
   foreach(PaddleGui* paddleUI, paddles) {
     QCaMotor * mot = paddleUI->component()->motor();
     chooseMotorBoxes[mot]->setText( mot->getDescription() );
@@ -491,7 +491,7 @@ void FiltersGui::onGoPressed() {
       selectedWindows[pcur]=-1; 
       // prevents deselected motors from travelling
     else
-      mlist << chooseMotorBoxes[paddles[pcur]->component()->motor() ];
+      mlist << paddles[pcur]->component()->motor() ;
   
   component()->setWindows(selectedWindows);
   updatePlot();
