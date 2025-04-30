@@ -491,7 +491,7 @@ void FiltersGui::onGoPressed() {
       selectedWindows[pcur]=-1; 
       // prevents deselected motors from travelling
     else
-      mlist << chooseMotorBoxes[paddles[pcur]->component()->motor();
+      mlist << chooseMotorBoxes[paddles[pcur]->component()->motor() ];
   
   component()->setWindows(selectedWindows);
   updatePlot();
