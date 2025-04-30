@@ -462,29 +462,48 @@ void FiltersGui::remFilter(){ // should be used only in one spot - search for it
 
 
 void FiltersGui::onGoPressed() {
-
   if (component()->isMoving()) {
     component()->stop(false);
     return;
-  }
+    }
 
-  foreach(Paddle* paddle, component()->paddles)
-    chooseMotorBoxes[paddle->motor()]->setText(paddle->motor()->getDescription());
+  foreach(Paddle* paddle, component()->paddles)    chooseMotorBoxes[paddle->motor()]->setText( paddle->motor()->getDescription() );
   foreach(PaddleGui* paddleUI, paddles) {
     QCaMotor * mot = paddleUI->component()->motor();
-    chooseMotorBoxes[mot]->setText(mot->getDescription());
-    chooseMotorBoxes[mot]->setChecked
-        ( paddleUI->selectedWindow() != paddleUI->component()->window() );
-  }
+    chooseMotorBoxes[mot]->setText( mot->getDescription() );
+    chooseMotorBoxes[mot]->setChecked( paddleUI->selectedWindow() != paddleUI->component()->window() );
+    }
   if ( ! PsswDial::askAddition(chooseMotors) )
     return;
+  
+  //NEW SAFETY FEATURE HERE - CLOSE FE and WAIT UNTIL CLOSED - note if it was open prior or not, reopen if it was once motion is Done
+  ShutterFE::State inst(ShutterFE::stateS() );
+  //#inst 1 for opened, 0 for closed, 2 for between
+  //now force close the shutter and wait for completion
+  if ( ! ShutterFE::setOpenedS(false,true) ) {
+    QMessageBox::warning(this, "Shutter error.","Can't close the FE shutter. Will not move filters. Try to repeat or do it manually.");
+    return;
+    }
 
-  for (int pcur=0; pcur<paddles.size(); pcur++)
-    if( ! chooseMotorBoxes[paddles[pcur]->component()->motor()]->isChecked()  )
-      selectedWindows[pcur]=-1; // prevents deselected motors from travelling
+  QList<QCaMotor*> mlist;
+  for (int pcur=0; pcur<paddles.size(); pcur++) 
+    if( ! chooseMotorBoxes[paddles[pcur]->component()->motor()]->isChecked() )
+      selectedWindows[pcur]=-1; 
+      // prevents deselected motors from travelling
+    else
+      mlist << chooseMotorBoxes[paddles[pcur]->component()->motor();
+  
   component()->setWindows(selectedWindows);
   updatePlot();
 
+  if (mlist.isEmpty() )
+    return;
+  //wait for all motors to cease motion
+  foreach(QCaMotor * mot, mlist) {
+    mot->wait_stop();
+    }
+  //reopen shutter if it was initially opened
+  ShutterFE::setOpenedS(inst == ShutterFE::OPENED);
 }
 
 
