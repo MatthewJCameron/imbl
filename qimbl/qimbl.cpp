@@ -3,6 +3,7 @@
 #include "error.h"
 #include "columnresizer.h"
 #include <stdio.h>
+#include "component.h"
 
 
 
@@ -73,7 +74,8 @@ Qimbl::Qimbl(QWidget *parent) :
   shIAP(new ShutterIAP(this)),
   slidePos(new QEpicsPv("SR08ID01SST21:YTrans")),
   slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV")),
-  expander(new ExpanderGui(this))
+  expander(new ExpanderGui(this)),
+  expertMode(false),
 {
 
   //QEpicsPv::setDebugLevel(1);
@@ -197,6 +199,8 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(this,SIGNAL(_bctTableisIn(bool)), sh1A, SLOT(bctTableisIn(bool)));
   connect(this,SIGNAL(_expanderisIn(bool)), ui->shmrt->component(), SLOT(expanderisIn(bool)));
   connect(this,SIGNAL(_bctTableisIn(bool)), ui->shmrt->component(), SLOT(bctTableisIn(bool)));
+  //expertMode menu item handling
+  connect(ui->actionToggle_Expert_Mode,SIGNAL(clicked()),SLOT(expertModeHandler()))
 
   update_rfstat();
   update_rfcurrent();
@@ -1047,3 +1051,18 @@ void Qimbl::MoveSlideToImagingShutter(){
     Qimbl::update_slidePos();
     }
 }
+
+ void Qimbl::expertModeHandler(){
+  if (expertMode){
+    //currently in expert mode, going to restricted mode - don't need password screen
+    filters->togglePaddlesOneToThree(expertMode);
+    expertMode = false;
+  }
+  else {
+    //currently in restricted mode, going to expert mode - need password correct
+    if ( ! PsswDial::ask() )
+    return;
+    filters->togglePaddlesOneToThree(expertMode);
+    expertMode = true;
+  }
+ }

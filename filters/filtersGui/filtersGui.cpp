@@ -37,7 +37,6 @@ PaddleGui::PaddleGui(Paddle *_pad, QWidget *parent) :
   adjustSize();
   setMinimumSize(frameSize());
   updateConnection(component()->isConnected());
-
 }
 
 PaddleGui::~PaddleGui() {
@@ -527,6 +526,31 @@ void FiltersGui::onAdvancedControl() {
     ui->advanced_pb->setStyleSheet("background-color: rgba(255, 0, 0,64);");
   }
 }
+
+void FiltersGui::togglePaddlesOneToThree(bool inExpertMode){
+  if (inExpertMode){
+    //currently in expert mode, going to Not In expert mode - hide paddles 1-3
+    paddles[0]->buttonGroup->setEnabled(false);
+    paddles[1]->buttonGroup->setEnabled(false);
+    paddles[2]->buttonGroup->setEnabled(false);
+    chooseMotorBoxes[0]->chbk->setChecked(false);
+    chooseMotorBoxes[0]->chbk->setEnabled(false);
+    chooseMotorBoxes[1]->chbk->setChecked(false);
+    chooseMotorBoxes[1]->chbk->setEnabled(false);
+    chooseMotorBoxes[2]->chbk->setChecked(false);
+    chooseMotorBoxes[2]->chbk->setEnabled(false);
+  }
+  else{
+    //not in expert mode, going to expert mode - show paddles 1-3
+    paddles[0]->buttonGroup->setEnabled(true);
+    paddles[1]->buttonGroup->setEnabled(true);
+    paddles[2]->buttonGroup->setEnabled(true);
+    chooseMotorBoxes[0]->chbk->setEnabled(true);
+    chooseMotorBoxes[1]->chbk->setEnabled(true);
+    chooseMotorBoxes[2]->chbk->setEnabled(true);
+  }
+}
+
 
 void FiltersGui::onAutoCalibration() {
 

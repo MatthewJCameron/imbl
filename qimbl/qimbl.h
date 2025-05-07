@@ -61,6 +61,7 @@ private:
   FiltersGui * filters;
   MonoGui * mono;
   ExpanderGui * expander;
+  bool expertMode;
 
 private slots:
 
@@ -86,6 +87,7 @@ private slots:
   void update_slidePos();
   void MoveSlideToMRTShutter();
   void MoveSlideToImagingShutter();
+  void expertModeHandler();
   
 
 };
