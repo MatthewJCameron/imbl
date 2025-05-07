@@ -530,24 +530,24 @@ void FiltersGui::onAdvancedControl() {
 void FiltersGui::togglePaddlesOneToThree(bool inExpertMode){
   if (inExpertMode){
     //currently in expert mode, going to Not In expert mode - hide paddles 1-3
-    paddles[0]->buttonGroup->setEnabled(false);
-    paddles[1]->buttonGroup->setEnabled(false);
-    paddles[2]->buttonGroup->setEnabled(false);
-    chooseMotorBoxes[0]->chbk->setChecked(false);
-    chooseMotorBoxes[0]->chbk->setEnabled(false);
-    chooseMotorBoxes[1]->chbk->setChecked(false);
-    chooseMotorBoxes[1]->chbk->setEnabled(false);
-    chooseMotorBoxes[2]->chbk->setChecked(false);
-    chooseMotorBoxes[2]->chbk->setEnabled(false);
+    paddles[0]->setButtonGroupEnableStatus(false);
+    paddles[1]->setButtonGroupEnableStatus(false);
+    paddles[2]->setButtonGroupEnableStatus(false);
+    chooseMotorBoxes[0]->setChecked(false);
+    chooseMotorBoxes[0]->setEnabled(false);
+    chooseMotorBoxes[1]->setChecked(false);
+    chooseMotorBoxes[1]->setEnabled(false);
+    chooseMotorBoxes[2]->setChecked(false);
+    chooseMotorBoxes[2]->setEnabled(false);
   }
   else{
     //not in expert mode, going to expert mode - show paddles 1-3
-    paddles[0]->buttonGroup->setEnabled(true);
-    paddles[1]->buttonGroup->setEnabled(true);
-    paddles[2]->buttonGroup->setEnabled(true);
-    chooseMotorBoxes[0]->chbk->setEnabled(true);
-    chooseMotorBoxes[1]->chbk->setEnabled(true);
-    chooseMotorBoxes[2]->chbk->setEnabled(true);
+    paddles[0]->setButtonGroupEnableStatus(true);
+    paddles[1]->setButtonGroupEnableStatus(true);
+    paddles[2]->setButtonGroupEnableStatus(true);
+    chooseMotorBoxes[0]->setEnabled(true);
+    chooseMotorBoxes[1]->setEnabled(true);
+    chooseMotorBoxes[2]->setEnabled(true);
   }
 }
 
