@@ -32,7 +32,7 @@ public:
   inline Absorber selectedAbsorber() const { return component()->absorber(selectedWindow()); }
   inline PaddleGui * duplicate(QWidget * parent=0) { return new PaddleGui(component(), parent); }
   inline Paddle * component() const {return static_cast<Paddle*>( ComponentGui::component() );}
-  inline void setButtonGroupEnableStatus(bool thebool) { buttonGroup->setEnabled(thebool); }
+  void setButtonGroupEnableStatus(bool thebool);
 
 public slots:
 

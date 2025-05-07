@@ -91,7 +91,9 @@ void PaddleGui::updateLabel() {
   ui->label->setText(text);
 }
 
-
+void PaddleGui::setButtonGroupEnableStatus(bool thebool) { 
+  buttonGroup->setEnabled(thebool); 
+}
 
 
 
@@ -550,6 +552,7 @@ void FiltersGui::togglePaddlesOneToThree(bool inExpertMode){
     chooseMotorBoxes[2]->setEnabled(true);
   }
 }
+
 
 
 void FiltersGui::onAutoCalibration() {
