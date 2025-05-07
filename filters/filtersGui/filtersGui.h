@@ -74,6 +74,7 @@ private:
 
   explicit FiltersGui(Filters * flt, QWidget *parent = 0);
   void init();
+  void togglePaddlesOneToThree(bool inExpertMode);
 
   QList<int> selectedWindows;
 
@@ -98,7 +99,6 @@ private slots:
   void onAdvancedControl();
   void onAutoCalibration();
   void onSavePlot();
-
 };
 
 
