@@ -1781,6 +1781,9 @@
    <addaction name="menuAdvanced"/>
   </widget>
   <action name="actionToggle_Expert_Mode">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Toggle Expert Mode</string>
    </property>

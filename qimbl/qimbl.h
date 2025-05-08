@@ -62,6 +62,7 @@ private:
   MonoGui * mono;
   ExpanderGui * expander;
   bool expertMode;
+  bool firstTimeGoingToFiltersTab;
 
 private slots:
 

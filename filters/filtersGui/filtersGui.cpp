@@ -91,8 +91,9 @@ void PaddleGui::updateLabel() {
   ui->label->setText(text);
 }
 
-void PaddleGui::setButtonGroupEnableStatus(bool thebool) { 
-  buttonGroup->setEnabled(thebool); 
+void PaddleGui::setButtonGroupEnableStatus(bool thebool) {
+  foreach(QAbstractButton* but, buttonGroup->buttons() )
+    but->setEnabled(thebool);
 }
 
 
@@ -535,21 +536,21 @@ void FiltersGui::togglePaddlesOneToThree(bool inExpertMode){
     paddles[0]->setButtonGroupEnableStatus(false);
     paddles[1]->setButtonGroupEnableStatus(false);
     paddles[2]->setButtonGroupEnableStatus(false);
-    chooseMotorBoxes[0]->setChecked(false);
-    chooseMotorBoxes[0]->setEnabled(false);
-    chooseMotorBoxes[1]->setChecked(false);
-    chooseMotorBoxes[1]->setEnabled(false);
-    chooseMotorBoxes[2]->setChecked(false);
-    chooseMotorBoxes[2]->setEnabled(false);
+    chooseMotorBoxes[paddles[0]->component()->motor()]->setChecked(false);
+    chooseMotorBoxes[paddles[0]->component()->motor()]->setEnabled(false);
+    chooseMotorBoxes[paddles[1]->component()->motor()]->setChecked(false);
+    chooseMotorBoxes[paddles[1]->component()->motor()]->setEnabled(false);
+    chooseMotorBoxes[paddles[2]->component()->motor()]->setChecked(false);
+    chooseMotorBoxes[paddles[2]->component()->motor()]->setEnabled(false);
   }
   else{
     //not in expert mode, going to expert mode - show paddles 1-3
     paddles[0]->setButtonGroupEnableStatus(true);
     paddles[1]->setButtonGroupEnableStatus(true);
     paddles[2]->setButtonGroupEnableStatus(true);
-    chooseMotorBoxes[0]->setEnabled(true);
-    chooseMotorBoxes[1]->setEnabled(true);
-    chooseMotorBoxes[2]->setEnabled(true);
+    chooseMotorBoxes[paddles[0]->component()->motor()]->setEnabled(true);
+    chooseMotorBoxes[paddles[1]->component()->motor()]->setEnabled(true);
+    chooseMotorBoxes[paddles[2]->component()->motor()]->setEnabled(true);
   }
 }
 

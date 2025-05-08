@@ -75,7 +75,6 @@ private:
 
   explicit FiltersGui(Filters * flt, QWidget *parent = 0);
   void init();
-  void togglePaddlesOneToThree(bool inExpertMode);
 
   QList<int> selectedWindows;
 
@@ -83,6 +82,7 @@ public:
   explicit FiltersGui(QWidget *parent = 0);
   ~FiltersGui();
 
+  void togglePaddlesOneToThree(bool inExpertMode);
   inline FiltersGui * duplicate(QWidget * parent=0) { return new FiltersGui(component(), parent); }
   inline Filters * component() const {return static_cast<Filters*>( ComponentGui::component() );}
 

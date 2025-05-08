@@ -75,8 +75,9 @@ Qimbl::Qimbl(QWidget *parent) :
   slidePos(new QEpicsPv("SR08ID01SST21:YTrans")),
   slidePosRBV(new QEpicsPv("SR08ID01SST21:YTrans.RBV")),
   expander(new ExpanderGui(this)),
-  expertMode(false),
-{
+  expertMode(true),
+  firstTimeGoingToFiltersTab(true)
+  {
 
   //QEpicsPv::setDebugLevel(1);
 
@@ -200,7 +201,7 @@ Qimbl::Qimbl(QWidget *parent) :
   connect(this,SIGNAL(_expanderisIn(bool)), ui->shmrt->component(), SLOT(expanderisIn(bool)));
   connect(this,SIGNAL(_bctTableisIn(bool)), ui->shmrt->component(), SLOT(bctTableisIn(bool)));
   //expertMode menu item handling
-  connect(ui->actionToggle_Expert_Mode,SIGNAL(clicked()),SLOT(expertModeHandler()))
+  connect(ui->actionToggle_Expert_Mode,SIGNAL(triggered()),SLOT(expertModeHandler()));
 
   update_rfstat();
   update_rfcurrent();
@@ -218,7 +219,6 @@ Qimbl::Qimbl(QWidget *parent) :
   update_valve_1();
   update_shIS();
   update_expander();
-
 }
 
 
@@ -230,6 +230,10 @@ Qimbl::~Qimbl() {
 void Qimbl::chooseComponent(QAbstractButton* but) {
   if (but == ui->chooseFilters)
     ui->control->setCurrentWidget(filters);
+    if (firstTimeGoingToFiltersTab){
+      expertModeHandler();
+      firstTimeGoingToFiltersTab=false;
+    }
   else if (but == ui->chooseMono)
     ui->control->setCurrentWidget(mono);
   else if (but == ui->chooseShutters)
@@ -1053,16 +1057,22 @@ void Qimbl::MoveSlideToImagingShutter(){
 }
 
  void Qimbl::expertModeHandler(){
+  //std::cout << "expert mode handler. at the start expert mode is: " << expertMode << "." << std::endl;
   if (expertMode){
     //currently in expert mode, going to restricted mode - don't need password screen
+    //std::cout << "disabling paddles 1-3." << std::endl;
     filters->togglePaddlesOneToThree(expertMode);
     expertMode = false;
   }
   else {
     //currently in restricted mode, going to expert mode - need password correct
-    if ( ! PsswDial::ask() )
-    return;
-    filters->togglePaddlesOneToThree(expertMode);
-    expertMode = true;
+    if ( PsswDial::ask() )
+      {
+      //std::cout << "enabling paddles 1-3." << std::endl;
+      filters->togglePaddlesOneToThree(expertMode);
+      expertMode = true;
+      }
   }
+   ui->actionToggle_Expert_Mode->setChecked(expertMode);
+   //std::cout << "At the end expert mode is: " << expertMode << "." << std::endl;
  }
