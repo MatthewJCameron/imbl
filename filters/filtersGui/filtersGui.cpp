@@ -271,18 +271,21 @@ void FiltersGui::init() {
   pen.setWidth(8);
   wb_curve->setPen(pen);
   wb_curve->attach(ui->SpectrumPlot);
+  ui->checkBox->setStyleSheet("QCheckBox::indicator {background-color: rgb(0,0,0);}");
 
   current_curve = new QwtPlotCurve("Current Setup");
   pen = QPen(QColor(170,85,0));
   pen.setWidth(5);
   current_curve->setPen(pen);
   current_curve->attach(ui->SpectrumPlot);
+  ui->checkBox_2->setStyleSheet("QCheckBox::indicator {background-color: rgb(170,85,0);}");
 
   new_curve = new QwtPlotCurve("New Setup");
   pen = QPen(QColor(128,255,255));
   pen.setWidth(2);
   new_curve->setPen(pen);
   new_curve->attach(ui->SpectrumPlot);
+  ui->checkBox_3->setStyleSheet("QCheckBox::indicator {background-color: rgb(128,255,255);}");
 
   ui->SpectrumPlot->replot();
 
